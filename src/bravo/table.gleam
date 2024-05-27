@@ -1,19 +1,19 @@
 import gleam/erlang/atom.{type Atom}
 
-pub type Set {
-  Set(table: Atom, size: Int, keypos: Int, stringed: Bool)
+pub type USet {
+  USet(table: Atom, size: Int, keypos: Int)
 }
 
-pub type OrderedSet {
-  OrderedSet(Atom, Int, Int, Bool)
+pub type OSet {
+  OSet(Atom, Int, Int, Bool)
 }
 
 pub type Bag {
   Bag(Atom, Int, Int, Bool)
 }
 
-pub type DuplicateBag {
-  DuplicateBag(Atom, Int, Int, Bool)
+pub type DBag {
+  DBag(Atom, Int, Int, Bool)
 }
 
 pub type Access {
