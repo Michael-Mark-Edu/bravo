@@ -3,6 +3,7 @@ import bravo/internal/bindings
 import bravo/internal/new_option
 import bravo/object.{type Object}
 import bravo/table.{type Access, type USet}
+import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
 import gleam/list
 import gleam/option.{type Option, None, Some}
@@ -44,7 +45,7 @@ pub fn insert_obj(uset: USet, objects: List(Object(a))) -> Bool {
   |> insert(uset, _)
 }
 
-pub fn lookup(uset: USet, key: a) -> Option(Object(b)) {
+pub fn lookup(uset: USet, key: a) -> Option(Object(Dynamic)) {
   case bindings.try_lookup(uset, key) {
     [res] -> Some(object.new(res))
     _ -> None

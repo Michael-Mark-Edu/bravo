@@ -7,7 +7,6 @@
 -import(bravo@object, [object/1]).
 -import(bravo@table, [table/0]).
 
-% -spec set_insert(Set, Objects) -> {ok, nil} | {error, nil} when Set :: bravo@table:set(), Objects :: [bravo@object:object(term())].
 try_insert(Table, Objects) ->
     {_, Name, Size, _} = Table,
     case lists:all(fun(Elem) -> tuple_size(Elem) >= Size end, Objects) of

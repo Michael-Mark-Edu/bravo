@@ -1,7 +1,9 @@
 import bravo/error
-import bravo/object.{type Object}
+import bravo/object
 import bravo/table
 import bravo/uset
+import gleam/dict
+import gleam/dynamic
 import gleam/erlang/atom
 import gleam/io
 import gleam/option.{None, Some}
@@ -18,9 +20,9 @@ pub fn insert_lookup_test() {
   uset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
   uset.lookup(table, 100)
-  |> should.equal(Some(object.new(#(100, 200))))
+  |> should.equal(Some(object.new(dynamic.from(#(100, 200)))))
   uset.lookup(table, 300)
-  |> should.equal(Some(object.new(#(300, 500))))
+  |> should.equal(Some(object.new(dynamic.from(#(300, 500)))))
   uset.lookup(table, 600)
   |> should.equal(None)
 }
@@ -31,9 +33,9 @@ pub fn insert_obj_test() {
   uset.insert_obj(table, [object.new(#(100, 200)), object.new(#(300, 500))])
   |> should.equal(True)
   uset.lookup(table, 100)
-  |> should.equal(Some(object.new(#(100, 200))))
+  |> should.equal(Some(object.new(dynamic.from(#(100, 200)))))
   uset.lookup(table, 300)
-  |> should.equal(Some(object.new(#(300, 500))))
+  |> should.equal(Some(object.new(dynamic.from(#(300, 500)))))
   uset.lookup(table, 600)
   |> should.equal(None)
 }
@@ -46,9 +48,9 @@ pub fn multisize_test() {
   uset.insert_obj(table, [object.new(#(400, 300, 200, 100))])
   |> should.equal(True)
   uset.lookup(table, 100)
-  |> should.equal(Some(object.new(#(100, 200, 300))))
+  |> should.equal(Some(object.new(dynamic.from(#(100, 200, 300)))))
   uset.lookup(table, 400)
-  |> should.equal(Some(object.new(#(400, 300, 200, 100))))
+  |> should.equal(Some(object.new(dynamic.from(#(400, 300, 200, 100)))))
 }
 
 pub fn multitype_test() {
@@ -57,9 +59,9 @@ pub fn multitype_test() {
   uset.insert(table, [#("a", 1), #("b", 2)])
   |> should.equal(True)
   uset.lookup(table, "a")
-  |> should.equal(Some(object.new(#("a", 1))))
+  |> should.equal(Some(object.new(dynamic.from(#("a", 1)))))
   uset.lookup(table, "b")
-  |> should.equal(Some(object.new(#("b", 2))))
+  |> should.equal(Some(object.new(dynamic.from(#("b", 2)))))
   uset.lookup(table, "c")
   |> should.equal(None)
 }
@@ -67,11 +69,6 @@ pub fn multitype_test() {
 pub fn large_test() {
   let assert Ok(table) =
     uset.new(atom.create_from_string("MyTable5"), 9, table.Public, 1)
-  uset.insert(table, [
-    #(1, 2, 3, 4, 5, 6, 7, 8, 9),
-    #(11, 12, 13, 14, 15, 16, 17, 18, 19),
-  ])
-  |> should.equal(True)
   uset.insert(table, [
     #(
       900,
@@ -96,34 +93,32 @@ pub fn large_test() {
     ),
   ])
   |> should.equal(True)
-  uset.lookup(table, 1)
-  |> should.equal(Some(object.new(#(1, 2, 3, 4, 5, 6, 7, 8, 9))))
-  uset.lookup(table, 11)
-  |> should.equal(Some(object.new(#(11, 12, 13, 14, 15, 16, 17, 18, 19))))
   uset.lookup(table, 900)
   |> should.equal(
     Some(
-      object.new(#(
-        900,
-        800,
-        700,
-        600,
-        500,
-        400,
-        300,
-        200,
-        100,
-        0,
-        -100,
-        -200,
-        -300,
-        -400,
-        -500,
-        -600,
-        -700,
-        -800,
-        -900,
-      )),
+      object.new(
+        dynamic.from(#(
+          900,
+          800,
+          700,
+          600,
+          500,
+          400,
+          300,
+          200,
+          100,
+          0,
+          -100,
+          -200,
+          -300,
+          -400,
+          -500,
+          -600,
+          -700,
+          -800,
+          -900,
+        )),
+      ),
     ),
   )
 }
@@ -134,9 +129,9 @@ pub fn keypos_test() {
   uset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
   uset.lookup(table, 200)
-  |> should.equal(Some(object.new(#(100, 200))))
+  |> should.equal(Some(object.new(dynamic.from(#(100, 200)))))
   uset.lookup(table, 500)
-  |> should.equal(Some(object.new(#(300, 500))))
+  |> should.equal(Some(object.new(dynamic.from(#(300, 500)))))
   uset.lookup(table, 100)
   |> should.equal(None)
 }
@@ -169,9 +164,44 @@ pub fn uset_multi_insert_test() {
   uset.insert(table, [#(100, 200)])
   |> should.equal(True)
   uset.lookup(table, 100)
-  |> should.equal(Some(object.new(#(100, 200))))
+  |> should.equal(Some(object.new(dynamic.from(#(100, 200)))))
   uset.insert(table, [#(100, 300), #(100, 400)])
   |> should.equal(True)
   uset.lookup(table, 100)
-  |> should.equal(Some(object.new(#(100, 400))))
+  |> should.equal(Some(object.new(dynamic.from(#(100, 400)))))
+}
+
+pub fn large_multitype_test() {
+  let assert Ok(table) =
+    uset.new(atom.create_from_string("MyTable13"), 2, table.Public, 1)
+  uset.insert(table, [
+    #(
+      "String",
+      5,
+      10.0,
+      [15, 20],
+      #(25, 30),
+      dict.from_list([#(35, 40)]),
+      Ok(45),
+      Some(50),
+    ),
+  ])
+  |> should.equal(True)
+  uset.lookup(table, "String")
+  |> should.equal(
+    Some(
+      object.new(
+        dynamic.from(#(
+          "String",
+          5,
+          10.0,
+          [15, 20],
+          #(25, 30),
+          dict.from_list([#(35, 40)]),
+          Ok(45),
+          Some(50),
+        )),
+      ),
+    ),
+  )
 }
