@@ -39,6 +39,9 @@ pub fn new(
           },
           new_option.NamedTable,
           new_option.Keypos(keypos),
+          new_option.WriteConcurrency(new_option.Auto),
+          new_option.ReadConcurrency(True),
+          new_option.DecentralizedCounters(True),
         ])
       {
         Error(e) -> Error(Some(e))

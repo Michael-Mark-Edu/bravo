@@ -11,14 +11,14 @@ pub type NewOption {
   NamedTable
   Keypos(Int)
   Heir(Pid, Term)
-  Tweaks(Tweak)
-}
-
-pub type Tweak {
-  WriteConcurrency(Bool)
+  WriteConcurrency(Auto)
   ReadConcurrency(Bool)
   DecentralizedCounters(Bool)
   Compressed
 }
 
 pub type Pid
+
+pub type Auto {
+  Auto
+}
