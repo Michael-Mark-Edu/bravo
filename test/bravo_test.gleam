@@ -205,3 +205,11 @@ pub fn large_multitype_test() {
     ),
   )
 }
+
+pub fn delete_test() {
+  let assert Ok(table) =
+    uset.new(atom.create_from_string("MyTable14"), 2, table.Public, 1)
+  uset.delete(table)
+  let assert Ok(_table) =
+    uset.new(atom.create_from_string("MyTable14"), 2, table.Public, 1)
+}

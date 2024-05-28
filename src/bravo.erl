@@ -3,6 +3,7 @@
 -export([try_insert/2]).
 -export([try_new/2]).
 -export([try_lookup/2]).
+-export([try_delete/1]).
 
 -import(bravo@object, [object/1]).
 -import(bravo@table, [table/0]).
@@ -24,3 +25,10 @@ try_lookup(Table, Key) ->
     {_, Name, _, _} = Table,
     ets:lookup(Name, Key).
 
+
+try_delete(Table) ->
+    {_, Name, _, _} = Table,
+    case (catch ets:delete(Name)) of
+        {'EXIT', _} -> false;
+        _ -> true
+    end.

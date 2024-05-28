@@ -88,3 +88,7 @@ pub fn lookup(uset: USet, key: a) -> Option(Object(Dynamic)) {
     _ -> None
   }
 }
+
+pub fn delete(uset: USet) -> Bool {
+  bindings.uset_delete(uset)
+}

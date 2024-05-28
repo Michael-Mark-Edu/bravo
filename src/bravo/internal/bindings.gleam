@@ -12,6 +12,9 @@ pub fn uset_insert(set: USet, list: List(a)) -> Bool
 @external(erlang, "bravo", "try_lookup")
 pub fn try_lookup(set: USet, key: a) -> List(b)
 
+@external(erlang, "bravo", "try_delete")
+pub fn uset_delete(uset: USet) -> Bool
+
 @external(erlang, "erlang", "tuple_size")
 pub fn tuple_size(tuple: a) -> Int
 
