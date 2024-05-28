@@ -20,16 +20,16 @@ pub opaque type OSet {
   OSet(table: Atom, keypos: Int)
 }
 
-/// Creates a new ETS table configured as a set: keys may only occur once per table, and objects are unordered.
+/// Creates a new ETS table configured as an ordered set: keys may only occur once per table, and objects are ordered (this comes at a performance cost).
 ///
-/// `name`: An atom representing the name of the `USet`. There may only be one ETS table associated with an atom.
+/// `name`: An atom representing the name of the `OSet`. There may only be one ETS table associated with an atom.
 /// `keypos`: The index (1-indexed) that represents the key position of the object. This function fails if this is less than 1.
 /// `access`: Determines how visible the table is to other processes.
-/// - `Public`: Any process can read or write to the `USet`.
-/// - `Protected`: Any process can read the `USet`. Only the owner process can write to it.
-/// - `Private`: Only the parent process can read or write to the `USet`.
+/// - `Public`: Any process can read or write to the `OSet`.
+/// - `Protected`: Any process can read the `OSet`. Only the owner process can write to it.
+/// - `Private`: Only the parent process can read or write to the `OSet`.
 ///
-/// Returns a result of the created `USet`, which can be used by other functions in this module.
+/// Returns a result of the created `OSet`, which can be used by other functions in this module.
 /// If this function errors with `None`, then you likely put in an illegal `keypos` value.
 /// Otherwise, something went wrong in the FFI layer and an error occured in Erlang land.
 ///
@@ -59,11 +59,11 @@ pub fn new(
   Ok(OSet(a, keypos))
 }
 
-/// Inserts a list of tuples into a `USet`.
+/// Inserts a list of tuples into a `OSet`.
 ///
 /// Returns a `Bool` representing if the inserting succeeded. 
 /// - If `True`, all objects in the list were inserted.
-/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the size of the tuple is less than the `USet`'s size.
+/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the size of the tuple is less than the `OSet`'s size.
 ///
 /// If an `Object` with the same key already exists, then the old `Object` will be overwritten with the new one.
 ///
@@ -71,11 +71,11 @@ pub fn insert(oset: OSet, objects: List(a)) -> Bool {
   bindings.try_insert(oset.table, oset.keypos, objects)
 }
 
-/// Inserts a list of `Object`s into a `USet`. It is recommended to use `insert` instead when possible, as this uses that function under the hood.
+/// Inserts a list of `Object`s into a `OSet`. It is recommended to use `insert` instead when possible, as this uses that function under the hood.
 ///
 /// Returns a `Bool` representing if the inserting succeeded. 
 /// - If `True`, all objects in the list were inserted.
-/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the size of the tuple is less than the `USet`'s size.
+/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the size of the tuple is less than the `OSet`'s size.
 ///
 /// If an `Object` with the same key already exists, then the old `Object` will be overwritten with the new one.
 ///
@@ -84,11 +84,11 @@ pub fn insert_obj(oset: OSet, objects: List(Object(a))) -> Bool {
   |> insert(oset, _)
 }
 
-/// Gets an `Object` from a `USet`.
+/// Gets an `Object` from a `OSet`.
 ///
 /// Returns an `Option` containing the object, if it exists.
 /// - If `Some`, then the object was found. ETS tables do not store types, so you must decode a `Dynamic` inside the `Object`.
-/// - If `None`, then the `USet` did not contain any `Object` with the specified `key`.
+/// - If `None`, then the `OSet` did not contain any `Object` with the specified `key`.
 ///
 pub fn lookup(oset: OSet, key: a) -> Option(Object(Dynamic)) {
   case bindings.try_lookup(oset.table, key) {
@@ -97,7 +97,7 @@ pub fn lookup(oset: OSet, key: a) -> Option(Object(Dynamic)) {
   }
 }
 
-/// Deletes a `USet`.
+/// Deletes a `OSet`.
 ///
 /// Table lifetime is static, and memory is only freed when the owner process is killed! Don't forget to call this function!
 ///
