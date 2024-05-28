@@ -5,9 +5,6 @@
 -export([try_lookup/2]).
 -export([try_delete/1]).
 
--import(bravo@object, [object/1]).
--import(bravo@table, [table/0]).
-
 try_insert(Name, Keypos, Objects) ->
     case lists:all(fun(Elem) -> tuple_size(Elem) >= Keypos end, Objects) of
         true -> ets:insert(Name, Objects);
