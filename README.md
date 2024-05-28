@@ -28,7 +28,7 @@ pub fn main() {
   // Create a new ETS table. There are multiple options, but here we are using
   // a USet (an alias for "set" in Erlang terms)
   let assert Ok(table) =
-    uset.new(atom.create_from_string("MyTable"), 2, table.Public, 1)
+    uset.new(atom.create_from_string("MyTable"), 1, table.Public)
   // We can then insert tuples into this table
   uset.insert(table, [#("Hello", "world!")])
   // Then we can lookup the object from the table
