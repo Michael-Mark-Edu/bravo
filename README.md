@@ -25,7 +25,8 @@ import gleam/io
 import gleam/option.{Some}
 
 pub fn main() {
-  // Create a new ETS table. There are multiple options, but here we are using a USet (an alias for "set" in Erlang terms)
+  // Create a new ETS table. There are multiple options, but here we are using
+  // a USet (an alias for "set" in Erlang terms)
   let assert Ok(table) =
     uset.new(atom.create_from_string("MyTable"), 2, table.Public, 1)
   // We can then insert tuples into this table
@@ -37,7 +38,8 @@ pub fn main() {
     |> object.extract
     |> dynamic.tuple2(dynamic.string, dynamic.string)
   io.print(tuple.0 <> ", " <> tuple.1) // "Hello, world!"
-  // ETS tables have static lifetimes, so don't forget to delete them when you're done!
+  // ETS tables have static lifetimes,
+  // so don't forget to delete them when you're done!
   uset.delete(table)
 }
 ```
