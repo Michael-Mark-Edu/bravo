@@ -37,6 +37,8 @@ pub fn main() {
     |> object.extract
     |> dynamic.tuple2(dynamic.string, dynamic.string)
   io.print(tuple.0 <> ", " <> tuple.1) // "Hello, world!"
+  // ETS tables have static lifetimes, so don't forget to delete them when you're done!
+  uset.delete(table)
 }
 ```
 
