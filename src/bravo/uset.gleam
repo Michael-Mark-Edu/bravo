@@ -88,6 +88,10 @@ pub fn lookup(uset: USet, key: a) -> Option(Object(Dynamic)) {
   }
 }
 
+/// Deletes a `USet`.
+///
+/// Table lifetime is static, and memory is only freed when the owner process is killed! Don't forget to call this function!
+///
 pub fn delete(uset: USet) -> Bool {
   bindings.uset_delete(uset)
 }
