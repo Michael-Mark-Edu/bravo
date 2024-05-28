@@ -3,10 +3,12 @@ import bravo/internal/bindings
 import bravo/internal/new_option
 import bravo/object.{type Object}
 import bravo/table.{type Access, type USet}
+import gleam/bool
 import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
 import gleam/list
 import gleam/option.{type Option, None, Some}
+import gleam/result
 
 /// Creates a new ETS table configured as a set: keys may only occur once per table, and objects are unordered.
 ///
@@ -19,6 +21,8 @@ import gleam/option.{type Option, None, Some}
 /// `keypos`: The index (1-indexed) that represents the key of the object. This function fails if this is greater than `size`.
 ///
 /// Returns a result of the created `USet`, which can be used by other functions in this module.
+/// If this function errors with `None`, then you likely put in an illegal combination of parameters.
+/// Otherwise, something went wrong in the FFI layer and an error occured in Erlang land.
 ///
 pub fn new(
   name: Atom,
@@ -26,29 +30,24 @@ pub fn new(
   access: Access,
   keypos: Int,
 ) -> Result(USet, Option(ErlangError)) {
-  case keypos > size || size < 2 {
-    True -> Error(None)
-    False -> {
-      case
-        bindings.new(name, [
-          new_option.Set,
-          case access {
-            table.Public -> new_option.Public
-            table.Protected -> new_option.Protected
-            table.Private -> new_option.Private
-          },
-          new_option.NamedTable,
-          new_option.Keypos(keypos),
-          new_option.WriteConcurrency(new_option.Auto),
-          new_option.ReadConcurrency(True),
-          new_option.DecentralizedCounters(True),
-        ])
-      {
-        Error(e) -> Error(Some(e))
-        Ok(a) -> Ok(table.USet(a, size, keypos))
-      }
-    }
-  }
+  use <- bool.guard(keypos > size || size < 2, Error(None))
+  use a <- result.try(
+    bindings.new(name, [
+      new_option.Set,
+      case access {
+        table.Public -> new_option.Public
+        table.Protected -> new_option.Protected
+        table.Private -> new_option.Private
+      },
+      new_option.NamedTable,
+      new_option.Keypos(keypos),
+      new_option.WriteConcurrency(new_option.Auto),
+      new_option.ReadConcurrency(True),
+      new_option.DecentralizedCounters(True),
+    ])
+    |> result.map_error(fn(e) { Some(e) }),
+  )
+  Ok(table.USet(a, size, keypos))
 }
 
 /// Inserts a list of tuples into a `USet`.
