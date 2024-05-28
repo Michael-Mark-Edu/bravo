@@ -16,7 +16,7 @@ import gleam/result
 ///
 /// In order for a lookup match to occur, entries must _coerce into the same value_. Two values may match even if they have different types.
 ///
-pub type OSet {
+pub opaque type OSet {
   OSet(table: Atom, keypos: Int)
 }
 

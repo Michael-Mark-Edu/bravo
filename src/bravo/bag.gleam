@@ -14,7 +14,7 @@ import gleam/result
 
 /// A bag table. Keys may occur multiple times per table, but objects cannot be copied verbatim.
 ///
-pub type Bag {
+pub opaque type Bag {
   Bag(table: Atom, keypos: Int)
 }
 

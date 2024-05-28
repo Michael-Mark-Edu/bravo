@@ -16,7 +16,7 @@ import gleam/result
 ///
 /// In order for a lookup match to occur, entries must have the same value _and type_.
 ///
-pub type USet {
+pub opaque type USet {
   USet(table: Atom, keypos: Int)
 }
 

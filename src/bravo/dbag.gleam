@@ -14,7 +14,7 @@ import gleam/result
 
 /// A duplicate bag etc. Keys may occur multiple times per table, and verbatim copies of an object can be stored.
 ///
-pub type DBag {
+pub opaque type DBag {
   DBag(table: Atom, keypos: Int)
 }
 
