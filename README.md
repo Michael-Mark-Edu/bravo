@@ -1,10 +1,13 @@
 # bravo
-### v0.0.0
+### v1.0.0
 
 [![Package Version](https://img.shields.io/hexpm/v/bravo)](https://hex.pm/packages/bravo)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/bravo/)
 
 ~~Comprehensive~~ Very much incomplete (for now) ETS bindings for Gleam.
+
+This library is still in heavy development! Expect frequent breaking changes (this is indicated
+when the first number of the version increases).
 
 This library is only compatible with the Erlang target!
 
