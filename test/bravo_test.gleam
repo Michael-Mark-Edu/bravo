@@ -4,8 +4,6 @@ import bravo/table
 import bravo/uset
 import gleam/dict
 import gleam/dynamic
-import gleam/erlang/atom
-import gleam/io
 import gleam/option.{None, Some}
 import gleeunit
 import gleeunit/should
@@ -14,9 +12,15 @@ pub fn main() {
   gleeunit.main()
 }
 
+fn defer(defer: fn() -> a, block: fn() -> b) -> b {
+  let b = block()
+  defer()
+  b
+}
+
 pub fn insert_lookup_delete_test() {
-  let assert Ok(table) =
-    uset.new(atom.create_from_string("MyTable"), 2, table.Public, 1)
+  let assert Ok(table) = uset.new("MyTable", 1, table.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
   uset.lookup(table, 100)
@@ -25,13 +29,11 @@ pub fn insert_lookup_delete_test() {
   |> should.equal(Some(object.new(dynamic.from(#(300, 500)))))
   uset.lookup(table, 600)
   |> should.equal(None)
-  uset.delete(table)
-  |> should.equal(True)
 }
 
 pub fn insert_obj_test() {
-  let assert Ok(table) =
-    uset.new(atom.create_from_string("MyTable"), 2, table.Public, 1)
+  let assert Ok(table) = uset.new("MyTable", 1, table.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert_obj(table, [object.new(#(100, 200)), object.new(#(300, 500))])
   |> should.equal(True)
   uset.lookup(table, 100)
@@ -40,13 +42,11 @@ pub fn insert_obj_test() {
   |> should.equal(Some(object.new(dynamic.from(#(300, 500)))))
   uset.lookup(table, 600)
   |> should.equal(None)
-  uset.delete(table)
-  |> should.equal(True)
 }
 
 pub fn multisize_test() {
-  let assert Ok(table) =
-    uset.new(atom.create_from_string("MyTable"), 3, table.Public, 1)
+  let assert Ok(table) = uset.new("MyTable", 1, table.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(100, 200, 300)])
   |> should.equal(True)
   uset.insert_obj(table, [object.new(#(400, 300, 200, 100))])
@@ -55,13 +55,11 @@ pub fn multisize_test() {
   |> should.equal(Some(object.new(dynamic.from(#(100, 200, 300)))))
   uset.lookup(table, 400)
   |> should.equal(Some(object.new(dynamic.from(#(400, 300, 200, 100)))))
-  uset.delete(table)
-  |> should.equal(True)
 }
 
 pub fn multitype_test() {
-  let assert Ok(table) =
-    uset.new(atom.create_from_string("MyTable"), 2, table.Public, 1)
+  let assert Ok(table) = uset.new("MyTable", 1, table.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#("a", 1), #("b", 2)])
   |> should.equal(True)
   uset.lookup(table, "a")
@@ -70,13 +68,11 @@ pub fn multitype_test() {
   |> should.equal(Some(object.new(dynamic.from(#("b", 2)))))
   uset.lookup(table, "c")
   |> should.equal(None)
-  uset.delete(table)
-  |> should.equal(True)
 }
 
 pub fn large_test() {
-  let assert Ok(table) =
-    uset.new(atom.create_from_string("MyTable"), 9, table.Public, 1)
+  let assert Ok(table) = uset.new("MyTable", 1, table.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [
     #(
       900,
@@ -129,13 +125,11 @@ pub fn large_test() {
       ),
     ),
   )
-  uset.delete(table)
-  |> should.equal(True)
 }
 
 pub fn keypos_test() {
-  let assert Ok(table) =
-    uset.new(atom.create_from_string("MyTable"), 2, table.Public, 2)
+  let assert Ok(table) = uset.new("MyTable", 2, table.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
   uset.lookup(table, 200)
@@ -144,39 +138,27 @@ pub fn keypos_test() {
   |> should.equal(Some(object.new(dynamic.from(#(300, 500)))))
   uset.lookup(table, 100)
   |> should.equal(None)
-  uset.delete(table)
-  |> should.equal(True)
 }
 
 pub fn bad_new_test() {
-  uset.new(atom.create_from_string("table1"), 1, table.Public, 1)
-  |> should.equal(Error(None))
-  uset.new(atom.create_from_string("table2"), 2, table.Public, 3)
-  |> should.equal(Error(None))
-  uset.new(atom.create_from_string("table()"), 2, table.Public, 3)
-  |> should.equal(Error(None))
-  let assert Ok(table) =
-    uset.new(atom.create_from_string("table3"), 2, table.Public, 1)
-  uset.new(atom.create_from_string("table3"), 2, table.Public, 1)
+  let assert Ok(table) = uset.new("table", 1, table.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.new("table", 1, table.Public)
   |> should.equal(Error(Some(error.Badarg)))
-  uset.delete(table)
-  |> should.equal(True)
 }
 
 pub fn bad_insert_test() {
-  let assert Ok(table) =
-    uset.new(atom.create_from_string("MyTable"), 3, table.Public, 1)
+  let assert Ok(table) = uset.new("MyTable", 3, table.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#("a", 1)])
   |> should.equal(False)
   uset.insert(table, [#(300, 400, 500)])
   |> should.equal(True)
-  uset.delete(table)
-  |> should.equal(True)
 }
 
 pub fn uset_multi_insert_test() {
-  let assert Ok(table) =
-    uset.new(atom.create_from_string("MyTable"), 2, table.Public, 1)
+  let assert Ok(table) = uset.new("MyTable", 1, table.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(100, 200)])
   |> should.equal(True)
   uset.lookup(table, 100)
@@ -185,13 +167,11 @@ pub fn uset_multi_insert_test() {
   |> should.equal(True)
   uset.lookup(table, 100)
   |> should.equal(Some(object.new(dynamic.from(#(100, 400)))))
-  uset.delete(table)
-  |> should.equal(True)
 }
 
 pub fn large_multitype_test() {
-  let assert Ok(table) =
-    uset.new(atom.create_from_string("MyTable"), 8, table.Public, 1)
+  let assert Ok(table) = uset.new("MyTable", 1, table.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [
     #(
       "String",
@@ -222,17 +202,13 @@ pub fn large_multitype_test() {
       ),
     ),
   )
-  uset.delete(table)
-  |> should.equal(True)
 }
 
 pub fn delete_test() {
-  let assert Ok(table) =
-    uset.new(atom.create_from_string("MyTable"), 2, table.Public, 1)
+  let assert Ok(table) = uset.new("MyTable", 1, table.Public)
   uset.delete(table)
   |> should.equal(True)
-  let assert Ok(table) =
-    uset.new(atom.create_from_string("MyTable"), 2, table.Public, 1)
+  let assert Ok(table) = uset.new("MyTable", 1, table.Public)
   uset.delete(table)
   |> should.equal(True)
   uset.delete(table)

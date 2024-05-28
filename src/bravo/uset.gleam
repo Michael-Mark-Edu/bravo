@@ -5,7 +5,7 @@ import bravo/object.{type Object}
 import bravo/table.{type Access, type USet}
 import gleam/bool
 import gleam/dynamic.{type Dynamic}
-import gleam/erlang/atom.{type Atom}
+import gleam/erlang/atom
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
@@ -13,26 +13,25 @@ import gleam/result
 /// Creates a new ETS table configured as a set: keys may only occur once per table, and objects are unordered.
 ///
 /// `name`: An atom representing the name of the `USet`. There may only be one ETS table associated with an atom.
-/// `size`: The _minimum_ size of an object in the `USet`. Attempting to insert an object less than this will fail. Must be at least 2.
+/// `keypos`: The index (1-indexed) that represents the key position of the object. This function fails if this is less than 1.
 /// `access`: Determines how visible the table is to other processes.
 /// - `Public`: Any process can read or write to the `USet`.
 /// - `Protected`: Any process can read the `USet`. Only the owner process can write to it.
 /// - `Private`: Only the parent process can read or write to the `USet`.
-/// `keypos`: The index (1-indexed) that represents the key of the object. This function fails if this is greater than `size`.
 ///
 /// Returns a result of the created `USet`, which can be used by other functions in this module.
-/// If this function errors with `None`, then you likely put in an illegal combination of parameters.
+/// If this function errors with `None`, then you likely put in an illegal `keypos` value.
 /// Otherwise, something went wrong in the FFI layer and an error occured in Erlang land.
 ///
 pub fn new(
-  name: Atom,
-  size: Int,
-  access: Access,
+  name: String,
   keypos: Int,
+  access: Access,
 ) -> Result(USet, Option(ErlangError)) {
-  use <- bool.guard(keypos > size || size < 2, Error(None))
+  let atom = atom.create_from_string(name)
+  use <- bool.guard(keypos < 1, Error(None))
   use a <- result.try(
-    bindings.new(name, [
+    bindings.new(atom, [
       new_option.Set,
       case access {
         table.Public -> new_option.Public
@@ -47,7 +46,7 @@ pub fn new(
     ])
     |> result.map_error(fn(e) { Some(e) }),
   )
-  Ok(table.USet(a, size, keypos))
+  Ok(table.USet(a, keypos))
 }
 
 /// Inserts a list of tuples into a `USet`.

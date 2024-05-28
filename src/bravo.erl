@@ -9,8 +9,8 @@
 -import(bravo@table, [table/0]).
 
 try_insert(Table, Objects) ->
-    {_, Name, Size, _} = Table,
-    case lists:all(fun(Elem) -> tuple_size(Elem) >= Size end, Objects) of
+    {_, Name, Keypos} = Table,
+    case lists:all(fun(Elem) -> tuple_size(Elem) >= Keypos end, Objects) of
         true -> ets:insert(Name, Objects);
         false -> false
     end.
@@ -22,12 +22,12 @@ try_new(Name, Options) ->
     end.
 
 try_lookup(Table, Key) ->
-    {_, Name, _, _} = Table,
+    {_, Name, _} = Table,
     ets:lookup(Name, Key).
 
 
 try_delete(Table) ->
-    {_, Name, _, _} = Table,
+    {_, Name, _} = Table,
     case (catch ets:delete(Name)) of
         {'EXIT', _} -> false;
         _ -> true
