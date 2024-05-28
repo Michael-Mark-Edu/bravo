@@ -58,6 +58,7 @@ pub fn new(
 /// - If `False`, _none_ of the objects in the list were inserted. This may occur if the size of the tuple is less than the `USet`'s size.
 ///
 /// If an `Object` with the same key already exists, then the old `Object` will be overwritten with the new one.
+///
 pub fn insert(uset: USet, objects: List(a)) -> Bool {
   bindings.uset_insert(uset, objects)
 }
@@ -69,6 +70,7 @@ pub fn insert(uset: USet, objects: List(a)) -> Bool {
 /// - If `False`, _none_ of the objects in the list were inserted. This may occur if the size of the tuple is less than the `USet`'s size.
 ///
 /// If an `Object` with the same key already exists, then the old `Object` will be overwritten with the new one.
+///
 pub fn insert_obj(uset: USet, objects: List(Object(a))) -> Bool {
   list.map(objects, object.extract)
   |> insert(uset, _)
