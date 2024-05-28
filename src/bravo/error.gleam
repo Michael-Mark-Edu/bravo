@@ -1,3 +1,5 @@
+//// This module provides error types specific to Bravo. Currently, this only includes `ErlangError`
+
 import bravo/etc.{type Term}
 
 /// Represents any of Erlang's runtime errors. These errors are often vague and unclear.

@@ -1,3 +1,5 @@
+//// This module provides functions to work with `Bag`s
+
 import bravo/error.{type ErlangError}
 import bravo/internal/bindings
 import bravo/internal/new_option

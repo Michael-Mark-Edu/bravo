@@ -1,3 +1,5 @@
+//// This module provides the `Object` type and functions that use it. `Object`s are essential to accessing any ETS table.
+
 import bravo/internal/bindings
 import gleam/dynamic.{type Dynamic}
 import gleam/option.{type Option, None, Some}
