@@ -141,7 +141,7 @@ pub fn bad_new_test() {
   |> should.equal(Error(None))
   uset.new(atom.create_from_string("MyTable8"), 2, table.Public, 3)
   |> should.equal(Error(None))
-  uset.new(atom.create_from_string("MyTable9"), 10, table.Public, 1)
+  uset.new(atom.create_from_string("table()"), 2, table.Public, 3)
   |> should.equal(Error(None))
   uset.new(atom.create_from_string("MyTable10"), 2, table.Public, 1)
   |> should.equal(Ok(table.USet(atom.create_from_string("MyTable10"), 2, 1)))
@@ -173,7 +173,7 @@ pub fn uset_multi_insert_test() {
 
 pub fn large_multitype_test() {
   let assert Ok(table) =
-    uset.new(atom.create_from_string("MyTable13"), 2, table.Public, 1)
+    uset.new(atom.create_from_string("MyTable13"), 8, table.Public, 1)
   uset.insert(table, [
     #(
       "String",
