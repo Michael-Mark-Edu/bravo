@@ -1,16 +1,22 @@
 //// This module provides functions to work with `Bag`s
 
 import bravo/error.{type ErlangError}
+import bravo/etc.{type Access}
 import bravo/internal/bindings
 import bravo/internal/new_option
 import bravo/object.{type Object}
-import bravo/table.{type Access, type Bag}
 import gleam/bool
 import gleam/dynamic.{type Dynamic}
-import gleam/erlang/atom
+import gleam/erlang/atom.{type Atom}
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
+
+/// A bag table. Keys may occur multiple times per table, but objects cannot be copied verbatim.
+///
+pub type Bag {
+  Bag(table: Atom, keypos: Int)
+}
 
 /// Creates a new ETS table configured as a set: keys may only occur once per table, and objects are unordered.
 ///
@@ -36,9 +42,9 @@ pub fn new(
     bindings.new(atom, [
       new_option.Bag,
       case access {
-        table.Public -> new_option.Public
-        table.Protected -> new_option.Protected
-        table.Private -> new_option.Private
+        etc.Public -> new_option.Public
+        etc.Protected -> new_option.Protected
+        etc.Private -> new_option.Private
       },
       new_option.NamedTable,
       new_option.Keypos(keypos),
@@ -48,7 +54,7 @@ pub fn new(
     ])
     |> result.map_error(fn(e) { Some(e) }),
   )
-  Ok(table.Bag(a, keypos))
+  Ok(Bag(a, keypos))
 }
 
 /// Inserts a list of tuples into a `USet`.

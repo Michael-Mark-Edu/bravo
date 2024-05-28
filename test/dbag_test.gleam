@@ -1,7 +1,7 @@
 import bravo/dbag
 import bravo/error
+import bravo/etc
 import bravo/object
-import bravo/table
 import gleam/dict
 import gleam/dynamic
 import gleam/option.{Some}
@@ -14,7 +14,7 @@ fn defer(defer: fn() -> a, block: fn() -> b) -> b {
 }
 
 pub fn dbag_insert_lookup_delete_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, table.Public)
+  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
@@ -27,7 +27,7 @@ pub fn dbag_insert_lookup_delete_test() {
 }
 
 pub fn dbag_insert_obj_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, table.Public)
+  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert_obj(table, [object.new(#(100, 200)), object.new(#(300, 500))])
   |> should.equal(True)
@@ -40,7 +40,7 @@ pub fn dbag_insert_obj_test() {
 }
 
 pub fn dbag_multisize_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, table.Public)
+  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#(100, 200, 300)])
   |> should.equal(True)
@@ -53,7 +53,7 @@ pub fn dbag_multisize_test() {
 }
 
 pub fn dbag_multitype_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, table.Public)
+  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#("a", 1), #("b", 2)])
   |> should.equal(True)
@@ -66,7 +66,7 @@ pub fn dbag_multitype_test() {
 }
 
 pub fn dbag_large_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, table.Public)
+  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [
     #(
@@ -121,7 +121,7 @@ pub fn dbag_large_test() {
 }
 
 pub fn dbag_keypos_test() {
-  let assert Ok(table) = dbag.new("MyTable", 2, table.Public)
+  let assert Ok(table) = dbag.new("MyTable", 2, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
@@ -134,14 +134,14 @@ pub fn dbag_keypos_test() {
 }
 
 pub fn dbag_bad_new_test() {
-  let assert Ok(table) = dbag.new("table", 1, table.Public)
+  let assert Ok(table) = dbag.new("table", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
-  dbag.new("table", 1, table.Public)
+  dbag.new("table", 1, etc.Public)
   |> should.equal(Error(Some(error.Badarg)))
 }
 
 pub fn dbag_bad_insert_test() {
-  let assert Ok(table) = dbag.new("MyTable", 3, table.Public)
+  let assert Ok(table) = dbag.new("MyTable", 3, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#("a", 1)])
   |> should.equal(False)
@@ -150,7 +150,7 @@ pub fn dbag_bad_insert_test() {
 }
 
 pub fn dbag_multi_insert_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, table.Public)
+  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#(100, 200)])
   |> should.equal(True)
@@ -168,7 +168,7 @@ pub fn dbag_multi_insert_test() {
 }
 
 pub fn dbag_large_multitype_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, table.Public)
+  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [
     #(
@@ -201,10 +201,10 @@ pub fn dbag_large_multitype_test() {
 }
 
 pub fn dbag_delete_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, table.Public)
+  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
   dbag.delete(table)
   |> should.equal(True)
-  let assert Ok(table) = dbag.new("MyTable", 1, table.Public)
+  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
   dbag.delete(table)
   |> should.equal(True)
   dbag.delete(table)
@@ -212,7 +212,7 @@ pub fn dbag_delete_test() {
 }
 
 pub fn dbag_singleton_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, table.Public)
+  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#(1), #(2)])
   |> should.equal(True)
