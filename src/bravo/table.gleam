@@ -13,19 +13,19 @@ pub type USet {
 /// In order for a lookup match to occur, entries must _coerce into the same value_. Two values may match even if they have different types.
 ///
 pub type OSet {
-  OSet(Atom, Int, Bool)
+  OSet(table: Atom, keypos: Int)
 }
 
 /// A bag table. Keys may occur multiple times per table, but objects cannot be copied verbatim.
 ///
 pub type Bag {
-  Bag(Atom, Int, Bool)
+  Bag(table: Atom, keypos: Int)
 }
 
 /// A duplicate bag table. Keys may occur multiple times per table, and verbatim copies of an object can be stored.
 ///
 pub type DBag {
-  DBag(Atom, Int, Bool)
+  DBag(table: Atom, keypos: Int)
 }
 
 /// Access specifiers for ETS tables. Affects how other processes can interact with the table.

@@ -1,6 +1,6 @@
 -module(bravo).
 
--export([try_insert/2]).
+-export([try_insert/3]).
 -export([try_new/2]).
 -export([try_lookup/2]).
 -export([try_delete/1]).
@@ -8,8 +8,7 @@
 -import(bravo@object, [object/1]).
 -import(bravo@table, [table/0]).
 
-try_insert(Table, Objects) ->
-    {_, Name, Keypos} = Table,
+try_insert(Name, Keypos, Objects) ->
     case lists:all(fun(Elem) -> tuple_size(Elem) >= Keypos end, Objects) of
         true -> ets:insert(Name, Objects);
         false -> false
@@ -21,13 +20,11 @@ try_new(Name, Options) ->
         Other -> {ok, Other}
     end.
 
-try_lookup(Table, Key) ->
-    {_, Name, _} = Table,
+try_lookup(Name, Key) ->
     ets:lookup(Name, Key).
 
 
-try_delete(Table) ->
-    {_, Name, _} = Table,
+try_delete(Name) ->
     case (catch ets:delete(Name)) of
         {'EXIT', _} -> false;
         _ -> true
