@@ -88,3 +88,10 @@ pub fn delete_key(dbag: DBag(t), key: a) -> Nil {
   bindings.try_delete_key(dbag.table, key)
   Nil
 }
+
+/// Deletes all objects in the `DBag`. This is atomic and isolated.
+///
+pub fn delete_all_objects(dbag: DBag(t)) -> Nil {
+  bindings.try_delete_all_objects(dbag.table)
+  Nil
+}

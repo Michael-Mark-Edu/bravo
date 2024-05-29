@@ -5,6 +5,7 @@
 -export([try_lookup/2]).
 -export([try_delete/1]).
 -export([try_delete_key/2]).
+-export([try_delete_all_objects/1]).
 
 try_insert(Name, Keypos, Objects) ->
     Condition = case is_tuple(lists:nth(1, Objects)) of
@@ -53,3 +54,6 @@ try_delete(Name) ->
 
 try_delete_key(Name, Key) ->
     ets:delete(Name, Key).
+
+try_delete_all_objects(Name) ->
+    ets:delete_all_objects(Name).

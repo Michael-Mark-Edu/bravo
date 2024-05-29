@@ -233,3 +233,15 @@ pub fn bag_delete_key_test() {
   bag.lookup(table, "Hello")
   |> should.equal([#("Hello", "World")])
 }
+
+pub fn bag_delete_all_objects_test() {
+  let assert Ok(table) = bag.new("bag15", 1, etc.Public)
+  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  bag.insert(table, [#("Hello", "World"), #("Bye", "World"), #("Bye", "Bye")])
+  |> should.equal(True)
+  bag.delete_all_objects(table)
+  bag.lookup(table, "Hello")
+  |> should.equal([])
+  bag.lookup(table, "Bye")
+  |> should.equal([])
+}

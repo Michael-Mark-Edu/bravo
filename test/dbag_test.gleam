@@ -233,3 +233,15 @@ pub fn dbag_delete_key_test() {
   dbag.lookup(table, "Hello")
   |> should.equal([#("Hello", "World")])
 }
+
+pub fn dbag_delete_all_objects_test() {
+  let assert Ok(table) = dbag.new("dbag15", 1, etc.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  dbag.insert(table, [#("Hello", "World"), #("Bye", "World"), #("Bye", "Bye")])
+  |> should.equal(True)
+  dbag.delete_all_objects(table)
+  dbag.lookup(table, "Hello")
+  |> should.equal([])
+  dbag.lookup(table, "Bye")
+  |> should.equal([])
+}

@@ -93,3 +93,10 @@ pub fn delete_key(uset: USet(t), key: a) -> Nil {
   bindings.try_delete_key(uset.table, key)
   Nil
 }
+
+/// Deletes all objects in the `USet`. This is atomic and isolated.
+///
+pub fn delete_all_objects(uset: USet(t)) -> Nil {
+  bindings.try_delete_all_objects(uset.table)
+  Nil
+}

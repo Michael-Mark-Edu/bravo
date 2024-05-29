@@ -93,3 +93,10 @@ pub fn delete_key(oset: OSet(t), key: a) -> Nil {
   bindings.try_delete_key(oset.table, key)
   Nil
 }
+
+/// Deletes all objects in the `OSet`. This is atomic and isolated.
+///
+pub fn delete_all_objects(oset: OSet(t)) -> Nil {
+  bindings.try_delete_all_objects(oset.table)
+  Nil
+}
