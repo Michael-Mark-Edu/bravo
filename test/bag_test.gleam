@@ -219,3 +219,17 @@ pub fn bag_nontuple_multirecord_test() {
   bag.lookup(table, C)
   |> should.equal([C])
 }
+
+pub fn bag_delete_key_test() {
+  let assert Ok(table) = bag.new("bag14", 1, etc.Public)
+  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  bag.insert(table, [#("Hello", "World"), #("Bye", "World"), #("Bye", "Bye")])
+  |> should.equal(True)
+  bag.lookup(table, "Bye")
+  |> should.equal([#("Bye", "World"), #("Bye", "Bye")])
+  bag.delete_key(table, "Bye")
+  bag.lookup(table, "Bye")
+  |> should.equal([])
+  bag.lookup(table, "Hello")
+  |> should.equal([#("Hello", "World")])
+}

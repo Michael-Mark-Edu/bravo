@@ -81,3 +81,10 @@ pub fn lookup(bag: Bag(t), key: a) -> List(t) {
 pub fn delete(bag: Bag(t)) -> Bool {
   bindings.try_delete(bag.table)
 }
+
+/// Deletes all objects addressed by `key`, if any exist. If nothing does, this does nothing.
+///
+pub fn delete_key(bag: Bag(t), key: a) -> Nil {
+  bindings.try_delete_key(bag.table, key)
+  Nil
+}

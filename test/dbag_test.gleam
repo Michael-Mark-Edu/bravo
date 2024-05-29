@@ -219,3 +219,17 @@ pub fn dbag_nontuple_multirecord_test() {
   dbag.lookup(table, C)
   |> should.equal([C])
 }
+
+pub fn dbag_delete_key_test() {
+  let assert Ok(table) = dbag.new("dbag14", 1, etc.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  dbag.insert(table, [#("Hello", "World"), #("Bye", "World"), #("Bye", "Bye")])
+  |> should.equal(True)
+  dbag.lookup(table, "Bye")
+  |> should.equal([#("Bye", "World"), #("Bye", "Bye")])
+  dbag.delete_key(table, "Bye")
+  dbag.lookup(table, "Bye")
+  |> should.equal([])
+  dbag.lookup(table, "Hello")
+  |> should.equal([#("Hello", "World")])
+}

@@ -219,3 +219,17 @@ pub fn oset_nontuple_multirecord_test() {
   oset.lookup(table, C)
   |> should.equal(Some(C))
 }
+
+pub fn oset_delete_key_test() {
+  let assert Ok(table) = oset.new("oset14", 1, etc.Public)
+  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  oset.insert(table, [#("Hello", "World"), #("Bye", "World")])
+  |> should.equal(True)
+  oset.lookup(table, "Bye")
+  |> should.equal(Some(#("Bye", "World")))
+  oset.delete_key(table, "Bye")
+  oset.lookup(table, "Bye")
+  |> should.equal(None)
+  oset.lookup(table, "Hello")
+  |> should.equal(Some(#("Hello", "World")))
+}

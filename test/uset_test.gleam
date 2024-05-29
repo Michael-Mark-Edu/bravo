@@ -219,3 +219,17 @@ pub fn uset_nontuple_multirecord_test() {
   uset.lookup(table, C)
   |> should.equal(Some(C))
 }
+
+pub fn uset_delete_key_test() {
+  let assert Ok(table) = uset.new("uset14", 1, etc.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, [#("Hello", "World"), #("Bye", "World")])
+  |> should.equal(True)
+  uset.lookup(table, "Bye")
+  |> should.equal(Some(#("Bye", "World")))
+  uset.delete_key(table, "Bye")
+  uset.lookup(table, "Bye")
+  |> should.equal(None)
+  uset.lookup(table, "Hello")
+  |> should.equal(Some(#("Hello", "World")))
+}

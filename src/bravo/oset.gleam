@@ -86,3 +86,10 @@ pub fn lookup(oset: OSet(t), key: a) -> Option(t) {
 pub fn delete(oset: OSet(t)) -> Bool {
   bindings.try_delete(oset.table)
 }
+
+/// Deletes the object addressed by `key`, if it exists. If it doesn't, this does nothing.
+///
+pub fn delete_key(oset: OSet(t), key: a) -> Nil {
+  bindings.try_delete_key(oset.table, key)
+  Nil
+}

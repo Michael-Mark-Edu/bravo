@@ -14,6 +14,9 @@ pub fn try_lookup(table: Atom, key: a) -> List(b)
 @external(erlang, "bravo", "try_delete")
 pub fn try_delete(table: Atom) -> Bool
 
+@external(erlang, "bravo", "try_delete_key")
+pub fn try_delete_key(table: Atom, key: a) -> Bool
+
 @external(erlang, "erlang", "tuple_size")
 pub fn tuple_size(tuple: a) -> Int
 
