@@ -1,9 +1,7 @@
 import bravo/dbag
 import bravo/error
 import bravo/etc
-import bravo/object
 import gleam/dict
-import gleam/dynamic
 import gleam/option.{Some}
 import gleeunit/should
 
@@ -19,37 +17,11 @@ pub fn dbag_insert_lookup_delete_test() {
   dbag.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
   dbag.lookup(table, 100)
-  |> should.equal([object.new(dynamic.from(#(100, 200)))])
+  |> should.equal([#(100, 200)])
   dbag.lookup(table, 300)
-  |> should.equal([object.new(dynamic.from(#(300, 500)))])
+  |> should.equal([#(300, 500)])
   dbag.lookup(table, 600)
   |> should.equal([])
-}
-
-pub fn dbag_insert_obj_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
-  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
-  dbag.insert_obj(table, [object.new(#(100, 200)), object.new(#(300, 500))])
-  |> should.equal(True)
-  dbag.lookup(table, 100)
-  |> should.equal([object.new(dynamic.from(#(100, 200)))])
-  dbag.lookup(table, 300)
-  |> should.equal([object.new(dynamic.from(#(300, 500)))])
-  dbag.lookup(table, 600)
-  |> should.equal([])
-}
-
-pub fn dbag_multisize_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
-  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
-  dbag.insert(table, [#(100, 200, 300)])
-  |> should.equal(True)
-  dbag.insert_obj(table, [object.new(#(400, 300, 200, 100))])
-  |> should.equal(True)
-  dbag.lookup(table, 100)
-  |> should.equal([object.new(dynamic.from(#(100, 200, 300)))])
-  dbag.lookup(table, 400)
-  |> should.equal([object.new(dynamic.from(#(400, 300, 200, 100)))])
 }
 
 pub fn dbag_multitype_test() {
@@ -58,9 +30,9 @@ pub fn dbag_multitype_test() {
   dbag.insert(table, [#("a", 1), #("b", 2)])
   |> should.equal(True)
   dbag.lookup(table, "a")
-  |> should.equal([object.new(dynamic.from(#("a", 1)))])
+  |> should.equal([#("a", 1)])
   dbag.lookup(table, "b")
-  |> should.equal([object.new(dynamic.from(#("b", 2)))])
+  |> should.equal([#("b", 2)])
   dbag.lookup(table, "c")
   |> should.equal([])
 }
@@ -94,28 +66,26 @@ pub fn dbag_large_test() {
   |> should.equal(True)
   dbag.lookup(table, 900)
   |> should.equal([
-    object.new(
-      dynamic.from(#(
-        900,
-        800,
-        700,
-        600,
-        500,
-        400,
-        300,
-        200,
-        100,
-        0,
-        -100,
-        -200,
-        -300,
-        -400,
-        -500,
-        -600,
-        -700,
-        -800,
-        -900,
-      )),
+    #(
+      900,
+      800,
+      700,
+      600,
+      500,
+      400,
+      300,
+      200,
+      100,
+      0,
+      -100,
+      -200,
+      -300,
+      -400,
+      -500,
+      -600,
+      -700,
+      -800,
+      -900,
     ),
   ])
 }
@@ -126,9 +96,9 @@ pub fn dbag_keypos_test() {
   dbag.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
   dbag.lookup(table, 200)
-  |> should.equal([object.new(dynamic.from(#(100, 200)))])
+  |> should.equal([#(100, 200)])
   dbag.lookup(table, 500)
-  |> should.equal([object.new(dynamic.from(#(300, 500)))])
+  |> should.equal([#(300, 500)])
   dbag.lookup(table, 100)
   |> should.equal([])
 }
@@ -145,8 +115,6 @@ pub fn dbag_bad_insert_test() {
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#("a", 1)])
   |> should.equal(False)
-  dbag.insert(table, [#(300, 400, 500)])
-  |> should.equal(True)
 }
 
 pub fn dbag_multi_insert_test() {
@@ -155,16 +123,11 @@ pub fn dbag_multi_insert_test() {
   dbag.insert(table, [#(100, 200)])
   |> should.equal(True)
   dbag.lookup(table, 100)
-  |> should.equal([object.new(dynamic.from(#(100, 200)))])
+  |> should.equal([#(100, 200)])
   dbag.insert(table, [#(100, 300), #(100, 400), #(100, 400)])
   |> should.equal(True)
   dbag.lookup(table, 100)
-  |> should.equal([
-    object.new(dynamic.from(#(100, 200))),
-    object.new(dynamic.from(#(100, 300))),
-    object.new(dynamic.from(#(100, 400))),
-    object.new(dynamic.from(#(100, 400))),
-  ])
+  |> should.equal([#(100, 200), #(100, 300), #(100, 400), #(100, 400)])
 }
 
 pub fn dbag_large_multitype_test() {
@@ -185,17 +148,15 @@ pub fn dbag_large_multitype_test() {
   |> should.equal(True)
   dbag.lookup(table, "String")
   |> should.equal([
-    object.new(
-      dynamic.from(#(
-        "String",
-        5,
-        10.0,
-        [15, 20],
-        #(25, 30),
-        dict.from_list([#(35, 40)]),
-        Ok(45),
-        Some(50),
-      )),
+    #(
+      "String",
+      5,
+      10.0,
+      [15, 20],
+      #(25, 30),
+      dict.from_list([#(35, 40)]),
+      Ok(45),
+      Some(50),
     ),
   ])
 }
@@ -217,7 +178,44 @@ pub fn dbag_singleton_test() {
   dbag.insert(table, [#(1), #(2)])
   |> should.equal(True)
   dbag.lookup(table, 1)
-  |> should.equal([object.new(dynamic.from(#(1)))])
+  |> should.equal([#(1)])
   dbag.lookup(table, 2)
-  |> should.equal([object.new(dynamic.from(#(2)))])
+  |> should.equal([#(2)])
+}
+
+pub fn dbag_nontuple_test() {
+  let assert Ok(table) = dbag.new("MyTable2", 1, etc.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  dbag.insert(table, [5])
+  |> should.equal(True)
+  dbag.lookup(table, 5)
+  |> should.equal([5])
+}
+
+pub fn dbag_nontuple_record_test() {
+  let assert Ok(table) = dbag.new("MyTable1", 1, etc.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  dbag.insert(table, [Ok(5)])
+  |> should.equal(True)
+  dbag.lookup(table, Ok(5))
+  |> should.equal([Ok(5)])
+}
+
+type Multirecord {
+  A(Int)
+  B(Int, Int)
+  C
+}
+
+pub fn dbag_nontuple_multirecord_test() {
+  let assert Ok(table) = dbag.new("dbag", 1, etc.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  dbag.insert(table, [A(1), B(2, 3), C])
+  |> should.equal(True)
+  dbag.lookup(table, A(1))
+  |> should.equal([A(1)])
+  dbag.lookup(table, B(2, 3))
+  |> should.equal([B(2, 3)])
+  dbag.lookup(table, C)
+  |> should.equal([C])
 }

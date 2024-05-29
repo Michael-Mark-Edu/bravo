@@ -4,11 +4,8 @@ import bravo/error.{type ErlangError}
 import bravo/etc.{type Access}
 import bravo/internal/bindings
 import bravo/internal/new_option
-import bravo/object.{type Object}
 import gleam/bool
-import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
-import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
 
@@ -16,7 +13,7 @@ import gleam/result
 ///
 /// In order for a lookup match to occur, entries must _coerce into the same value_. Two values may match even if they have different types.
 ///
-pub opaque type OSet {
+pub opaque type OSet(t) {
   OSet(table: Atom, keypos: Int)
 }
 
@@ -37,7 +34,7 @@ pub fn new(
   name: String,
   keypos: Int,
   access: Access,
-) -> Result(OSet, Option(ErlangError)) {
+) -> Result(OSet(t), Option(ErlangError)) {
   let atom = atom.create_from_string(name)
   use <- bool.guard(keypos < 1, Error(None))
   use a <- result.try(
@@ -67,21 +64,8 @@ pub fn new(
 ///
 /// If an `Object` with the same key already exists, then the old `Object` will be overwritten with the new one.
 ///
-pub fn insert(oset: OSet, objects: List(a)) -> Bool {
+pub fn insert(oset: OSet(t), objects: List(t)) -> Bool {
   bindings.try_insert(oset.table, oset.keypos, objects)
-}
-
-/// Inserts a list of `Object`s into a `OSet`. It is recommended to use `insert` instead when possible, as this uses that function under the hood.
-///
-/// Returns a `Bool` representing if the inserting succeeded. 
-/// - If `True`, all objects in the list were inserted.
-/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the size of the tuple is less than the `OSet`'s size.
-///
-/// If an `Object` with the same key already exists, then the old `Object` will be overwritten with the new one.
-///
-pub fn insert_obj(oset: OSet, objects: List(Object(a))) -> Bool {
-  list.map(objects, object.extract)
-  |> insert(oset, _)
 }
 
 /// Gets an `Object` from a `OSet`.
@@ -90,9 +74,9 @@ pub fn insert_obj(oset: OSet, objects: List(Object(a))) -> Bool {
 /// - If `Some`, then the object was found. ETS tables do not store types, so you must decode a `Dynamic` inside the `Object`.
 /// - If `None`, then the `OSet` did not contain any `Object` with the specified `key`.
 ///
-pub fn lookup(oset: OSet, key: a) -> Option(Object(Dynamic)) {
+pub fn lookup(oset: OSet(t), key: a) -> Option(t) {
   case bindings.try_lookup(oset.table, key) {
-    [res] -> Some(object.new(res))
+    [res] -> Some(res)
     _ -> None
   }
 }
@@ -101,6 +85,6 @@ pub fn lookup(oset: OSet, key: a) -> Option(Object(Dynamic)) {
 ///
 /// Table lifetime is static, and memory is only freed when the owner process is killed! Don't forget to call this function!
 ///
-pub fn delete(oset: OSet) -> Bool {
+pub fn delete(oset: OSet(t)) -> Bool {
   bindings.try_delete(oset.table)
 }

@@ -4,17 +4,14 @@ import bravo/error.{type ErlangError}
 import bravo/etc.{type Access}
 import bravo/internal/bindings
 import bravo/internal/new_option
-import bravo/object.{type Object}
 import gleam/bool
-import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
-import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
 
 /// A bag table. Keys may occur multiple times per table, but objects cannot be copied verbatim.
 ///
-pub opaque type Bag {
+pub opaque type Bag(t) {
   Bag(table: Atom, keypos: Int)
 }
 
@@ -35,7 +32,7 @@ pub fn new(
   name: String,
   keypos: Int,
   access: Access,
-) -> Result(Bag, Option(ErlangError)) {
+) -> Result(Bag(t), Option(ErlangError)) {
   let atom = atom.create_from_string(name)
   use <- bool.guard(keypos < 1, Error(None))
   use a <- result.try(
@@ -65,36 +62,22 @@ pub fn new(
 ///
 /// If an `Object` with the same key already exists, then the old `Object` will be overwritten with the new one.
 ///
-pub fn insert(bag: Bag, objects: List(a)) -> Bool {
+pub fn insert(bag: Bag(t), objects: List(t)) -> Bool {
   bindings.try_insert(bag.table, bag.keypos, objects)
-}
-
-/// Inserts a list of `Object`s into a `Bag`. It is recommended to use `insert` instead when possible, as this uses that function under the hood.
-///
-/// Returns a `Bool` representing if the inserting succeeded. 
-/// - If `True`, all objects in the list were inserted.
-/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the size of the tuple is less than the `Bag`'s size.
-///
-/// If an `Object` with the same key already exists, then the old `Object` will be overwritten with the new one.
-///
-pub fn insert_obj(bag: Bag, objects: List(Object(a))) -> Bool {
-  list.map(objects, object.extract)
-  |> insert(bag, _)
 }
 
 /// Gets a list of `Object`s from a `Bag`.
 ///
 /// - If the list isn't empty, then at least one object was found. ETS tables do not store types, so you must decode a `Dynamic` inside the `Object`.
 /// - If the list is empty, then the `Bag` did not contain any `Object` with the specified `key`.
-pub fn lookup(bag: Bag, key: a) -> List(Object(Dynamic)) {
+pub fn lookup(bag: Bag(t), key: a) -> List(t) {
   bindings.try_lookup(bag.table, key)
-  |> list.map(fn(raw) { object.new(raw) })
 }
 
 /// Deletes a `Bag`.
 ///
 /// Table lifetime is static, and memory is only freed when the owner process is killed! Don't forget to call this function!
 ///
-pub fn delete(bag: Bag) -> Bool {
+pub fn delete(bag: Bag(t)) -> Bool {
   bindings.try_delete(bag.table)
 }

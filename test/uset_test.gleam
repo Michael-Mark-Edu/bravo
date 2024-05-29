@@ -1,9 +1,7 @@
 import bravo/error
 import bravo/etc
-import bravo/object
 import bravo/uset
 import gleam/dict
-import gleam/dynamic
 import gleam/option.{None, Some}
 import gleeunit/should
 
@@ -19,37 +17,11 @@ pub fn uset_insert_lookup_delete_test() {
   uset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
   uset.lookup(table, 100)
-  |> should.equal(Some(object.new(dynamic.from(#(100, 200)))))
+  |> should.equal(Some(#(100, 200)))
   uset.lookup(table, 300)
-  |> should.equal(Some(object.new(dynamic.from(#(300, 500)))))
+  |> should.equal(Some(#(300, 500)))
   uset.lookup(table, 600)
   |> should.equal(None)
-}
-
-pub fn uset_insert_obj_test() {
-  let assert Ok(table) = uset.new("MyTable", 1, etc.Public)
-  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-  uset.insert_obj(table, [object.new(#(100, 200)), object.new(#(300, 500))])
-  |> should.equal(True)
-  uset.lookup(table, 100)
-  |> should.equal(Some(object.new(dynamic.from(#(100, 200)))))
-  uset.lookup(table, 300)
-  |> should.equal(Some(object.new(dynamic.from(#(300, 500)))))
-  uset.lookup(table, 600)
-  |> should.equal(None)
-}
-
-pub fn uset_multisize_test() {
-  let assert Ok(table) = uset.new("MyTable", 1, etc.Public)
-  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-  uset.insert(table, [#(100, 200, 300)])
-  |> should.equal(True)
-  uset.insert_obj(table, [object.new(#(400, 300, 200, 100))])
-  |> should.equal(True)
-  uset.lookup(table, 100)
-  |> should.equal(Some(object.new(dynamic.from(#(100, 200, 300)))))
-  uset.lookup(table, 400)
-  |> should.equal(Some(object.new(dynamic.from(#(400, 300, 200, 100)))))
 }
 
 pub fn uset_multitype_test() {
@@ -58,9 +30,9 @@ pub fn uset_multitype_test() {
   uset.insert(table, [#("a", 1), #("b", 2)])
   |> should.equal(True)
   uset.lookup(table, "a")
-  |> should.equal(Some(object.new(dynamic.from(#("a", 1)))))
+  |> should.equal(Some(#("a", 1)))
   uset.lookup(table, "b")
-  |> should.equal(Some(object.new(dynamic.from(#("b", 2)))))
+  |> should.equal(Some(#("b", 2)))
   uset.lookup(table, "c")
   |> should.equal(None)
 }
@@ -94,31 +66,27 @@ pub fn uset_large_test() {
   |> should.equal(True)
   uset.lookup(table, 900)
   |> should.equal(
-    Some(
-      object.new(
-        dynamic.from(#(
-          900,
-          800,
-          700,
-          600,
-          500,
-          400,
-          300,
-          200,
-          100,
-          0,
-          -100,
-          -200,
-          -300,
-          -400,
-          -500,
-          -600,
-          -700,
-          -800,
-          -900,
-        )),
-      ),
-    ),
+    Some(#(
+      900,
+      800,
+      700,
+      600,
+      500,
+      400,
+      300,
+      200,
+      100,
+      0,
+      -100,
+      -200,
+      -300,
+      -400,
+      -500,
+      -600,
+      -700,
+      -800,
+      -900,
+    )),
   )
 }
 
@@ -128,9 +96,9 @@ pub fn uset_keypos_test() {
   uset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
   uset.lookup(table, 200)
-  |> should.equal(Some(object.new(dynamic.from(#(100, 200)))))
+  |> should.equal(Some(#(100, 200)))
   uset.lookup(table, 500)
-  |> should.equal(Some(object.new(dynamic.from(#(300, 500)))))
+  |> should.equal(Some(#(300, 500)))
   uset.lookup(table, 100)
   |> should.equal(None)
 }
@@ -147,8 +115,6 @@ pub fn uset_bad_insert_test() {
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#("a", 1)])
   |> should.equal(False)
-  uset.insert(table, [#(300, 400, 500)])
-  |> should.equal(True)
 }
 
 pub fn uset_multi_insert_test() {
@@ -157,11 +123,11 @@ pub fn uset_multi_insert_test() {
   uset.insert(table, [#(100, 200)])
   |> should.equal(True)
   uset.lookup(table, 100)
-  |> should.equal(Some(object.new(dynamic.from(#(100, 200)))))
+  |> should.equal(Some(#(100, 200)))
   uset.insert(table, [#(100, 300), #(100, 400)])
   |> should.equal(True)
   uset.lookup(table, 100)
-  |> should.equal(Some(object.new(dynamic.from(#(100, 400)))))
+  |> should.equal(Some(#(100, 400)))
 }
 
 pub fn uset_large_multitype_test() {
@@ -182,20 +148,16 @@ pub fn uset_large_multitype_test() {
   |> should.equal(True)
   uset.lookup(table, "String")
   |> should.equal(
-    Some(
-      object.new(
-        dynamic.from(#(
-          "String",
-          5,
-          10.0,
-          [15, 20],
-          #(25, 30),
-          dict.from_list([#(35, 40)]),
-          Ok(45),
-          Some(50),
-        )),
-      ),
-    ),
+    Some(#(
+      "String",
+      5,
+      10.0,
+      [15, 20],
+      #(25, 30),
+      dict.from_list([#(35, 40)]),
+      Ok(45),
+      Some(50),
+    )),
   )
 }
 
@@ -216,7 +178,44 @@ pub fn uset_singleton_test() {
   uset.insert(table, [#(1), #(2)])
   |> should.equal(True)
   uset.lookup(table, 1)
-  |> should.equal(Some(object.new(dynamic.from(#(1)))))
+  |> should.equal(Some(#(1)))
   uset.lookup(table, 2)
-  |> should.equal(Some(object.new(dynamic.from(#(2)))))
+  |> should.equal(Some(#(2)))
+}
+
+pub fn uset_nontuple_test() {
+  let assert Ok(table) = uset.new("MyTable2", 1, etc.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, [5])
+  |> should.equal(True)
+  uset.lookup(table, 5)
+  |> should.equal(Some(5))
+}
+
+pub fn uset_nontuple_record_test() {
+  let assert Ok(table) = uset.new("MyTable1", 1, etc.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, [Ok(5)])
+  |> should.equal(True)
+  uset.lookup(table, Ok(5))
+  |> should.equal(Some(Ok(5)))
+}
+
+type Multirecord {
+  A(Int)
+  B(Int, Int)
+  C
+}
+
+pub fn uset_nontuple_multirecord_test() {
+  let assert Ok(table) = uset.new("uset", 1, etc.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, [A(1), B(2, 3), C])
+  |> should.equal(True)
+  uset.lookup(table, A(1))
+  |> should.equal(Some(A(1)))
+  uset.lookup(table, B(2, 3))
+  |> should.equal(Some(B(2, 3)))
+  uset.lookup(table, C)
+  |> should.equal(Some(C))
 }
