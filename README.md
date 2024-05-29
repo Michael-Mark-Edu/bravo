@@ -1,5 +1,5 @@
 # bravo
-### v2.0.0
+### v2.1.0
 
 [![Package Version](https://img.shields.io/hexpm/v/bravo)](https://hex.pm/packages/bravo)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/bravo/)

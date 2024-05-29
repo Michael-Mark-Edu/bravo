@@ -1,3 +1,7 @@
+# v2.1.0
+- Added `delete_key` to all tables
+- Added `delete_all_objects` to all tables
+
 # v2.0.0
 This is a breaking update!
 
