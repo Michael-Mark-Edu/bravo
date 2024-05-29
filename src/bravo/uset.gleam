@@ -100,3 +100,10 @@ pub fn delete_all_objects(uset: USet(t)) -> Nil {
   bindings.try_delete_all_objects(uset.table)
   Nil
 }
+
+/// Deletes a specific object in the `USet`. This is more useful in `Bag`s and `DBag`s.
+///
+pub fn delete_object(uset: USet(t), object: t) -> Nil {
+  bindings.try_delete_object(uset.table, object)
+  Nil
+}

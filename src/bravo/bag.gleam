@@ -95,3 +95,10 @@ pub fn delete_all_objects(bag: Bag(t)) -> Nil {
   bindings.try_delete_all_objects(bag.table)
   Nil
 }
+
+/// Deletes a specific object in the `Bag`. Other objects with the same key are unaffected.
+///
+pub fn delete_object(bag: Bag(t), object: t) -> Nil {
+  bindings.try_delete_object(bag.table, object)
+  Nil
+}

@@ -95,3 +95,12 @@ pub fn delete_all_objects(dbag: DBag(t)) -> Nil {
   bindings.try_delete_all_objects(dbag.table)
   Nil
 }
+
+/// Deletes a specific object in the `DBag`. Other objects with the same key are unaffected.
+///
+/// If there are multiple of the same object, then they will all be deleted.
+///
+pub fn delete_object(dbag: DBag(t), object: t) -> Nil {
+  bindings.try_delete_object(dbag.table, object)
+  Nil
+}

@@ -245,3 +245,15 @@ pub fn uset_delete_all_objects_test() {
   uset.lookup(table, "Bye")
   |> should.equal(None)
 }
+
+pub fn uset_delete_object_test() {
+  let assert Ok(table) = uset.new("uset16", 1, etc.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, [#("Hello", "World"), #("Bye", "World")])
+  |> should.equal(True)
+  uset.delete_object(table, #("Bye", "World"))
+  uset.lookup(table, "Hello")
+  |> should.equal(Some(#("Hello", "World")))
+  uset.lookup(table, "Bye")
+  |> should.equal(None)
+}

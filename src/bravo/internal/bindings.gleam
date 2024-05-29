@@ -20,6 +20,9 @@ pub fn try_delete_key(table: Atom, key: a) -> Bool
 @external(erlang, "bravo", "try_delete_all_objects")
 pub fn try_delete_all_objects(table: Atom) -> Bool
 
+@external(erlang, "bravo", "try_delete_object")
+pub fn try_delete_object(table: Atom, object: a) -> Bool
+
 @external(erlang, "erlang", "tuple_size")
 pub fn tuple_size(tuple: a) -> Int
 

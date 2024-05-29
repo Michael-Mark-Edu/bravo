@@ -245,3 +245,15 @@ pub fn oset_delete_all_objects_test() {
   oset.lookup(table, "Bye")
   |> should.equal(None)
 }
+
+pub fn oset_delete_object_test() {
+  let assert Ok(table) = oset.new("oset16", 1, etc.Public)
+  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  oset.insert(table, [#("Hello", "World"), #("Bye", "World")])
+  |> should.equal(True)
+  oset.delete_object(table, #("Bye", "World"))
+  oset.lookup(table, "Hello")
+  |> should.equal(Some(#("Hello", "World")))
+  oset.lookup(table, "Bye")
+  |> should.equal(None)
+}
