@@ -12,7 +12,7 @@ fn defer(defer: fn() -> a, block: fn() -> b) -> b {
 }
 
 pub fn dbag_insert_lookup_delete_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = dbag.new("dbag1", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
@@ -25,7 +25,7 @@ pub fn dbag_insert_lookup_delete_test() {
 }
 
 pub fn dbag_multitype_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = dbag.new("dbag2", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#("a", 1), #("b", 2)])
   |> should.equal(True)
@@ -38,7 +38,7 @@ pub fn dbag_multitype_test() {
 }
 
 pub fn dbag_large_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = dbag.new("dbag3", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [
     #(
@@ -91,7 +91,7 @@ pub fn dbag_large_test() {
 }
 
 pub fn dbag_keypos_test() {
-  let assert Ok(table) = dbag.new("MyTable", 2, etc.Public)
+  let assert Ok(table) = dbag.new("dbag4", 2, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
@@ -104,21 +104,21 @@ pub fn dbag_keypos_test() {
 }
 
 pub fn dbag_bad_new_test() {
-  let assert Ok(table) = dbag.new("table", 1, etc.Public)
+  let assert Ok(table) = dbag.new("dbag5", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
-  dbag.new("table", 1, etc.Public)
+  dbag.new("dbag5", 1, etc.Public)
   |> should.equal(Error(Some(error.Badarg)))
 }
 
 pub fn dbag_bad_insert_test() {
-  let assert Ok(table) = dbag.new("MyTable", 3, etc.Public)
+  let assert Ok(table) = dbag.new("dbag6", 3, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#("a", 1)])
   |> should.equal(False)
 }
 
 pub fn dbag_multi_insert_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = dbag.new("dbag7", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#(100, 200)])
   |> should.equal(True)
@@ -131,7 +131,7 @@ pub fn dbag_multi_insert_test() {
 }
 
 pub fn dbag_large_multitype_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = dbag.new("dbag8", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [
     #(
@@ -162,10 +162,10 @@ pub fn dbag_large_multitype_test() {
 }
 
 pub fn dbag_delete_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = dbag.new("dbag9", 1, etc.Public)
   dbag.delete(table)
   |> should.equal(True)
-  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = dbag.new("dbag9", 1, etc.Public)
   dbag.delete(table)
   |> should.equal(True)
   dbag.delete(table)
@@ -173,7 +173,7 @@ pub fn dbag_delete_test() {
 }
 
 pub fn dbag_singleton_test() {
-  let assert Ok(table) = dbag.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = dbag.new("dbag10", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [#(1), #(2)])
   |> should.equal(True)
@@ -184,7 +184,7 @@ pub fn dbag_singleton_test() {
 }
 
 pub fn dbag_nontuple_test() {
-  let assert Ok(table) = dbag.new("MyTable2", 1, etc.Public)
+  let assert Ok(table) = dbag.new("dbag11", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [5])
   |> should.equal(True)
@@ -193,7 +193,7 @@ pub fn dbag_nontuple_test() {
 }
 
 pub fn dbag_nontuple_record_test() {
-  let assert Ok(table) = dbag.new("MyTable1", 1, etc.Public)
+  let assert Ok(table) = dbag.new("dbag12", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [Ok(5)])
   |> should.equal(True)
@@ -208,7 +208,7 @@ type Multirecord {
 }
 
 pub fn dbag_nontuple_multirecord_test() {
-  let assert Ok(table) = dbag.new("dbag", 1, etc.Public)
+  let assert Ok(table) = dbag.new("dbag14", 1, etc.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [A(1), B(2, 3), C])
   |> should.equal(True)

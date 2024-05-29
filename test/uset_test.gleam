@@ -12,7 +12,7 @@ fn defer(defer: fn() -> a, block: fn() -> b) -> b {
 }
 
 pub fn uset_insert_lookup_delete_test() {
-  let assert Ok(table) = uset.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = uset.new("uset1", 1, etc.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
@@ -25,7 +25,7 @@ pub fn uset_insert_lookup_delete_test() {
 }
 
 pub fn uset_multitype_test() {
-  let assert Ok(table) = uset.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = uset.new("uset2", 1, etc.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#("a", 1), #("b", 2)])
   |> should.equal(True)
@@ -38,7 +38,7 @@ pub fn uset_multitype_test() {
 }
 
 pub fn uset_large_test() {
-  let assert Ok(table) = uset.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = uset.new("uset3", 1, etc.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [
     #(
@@ -91,7 +91,7 @@ pub fn uset_large_test() {
 }
 
 pub fn uset_keypos_test() {
-  let assert Ok(table) = uset.new("MyTable", 2, etc.Public)
+  let assert Ok(table) = uset.new("uset4", 2, etc.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
@@ -104,21 +104,21 @@ pub fn uset_keypos_test() {
 }
 
 pub fn uset_bad_new_test() {
-  let assert Ok(table) = uset.new("table", 1, etc.Public)
+  let assert Ok(table) = uset.new("uset5", 1, etc.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-  uset.new("table", 1, etc.Public)
+  uset.new("uset5", 1, etc.Public)
   |> should.equal(Error(Some(error.Badarg)))
 }
 
 pub fn uset_bad_insert_test() {
-  let assert Ok(table) = uset.new("MyTable", 3, etc.Public)
+  let assert Ok(table) = uset.new("uset6", 3, etc.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#("a", 1)])
   |> should.equal(False)
 }
 
 pub fn uset_multi_insert_test() {
-  let assert Ok(table) = uset.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = uset.new("uset7", 1, etc.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(100, 200)])
   |> should.equal(True)
@@ -131,7 +131,7 @@ pub fn uset_multi_insert_test() {
 }
 
 pub fn uset_large_multitype_test() {
-  let assert Ok(table) = uset.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = uset.new("uset8", 1, etc.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [
     #(
@@ -162,10 +162,10 @@ pub fn uset_large_multitype_test() {
 }
 
 pub fn uset_delete_test() {
-  let assert Ok(table) = uset.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = uset.new("uset9", 1, etc.Public)
   uset.delete(table)
   |> should.equal(True)
-  let assert Ok(table) = uset.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = uset.new("uset9", 1, etc.Public)
   uset.delete(table)
   |> should.equal(True)
   uset.delete(table)
@@ -173,7 +173,7 @@ pub fn uset_delete_test() {
 }
 
 pub fn uset_singleton_test() {
-  let assert Ok(table) = uset.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = uset.new("uset10", 1, etc.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(1), #(2)])
   |> should.equal(True)
@@ -184,7 +184,7 @@ pub fn uset_singleton_test() {
 }
 
 pub fn uset_nontuple_test() {
-  let assert Ok(table) = uset.new("MyTable2", 1, etc.Public)
+  let assert Ok(table) = uset.new("uset11", 1, etc.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [5])
   |> should.equal(True)
@@ -193,7 +193,7 @@ pub fn uset_nontuple_test() {
 }
 
 pub fn uset_nontuple_record_test() {
-  let assert Ok(table) = uset.new("MyTable1", 1, etc.Public)
+  let assert Ok(table) = uset.new("uset12", 1, etc.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [Ok(5)])
   |> should.equal(True)
@@ -208,7 +208,7 @@ type Multirecord {
 }
 
 pub fn uset_nontuple_multirecord_test() {
-  let assert Ok(table) = uset.new("uset", 1, etc.Public)
+  let assert Ok(table) = uset.new("uset13", 1, etc.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [A(1), B(2, 3), C])
   |> should.equal(True)
