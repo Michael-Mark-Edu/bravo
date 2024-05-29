@@ -62,17 +62,15 @@ pub fn new(
 /// - If `True`, all objects in the list were inserted.
 /// - If `False`, _none_ of the objects in the list were inserted. This may occur if the size of the tuple is less than the `OSet`'s size.
 ///
-/// If an `Object` with the same key already exists, then the old `Object` will be overwritten with the new one.
+/// If an object with the same key already exists, then the old object will be overwritten with the new one.
 ///
 pub fn insert(oset: OSet(t), objects: List(t)) -> Bool {
   bindings.try_insert(oset.table, oset.keypos, objects)
 }
 
-/// Gets an `Object` from a `OSet`.
+/// Gets an object from a `OSet`.
 ///
 /// Returns an `Option` containing the object, if it exists.
-/// - If `Some`, then the object was found. ETS tables do not store types, so you must decode a `Dynamic` inside the `Object`.
-/// - If `None`, then the `OSet` did not contain any `Object` with the specified `key`.
 ///
 pub fn lookup(oset: OSet(t), key: a) -> Option(t) {
   case bindings.try_lookup(oset.table, key) {

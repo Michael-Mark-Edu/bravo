@@ -60,16 +60,16 @@ pub fn new(
 /// - If `True`, all objects in the list were inserted.
 /// - If `False`, _none_ of the objects in the list were inserted. This may occur if the size of the tuple is less than the `Bag`'s size.
 ///
-/// If an `Object` with the same key already exists, then the old `Object` will be overwritten with the new one.
+/// If an object with the same key already exists, then the old object will be overwritten with the new one.
 ///
 pub fn insert(bag: Bag(t), objects: List(t)) -> Bool {
   bindings.try_insert(bag.table, bag.keypos, objects)
 }
 
-/// Gets a list of `Object`s from a `Bag`.
+/// Gets a list of objects from a `Bag`.
 ///
-/// - If the list isn't empty, then at least one object was found. ETS tables do not store types, so you must decode a `Dynamic` inside the `Object`.
-/// - If the list is empty, then the `Bag` did not contain any `Object` with the specified `key`.
+/// Returns an list containing the objects, if any match.
+///
 pub fn lookup(bag: Bag(t), key: a) -> List(t) {
   bindings.try_lookup(bag.table, key)
 }

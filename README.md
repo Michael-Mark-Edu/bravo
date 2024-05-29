@@ -1,5 +1,5 @@
 # bravo
-### v1.0.0
+### v2.0.0
 
 [![Package Version](https://img.shields.io/hexpm/v/bravo)](https://hex.pm/packages/bravo)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/bravo/)
@@ -7,7 +7,8 @@
 ~~Comprehensive~~ Very much incomplete (for now) ETS bindings for Gleam.
 
 This library is still in heavy development! Expect frequent breaking changes (this is indicated
-when the first number of the version increases).
+when the first number of the version increases). As it happens, this library just received a
+breaking change!
 
 This library is only compatible with the Erlang target!
 
@@ -35,10 +36,13 @@ A difficulty of implementing ETS tables in Gleam is that Gleam is a statically-t
 ETS tables are very much designed for the dynamically-typed Erlang. Carpenter ensures type safety
 by restricting objects to simple key-value pairs, much like a `Dict`.
 
-Bravo, however, sacrifices type guarantees to empower the ETS table. ETS tables do not store type
-information, so the burden of interpreting the binary data stored in the ETS into a usable Gleam
-type is placed on the user. Fortunately, the `gleam/dynamic` library provides powerful tools to
-work around this. As long as you know what each object's type signature is, you should be fine.
+Bravo, however, does not impose much of any restriction at all. The only restriction that is in
+place is that all objects in a table must have the same type, but that type can be literally
+anything. In an earlier version of this package, even this wasn't a restriction, but that resulted
+in unsafe and un-Gleamlike code.
+
+A goal of Bravo is to be fully comprehensive, meaning that I intend on implementing every single
+ETS function into the library. This goal may very well be infeasible, but I will pursue it anyway.
 
 ## Installation
 Bravo depends on the `gleam_erlang` package, but otherwise does not have any other dependency.
@@ -50,9 +54,7 @@ gleam add bravo gleam_erlang
 ## Usage
 ```gleam
 import bravo/etc
-import bravo/object
 import bravo/uset
-import gleam/dynamic
 import gleam/io
 import gleam/option.{Some}
 
@@ -66,11 +68,7 @@ pub fn main() {
 
   // Then we can lookup the object from the table
   let assert Some(object) = uset.lookup(table, "Hello")
-  let assert Ok(tuple) =
-    object
-    |> object.extract
-    |> dynamic.tuple2(dynamic.string, dynamic.string)
-  io.print(tuple.0 <> ", " <> tuple.1) // "Hello, world!"
+  io.print(object.0 <> ", " <> object.1) // "Hello, world!"
 
   // ETS tables have static lifetimes,
   // so don't forget to delete them when you're done!
