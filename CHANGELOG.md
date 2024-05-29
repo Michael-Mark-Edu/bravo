@@ -2,6 +2,8 @@
 - Added `delete_key` to all tables.
 - Added `delete_all_objects` to all tables.
 - Added `delete_object` to all tables.
+- Relaxed `gleam_erlang` version requirement to >= 0.23.1
+- Relaxed `gleam_stdlib` version requirement to >= 0.33.0
 
 # v2.0.0
 This is a breaking update!
