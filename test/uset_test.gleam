@@ -257,3 +257,15 @@ pub fn uset_delete_object_test() {
   uset.lookup(table, "Bye")
   |> should.equal(None)
 }
+
+pub fn uset_tab2file_test() {
+  let assert Ok(table) = uset.new("uset17", 2, etc.Public)
+  uset.insert(table, [#("Hello", "World")])
+  |> should.equal(True)
+  uset.tab2file(table, "uset17", True, True, True)
+  |> should.equal(True)
+  uset.delete(table)
+  let assert Some(new_table) = uset.file2tab("uset17", True)
+  uset.lookup(new_table, "World")
+  |> should.equal(Some(#("Hello", "World")))
+}

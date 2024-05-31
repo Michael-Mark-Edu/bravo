@@ -5,9 +5,11 @@ import bravo/etc.{type Access}
 import bravo/internal/bindings
 import bravo/internal/new_option
 import gleam/bool
+import gleam/dynamic
 import gleam/erlang/atom.{type Atom}
 import gleam/option.{type Option, None, Some}
 import gleam/result
+import gleam/string
 
 /// An unordered set. Keys may only occur once per table, and objects are unordered.
 ///
@@ -58,7 +60,7 @@ pub fn new(
 
 /// Inserts a list of tuples into a `USet`.
 ///
-/// Returns a `Bool` representing if the inserting succeeded. 
+/// Returns a `Bool` representing if the inserting succeeded.
 /// - If `True`, all objects in the list were inserted.
 /// - If `False`, _none_ of the objects in the list were inserted. This may occur if the size of the tuple is less than the `USet`'s size.
 ///
@@ -106,4 +108,36 @@ pub fn delete_all_objects(uset: USet(t)) -> Nil {
 pub fn delete_object(uset: USet(t), object: t) -> Nil {
   bindings.try_delete_object(uset.table, object)
   Nil
+}
+
+pub fn tab2file(
+  uset: USet(t),
+  filename: String,
+  object_count: Bool,
+  md5sum: Bool,
+  sync: Bool,
+) -> Bool {
+  case
+    bindings.try_tab2file(
+      uset.table,
+      string.to_utf_codepoints(filename),
+      object_count,
+      md5sum,
+      sync,
+    )
+  {
+    new_option.Ok -> True
+    new_option.Error(_) -> False
+  }
+}
+
+pub fn file2tab(filename: String, verify: Bool) -> Option(USet(t)) {
+  case bindings.try_file2tab(string.to_utf_codepoints(filename), verify) {
+    Error(_) -> None
+    Ok(name) -> {
+      let assert Ok(keypos) =
+        dynamic.int(bindings.inform(name, atom.create_from_string("keypos")))
+      Some(USet(name, keypos))
+    }
+  }
 }

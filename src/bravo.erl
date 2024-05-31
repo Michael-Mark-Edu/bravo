@@ -7,6 +7,9 @@
 -export([try_delete_key/2]).
 -export([try_delete_all_objects/1]).
 -export([try_delete_object/2]).
+-export([try_tab2file/5]).
+-export([try_file2tab/2]).
+-export([inform/2]).
 
 try_insert(Name, Keypos, Objects) ->
     Condition = case is_tuple(lists:nth(1, Objects)) of
@@ -61,3 +64,19 @@ try_delete_all_objects(Name) ->
 
 try_delete_object(Name, Object) ->
     ets:delete_object(Name, Object).
+
+try_tab2file(Name, Filename, ObjectCount, Md5sum, Sync) ->
+    A = if ObjectCount -> [object_count]; true -> [] end,
+    B = if Md5sum -> [md5sum]; true -> [] end,
+    C = [{extended_info, lists:append(A, B)}],
+    D = [{sync, Sync}],
+    Options = lists:append(C, D),
+    ets:tab2file(Name, Filename, Options).
+
+try_file2tab(Filename, Verify) ->
+    ets:file2tab(Filename, [{verify, Verify}]).
+
+inform(Name, Key) ->
+    Info = ets:info(Name),
+    {_, Target} = lists:keyfind(Key, 1, Info),
+    Target.

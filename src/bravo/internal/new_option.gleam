@@ -22,3 +22,8 @@ pub type Pid
 pub type Auto {
   Auto
 }
+
+pub type EmptyResult(error) {
+  Ok
+  Error(error)
+}
