@@ -2,8 +2,11 @@ import bravo/bag
 import bravo/error
 import bravo/etc
 import gleam/dict
-import gleam/option.{Some}
+import gleam/dynamic
+import gleam/list
+import gleam/option.{None, Some}
 import gleeunit/should
+import simplifile
 
 fn defer(defer: fn() -> a, block: fn() -> b) -> b {
   let b = block()
@@ -256,4 +259,36 @@ pub fn bag_delete_object_test() {
   |> should.equal([#("Hello", "World")])
   bag.lookup(table, "Bye")
   |> should.equal([#("Bye", "World")])
+}
+
+pub fn bag_tab2file_test() {
+  let assert Ok(table) = bag.new("bag17", 2, etc.Public)
+  bag.insert(table, [#("Hello", "World")])
+  |> should.equal(True)
+  bag.tab2file(table, "bag17", True, True, True)
+  |> should.equal(True)
+  bag.delete(table)
+  let assert Some(new_table) =
+    bag.file2tab("bag17", True, dynamic.tuple2(dynamic.string, dynamic.string))
+  bag.lookup(new_table, "World")
+  |> should.equal([#("Hello", "World")])
+  bag.delete(new_table)
+  bag.file2tab("bag17", True, dynamic.tuple2(dynamic.int, dynamic.int))
+  |> should.equal(None)
+  simplifile.delete("bag17")
+  |> should.equal(Ok(Nil))
+}
+
+pub fn bag_tab2list_test() {
+  let assert Ok(table) = bag.new("bag18", 1, etc.Public)
+  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  bag.insert(table, [#("Hello", "World"), #("Bye", "World")])
+  |> should.equal(True)
+  let objects = bag.tab2list(table)
+  list.contains(objects, #("Hello", "World"))
+  |> should.equal(True)
+  list.contains(objects, #("Bye", "World"))
+  |> should.equal(True)
+  list.contains(objects, #("Bye", "Bye"))
+  |> should.equal(False)
 }

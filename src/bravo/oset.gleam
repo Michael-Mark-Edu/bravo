@@ -5,9 +5,12 @@ import bravo/etc.{type Access}
 import bravo/internal/bindings
 import bravo/internal/new_option
 import gleam/bool
+import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
+import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
+import gleam/string
 
 /// An ordered set. Keys may only occur once per table, and objects are ordered (this comes at a performance cost).
 ///
@@ -58,7 +61,7 @@ pub fn new(
 
 /// Inserts a list of tuples into a `OSet`.
 ///
-/// Returns a `Bool` representing if the inserting succeeded. 
+/// Returns a `Bool` representing if the inserting succeeded.
 /// - If `True`, all objects in the list were inserted.
 /// - If `False`, _none_ of the objects in the list were inserted. This may occur if the size of the tuple is less than the `OSet`'s size.
 ///
@@ -106,4 +109,70 @@ pub fn delete_all_objects(oset: OSet(t)) -> Nil {
 pub fn delete_object(oset: OSet(t), object: t) -> Nil {
   bindings.try_delete_object(oset.table, object)
   Nil
+}
+
+/// Saves a `OSet` as file `filename` that can later be read back into memory using `file2tab`.
+///
+/// There are three configuration flags with this function:
+/// - `object_count`: Stores the number of objects in the table in the footer. This can detect truncation.
+/// - `md5sum`: Stores a md5 checksum of the table and its objects. This can detect even single bitflips, but is computationally expensive.
+/// - `sync`: Blocks the process until the file has been successfully written.
+///
+pub fn tab2file(
+  oset: OSet(t),
+  filename: String,
+  object_count: Bool,
+  md5sum: Bool,
+  sync: Bool,
+) -> Bool {
+  case
+    bindings.try_tab2file(
+      oset.table,
+      string.to_utf_codepoints(filename),
+      object_count,
+      md5sum,
+      sync,
+    )
+  {
+    new_option.Ok -> True
+    new_option.Error(_) -> False
+  }
+}
+
+/// Creates a `OSet` from file `filename` that was previously created by `tab2file`.
+///
+/// For type safety reasons, a dynamic decoder must be provided, and the decoder must not fail for all objects in the table.
+///
+/// If the flag `verify` is set, then checks are performed to ensure the data is correct. This can be slow if `tab2file` was ran with `md5sum` enabled.
+///
+pub fn file2tab(
+  filename: String,
+  verify: Bool,
+  decoder: fn(Dynamic) -> Result(t, _),
+) -> Option(OSet(t)) {
+  case bindings.try_file2tab(string.to_utf_codepoints(filename), verify) {
+    Error(_) -> None
+    Ok(name) -> {
+      let assert Ok(keypos) =
+        dynamic.int(bindings.inform(name, atom.create_from_string("keypos")))
+      let table = OSet(name, keypos)
+      use <- bool.guard(
+        !{
+          use obj <- list.all(tab2list(table))
+          case decoder(dynamic.from(obj)) {
+            Ok(_) -> True
+            Error(_) -> False
+          }
+        },
+        None,
+      )
+      Some(table)
+    }
+  }
+}
+
+/// Returns a list containing all of the objects in the `OSet`.
+///
+pub fn tab2list(oset: OSet(t)) -> List(t) {
+  bindings.try_tab2list(oset.table)
 }

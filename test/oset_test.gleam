@@ -2,8 +2,11 @@ import bravo/error
 import bravo/etc
 import bravo/oset
 import gleam/dict
+import gleam/dynamic
+import gleam/list
 import gleam/option.{None, Some}
 import gleeunit/should
+import simplifile
 
 fn defer(defer: fn() -> a, block: fn() -> b) -> b {
   let b = block()
@@ -256,4 +259,75 @@ pub fn oset_delete_object_test() {
   |> should.equal(Some(#("Hello", "World")))
   oset.lookup(table, "Bye")
   |> should.equal(None)
+}
+
+pub fn oset_tab2file_test() {
+  let assert Ok(table) = oset.new("oset17", 2, etc.Public)
+  oset.insert(table, [#("Hello", "World")])
+  |> should.equal(True)
+  oset.tab2file(table, "oset17", True, True, True)
+  |> should.equal(True)
+  oset.delete(table)
+  let assert Some(new_table) =
+    oset.file2tab(
+      "oset17",
+      True,
+      dynamic.tuple2(dynamic.string, dynamic.string),
+    )
+  oset.lookup(new_table, "World")
+  |> should.equal(Some(#("Hello", "World")))
+  oset.delete(new_table)
+  oset.file2tab("oset17", True, dynamic.tuple2(dynamic.int, dynamic.int))
+  |> should.equal(None)
+  simplifile.delete("oset17")
+  |> should.equal(Ok(Nil))
+}
+
+pub fn oset_tab2list_test() {
+  let assert Ok(table) = oset.new("oset18", 1, etc.Public)
+  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  oset.insert(table, [#("Hello", "World"), #("Bye", "World")])
+  |> should.equal(True)
+  let objects = oset.tab2list(table)
+  list.contains(objects, #("Hello", "World"))
+  |> should.equal(True)
+  list.contains(objects, #("Bye", "World"))
+  |> should.equal(True)
+  list.contains(objects, #("Bye", "Bye"))
+  |> should.equal(False)
+}
+
+pub fn oset_tab2list_orderedness_test() {
+  let assert Ok(table) = oset.new("osetx1", 1, etc.Public)
+  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  oset.insert(table, [
+    #("A"),
+    #("Q"),
+    #("C"),
+    #("R"),
+    #("Z"),
+    #("B"),
+    #("S"),
+    #("F"),
+    #("Da"),
+    #("DA"),
+    #("Db"),
+    #("a"),
+  ])
+  |> should.equal(True)
+  oset.tab2list(table)
+  |> should.equal([
+    #("A"),
+    #("B"),
+    #("C"),
+    #("DA"),
+    #("Da"),
+    #("Db"),
+    #("F"),
+    #("Q"),
+    #("R"),
+    #("S"),
+    #("Z"),
+    #("a"),
+  ])
 }
