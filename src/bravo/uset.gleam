@@ -5,8 +5,9 @@ import bravo/etc.{type Access}
 import bravo/internal/bindings
 import bravo/internal/new_option
 import gleam/bool
-import gleam/dynamic
+import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
+import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
 import gleam/string
@@ -110,6 +111,13 @@ pub fn delete_object(uset: USet(t), object: t) -> Nil {
   Nil
 }
 
+/// Saves a `USet` as file `filename` that can later be read back into memory using `file2tab`.
+///
+/// There are three configuration flags with this function:
+/// - `object_count`: Stores the number of objects in the table in the footer. This can detect truncation.
+/// - `md5sum`: Stores a md5 checksum of the table and its objects. This can detect even single bitflips, but is computationally expensive.
+/// - `sync`: Blocks the process until the file has been successfully written.
+///
 pub fn tab2file(
   uset: USet(t),
   filename: String,
@@ -131,13 +139,40 @@ pub fn tab2file(
   }
 }
 
-pub fn file2tab(filename: String, verify: Bool) -> Option(USet(t)) {
+/// Creates a `USet` from file `filename` that was previously created by `tab2file`.
+///
+/// For type safety reasons, a dynamic decoder must be provided, and the decoder must not fail for all objects in the table.
+///
+/// If the flag `verify` is set, then checks are performed to ensure the data is correct. This can be slow if `tab2file` was ran with `md5sum` enabled.
+///
+pub fn file2tab(
+  filename: String,
+  verify: Bool,
+  decoder: fn(Dynamic) -> Result(t, _),
+) -> Option(USet(t)) {
   case bindings.try_file2tab(string.to_utf_codepoints(filename), verify) {
     Error(_) -> None
     Ok(name) -> {
       let assert Ok(keypos) =
         dynamic.int(bindings.inform(name, atom.create_from_string("keypos")))
-      Some(USet(name, keypos))
+      let table = USet(name, keypos)
+      use <- bool.guard(
+        !{
+          use obj <- list.all(tab2list(table))
+          case decoder(dynamic.from(obj)) {
+            Ok(_) -> True
+            Error(_) -> False
+          }
+        },
+        None,
+      )
+      Some(table)
     }
   }
+}
+
+/// Returns a list containing all of the objects in the `USet`.
+///
+pub fn tab2list(uset: USet(t)) -> List(t) {
+  bindings.try_tab2list(uset.table)
 }

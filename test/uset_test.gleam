@@ -2,8 +2,10 @@ import bravo/error
 import bravo/etc
 import bravo/uset
 import gleam/dict
+import gleam/dynamic
 import gleam/option.{None, Some}
 import gleeunit/should
+import simplifile
 
 fn defer(defer: fn() -> a, block: fn() -> b) -> b {
   let b = block()
@@ -265,7 +267,17 @@ pub fn uset_tab2file_test() {
   uset.tab2file(table, "uset17", True, True, True)
   |> should.equal(True)
   uset.delete(table)
-  let assert Some(new_table) = uset.file2tab("uset17", True)
+  let assert Some(new_table) =
+    uset.file2tab(
+      "uset17",
+      True,
+      dynamic.tuple2(dynamic.string, dynamic.string),
+    )
   uset.lookup(new_table, "World")
   |> should.equal(Some(#("Hello", "World")))
+  uset.delete(new_table)
+  uset.file2tab("uset17", True, dynamic.tuple2(dynamic.int, dynamic.int))
+  |> should.equal(None)
+  simplifile.delete("uset17")
+  |> should.equal(Ok(Nil))
 }

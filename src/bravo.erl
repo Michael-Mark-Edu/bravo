@@ -1,5 +1,6 @@
 -module(bravo).
 
+-export([try_tab2list/1]).
 -export([try_insert/3]).
 -export([try_new/2]).
 -export([try_lookup/2]).
@@ -75,6 +76,9 @@ try_tab2file(Name, Filename, ObjectCount, Md5sum, Sync) ->
 
 try_file2tab(Filename, Verify) ->
     ets:file2tab(Filename, [{verify, Verify}]).
+
+try_tab2list(Name) ->
+    ets:tab2list(Name).
 
 inform(Name, Key) ->
     Info = ets:info(Name),

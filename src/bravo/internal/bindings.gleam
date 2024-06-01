@@ -39,6 +39,9 @@ pub fn try_file2tab(
   verify: Bool,
 ) -> Result(Atom, ErlangError)
 
+@external(erlang, "bravo", "try_tab2list")
+pub fn try_tab2list(table: Atom) -> a
+
 @external(erlang, "bravo", "inform")
 pub fn inform(table: Atom, key: Atom) -> Dynamic
 
