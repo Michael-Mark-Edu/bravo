@@ -296,3 +296,38 @@ pub fn uset_tab2list_test() {
   list.contains(objects, #("Bye", "Bye"))
   |> should.equal(False)
 }
+
+pub fn uset_tab2list_orderedness_test() {
+  let assert Ok(table) = uset.new("uset19", 1, etc.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, [
+    #("A"),
+    #("Q"),
+    #("C"),
+    #("R"),
+    #("Z"),
+    #("B"),
+    #("S"),
+    #("F"),
+    #("Da"),
+    #("DA"),
+    #("Db"),
+    #("a"),
+  ])
+  |> should.equal(True)
+  uset.tab2list(table)
+  |> should.not_equal([
+    #("A"),
+    #("B"),
+    #("C"),
+    #("DA"),
+    #("Da"),
+    #("Db"),
+    #("F"),
+    #("Q"),
+    #("R"),
+    #("S"),
+    #("Z"),
+    #("a"),
+  ])
+}

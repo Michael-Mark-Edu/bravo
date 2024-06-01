@@ -298,7 +298,7 @@ pub fn oset_tab2list_test() {
 }
 
 pub fn oset_tab2list_orderedness_test() {
-  let assert Ok(table) = oset.new("osetx1", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset19", 1, etc.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [
     #("A"),

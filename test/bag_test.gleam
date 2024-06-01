@@ -292,3 +292,38 @@ pub fn bag_tab2list_test() {
   list.contains(objects, #("Bye", "Bye"))
   |> should.equal(False)
 }
+
+pub fn bag_tab2list_orderedness_test() {
+  let assert Ok(table) = bag.new("bag19", 1, etc.Public)
+  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  bag.insert(table, [
+    #("A"),
+    #("Q"),
+    #("C"),
+    #("R"),
+    #("Z"),
+    #("B"),
+    #("S"),
+    #("F"),
+    #("Da"),
+    #("DA"),
+    #("Db"),
+    #("a"),
+  ])
+  |> should.equal(True)
+  bag.tab2list(table)
+  |> should.not_equal([
+    #("A"),
+    #("B"),
+    #("C"),
+    #("DA"),
+    #("Da"),
+    #("Db"),
+    #("F"),
+    #("Q"),
+    #("R"),
+    #("S"),
+    #("Z"),
+    #("a"),
+  ])
+}

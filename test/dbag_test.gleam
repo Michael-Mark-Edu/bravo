@@ -301,3 +301,38 @@ pub fn dbag_tab2list_test() {
   list.contains(objects, #("Bye", "Bye"))
   |> should.equal(False)
 }
+
+pub fn dbag_tab2list_orderedness_test() {
+  let assert Ok(table) = dbag.new("dbag19", 1, etc.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  dbag.insert(table, [
+    #("A"),
+    #("Q"),
+    #("C"),
+    #("R"),
+    #("Z"),
+    #("B"),
+    #("S"),
+    #("F"),
+    #("Da"),
+    #("DA"),
+    #("Db"),
+    #("a"),
+  ])
+  |> should.equal(True)
+  dbag.tab2list(table)
+  |> should.not_equal([
+    #("A"),
+    #("Q"),
+    #("C"),
+    #("R"),
+    #("Z"),
+    #("B"),
+    #("S"),
+    #("F"),
+    #("Da"),
+    #("DA"),
+    #("Db"),
+    #("a"),
+  ])
+}
