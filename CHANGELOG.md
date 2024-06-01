@@ -1,7 +1,10 @@
 # v2.2.0
-- Added `tab2file`
-- Added `file2tab`
-- Added `tab2list`
+- Added `tab2file` to all tables.
+- Added `file2tab` to all tables.
+- Added `tab2list` to all tables.
+- Changelog link in README.md is now on the version number instead of a separate
+  label.
+- Edited changelog so that everything fits within 80 columns.
 
 # v2.1.0
 - Added `delete_key` to all tables.
@@ -14,6 +17,6 @@
 This is a breaking update!
 
 - `bravo/object` has been completely deleted.
-- The table types are now typed. `insert` and `lookup` use these types now. As a result, tables are
-  now restricted to only being able to store a single type of object, but now the library is
-  significantly more type safe.
+- The table types are now typed. `insert` and `lookup` use these types now. As a
+  result, tables are now restricted to only being able to store a single type of
+  object, but now the library is significantly more type safe.
