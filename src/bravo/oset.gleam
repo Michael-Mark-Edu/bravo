@@ -173,6 +173,8 @@ pub fn file2tab(
 
 /// Returns a list containing all of the objects in the `OSet`.
 ///
+/// The list returned is ordered.
+///
 pub fn tab2list(oset: OSet(t)) -> List(t) {
   bindings.try_tab2list(oset.table)
 }
