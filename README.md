@@ -1,6 +1,5 @@
 # bravo
-### v2.1.0
-[View Changelog](https://github.com/Michael-Mark-Edu/bravo/blob/main/CHANGELOG.md#v210)
+### [v2.2.0](https://github.com/Michael-Mark-Edu/bravo/blob/main/CHANGELOG.md#v220)
 
 [![Package Version](https://img.shields.io/hexpm/v/bravo)](https://hex.pm/packages/bravo)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/bravo/)
@@ -27,7 +26,7 @@ ETS tables have the following properties that make them distinct from `Dict`s:
 - ETS tables offer a wide array of customization options that `Dict`s do not, such as the options
   to be ordered, allow multiple objects per key, which element of the object acts as the key,
   and controlling read/write access from external processes.
-- ETS tables offer increased functionality compared to `Dict`s, natively allowing functions such as 
+- ETS tables offer increased functionality compared to `Dict`s, natively allowing functions such as
   complex searching, reading/writing the ETS to a file, and having much more complex entries.
 - ETS tables work well with concurrency.
 

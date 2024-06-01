@@ -1,3 +1,8 @@
+# v2.2.0
+- Added `tab2file`
+- Added `file2tab`
+- Added `tab2list`
+
 # v2.1.0
 - Added `delete_key` to all tables.
 - Added `delete_all_objects` to all tables.
