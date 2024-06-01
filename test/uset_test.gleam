@@ -3,6 +3,7 @@ import bravo/etc
 import bravo/uset
 import gleam/dict
 import gleam/dynamic
+import gleam/list
 import gleam/option.{None, Some}
 import gleeunit/should
 import simplifile
@@ -280,4 +281,18 @@ pub fn uset_tab2file_test() {
   |> should.equal(None)
   simplifile.delete("uset17")
   |> should.equal(Ok(Nil))
+}
+
+pub fn uset_tab2list_test() {
+  let assert Ok(table) = uset.new("uset18", 1, etc.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, [#("Hello", "World"), #("Bye", "World")])
+  |> should.equal(True)
+  let objects = uset.tab2list(table)
+  list.contains(objects, #("Hello", "World"))
+  |> should.equal(True)
+  list.contains(objects, #("Bye", "World"))
+  |> should.equal(True)
+  list.contains(objects, #("Bye", "Bye"))
+  |> should.equal(False)
 }
