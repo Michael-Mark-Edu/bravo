@@ -349,11 +349,24 @@ pub fn dbag_dynamic_test() {
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.insert(table, [
     dynamic.from(#("Hello", "World")),
+    dynamic.from(#("Hello", "my", "friend!")),
+    dynamic.from(#("Hello", "World")),
     dynamic.from(#(1, 2, 3)),
   ])
   |> should.equal(True)
-  dbag.lookup(table, "Hello")
-  |> should.equal([dynamic.from(#("Hello", "World"))])
+  let list = dbag.lookup(table, "Hello")
+  list.contains(list, dynamic.from(#("Hello", "World")))
+  |> should.equal(True)
+  let assert Ok(#(_, newlist)) = {
+    use a <- list.pop(list)
+    let fun = dynamic.tuple2(dynamic.string, dynamic.string)
+    let assert Ok(res) = fun(a)
+    res == #("Hello", "World")
+  }
+  list.contains(newlist, dynamic.from(#("Hello", "World")))
+  |> should.equal(True)
+  list.contains(newlist, dynamic.from(#("Hello", "my", "friend!")))
+  |> should.equal(True)
   dbag.lookup(table, 1)
   |> should.equal([dynamic.from(#(1, 2, 3))])
 }

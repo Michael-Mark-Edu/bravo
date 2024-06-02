@@ -340,11 +340,15 @@ pub fn bag_dynamic_test() {
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [
     dynamic.from(#("Hello", "World")),
+    dynamic.from(#("Hello", "my", "friend!")),
     dynamic.from(#(1, 2, 3)),
   ])
   |> should.equal(True)
-  bag.lookup(table, "Hello")
-  |> should.equal([dynamic.from(#("Hello", "World"))])
+  let list = bag.lookup(table, "Hello")
+  list.contains(list, dynamic.from(#("Hello", "World")))
+  |> should.equal(True)
+  list.contains(list, dynamic.from(#("Hello", "my", "friend!")))
+  |> should.equal(True)
   bag.lookup(table, 1)
   |> should.equal([dynamic.from(#(1, 2, 3))])
 }
