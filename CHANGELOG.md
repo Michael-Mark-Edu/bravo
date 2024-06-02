@@ -1,4 +1,4 @@
-# v2.2.1 (unreleased)
+# v2.2.1
 - Added checking in `insert` functions for if the input list is empty.
   Previously, inserting an empty list would cause an unintended runtime error.
   Now, the functions will simply return `False` when fed an empty list.
