@@ -1,3 +1,8 @@
+# v2.2.1 (unreleased)
+- Added checking in `insert` functions for if the input list is empty.
+  Previously, inserting an empty list would cause an unintended runtime error.
+  Now, the functions will simply return `False` when fed an empty list.
+
 # v2.2.0
 - Added `tab2file` to all tables.
 - Added `file2tab` to all tables.
