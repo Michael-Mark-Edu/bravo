@@ -50,3 +50,6 @@ pub fn tuple_size(tuple: a) -> Int
 
 @external(erlang, "erlang", "element")
 pub fn element(n: Int, tuple: a) -> b
+
+@external(erlang, "erlang", "is_tuple")
+pub fn is_tuple(a: a) -> Bool

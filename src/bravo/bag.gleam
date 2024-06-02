@@ -61,11 +61,12 @@ pub fn new(
 ///
 /// Returns a `Bool` representing if the inserting succeeded.
 /// - If `True`, all objects in the list were inserted.
-/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the `keypos` of the `Bag` is greater than the object tuple size.
+/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the `keypos` of the `Bag` is greater than the object tuple size or if the input list is empty.
 ///
 /// If an object with the same key already exists, then the old object will be overwritten with the new one.
 ///
 pub fn insert(bag: Bag(t), objects: List(t)) -> Bool {
+  use <- bool.guard(list.is_empty(objects), False)
   bindings.try_insert(bag.table, bag.keypos, objects)
 }
 

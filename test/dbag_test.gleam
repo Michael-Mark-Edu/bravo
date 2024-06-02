@@ -336,3 +336,10 @@ pub fn dbag_tab2list_orderedness_test() {
     #("a"),
   ])
 }
+
+pub fn dbag_empty_insert_test() {
+  let assert Ok(table) = dbag.new("dbag20", 1, etc.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  dbag.insert(table, [])
+  |> should.equal(False)
+}

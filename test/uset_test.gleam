@@ -331,3 +331,10 @@ pub fn uset_tab2list_orderedness_test() {
     #("a"),
   ])
 }
+
+pub fn uset_empty_insert_test() {
+  let assert Ok(table) = uset.new("uset20", 1, etc.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, [])
+  |> should.equal(False)
+}

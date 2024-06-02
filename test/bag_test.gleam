@@ -327,3 +327,10 @@ pub fn bag_tab2list_orderedness_test() {
     #("a"),
   ])
 }
+
+pub fn bag_empty_insert_test() {
+  let assert Ok(table) = bag.new("bag20", 1, etc.Public)
+  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  bag.insert(table, [])
+  |> should.equal(False)
+}
