@@ -331,3 +331,10 @@ pub fn oset_tab2list_orderedness_test() {
     #("a"),
   ])
 }
+
+pub fn oset_empty_insert_test() {
+  let assert Ok(table) = oset.new("oset20", 1, etc.Public)
+  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  oset.insert(table, [])
+  |> should.equal(False)
+}
