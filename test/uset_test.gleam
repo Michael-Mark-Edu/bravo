@@ -338,3 +338,17 @@ pub fn uset_empty_insert_test() {
   uset.insert(table, [])
   |> should.equal(False)
 }
+
+pub fn uset_dynamic_test() {
+  let assert Ok(table) = uset.new("uset21", 1, etc.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, [
+    dynamic.from(#("Hello", "World")),
+    dynamic.from(#(1, 2, 3)),
+  ])
+  |> should.equal(True)
+  uset.lookup(table, "Hello")
+  |> should.equal(Some(dynamic.from(#("Hello", "World"))))
+  uset.lookup(table, 1)
+  |> should.equal(Some(dynamic.from(#(1, 2, 3))))
+}

@@ -334,3 +334,17 @@ pub fn bag_empty_insert_test() {
   bag.insert(table, [])
   |> should.equal(False)
 }
+
+pub fn bag_dynamic_test() {
+  let assert Ok(table) = bag.new("bag21", 1, etc.Public)
+  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  bag.insert(table, [
+    dynamic.from(#("Hello", "World")),
+    dynamic.from(#(1, 2, 3)),
+  ])
+  |> should.equal(True)
+  bag.lookup(table, "Hello")
+  |> should.equal([dynamic.from(#("Hello", "World"))])
+  bag.lookup(table, 1)
+  |> should.equal([dynamic.from(#(1, 2, 3))])
+}

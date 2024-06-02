@@ -343,3 +343,17 @@ pub fn dbag_empty_insert_test() {
   dbag.insert(table, [])
   |> should.equal(False)
 }
+
+pub fn dbag_dynamic_test() {
+  let assert Ok(table) = dbag.new("dbag21", 1, etc.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  dbag.insert(table, [
+    dynamic.from(#("Hello", "World")),
+    dynamic.from(#(1, 2, 3)),
+  ])
+  |> should.equal(True)
+  dbag.lookup(table, "Hello")
+  |> should.equal([dynamic.from(#("Hello", "World"))])
+  dbag.lookup(table, 1)
+  |> should.equal([dynamic.from(#(1, 2, 3))])
+}

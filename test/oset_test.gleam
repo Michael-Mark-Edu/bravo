@@ -338,3 +338,17 @@ pub fn oset_empty_insert_test() {
   oset.insert(table, [])
   |> should.equal(False)
 }
+
+pub fn oset_dynamic_test() {
+  let assert Ok(table) = oset.new("oset21", 1, etc.Public)
+  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  oset.insert(table, [
+    dynamic.from(#("Hello", "World")),
+    dynamic.from(#(1, 2, 3)),
+  ])
+  |> should.equal(True)
+  oset.lookup(table, "Hello")
+  |> should.equal(Some(dynamic.from(#("Hello", "World"))))
+  oset.lookup(table, 1)
+  |> should.equal(Some(dynamic.from(#(1, 2, 3))))
+}
