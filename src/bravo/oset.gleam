@@ -63,7 +63,7 @@ pub fn new(
 ///
 /// Returns a `Bool` representing if the inserting succeeded.
 /// - If `True`, all objects in the list were inserted.
-/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the `keypos` of the `OSet` is greater than the object tuple size.
+/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the `keypos` of the `OSet` is greater than the object tuple size or if the input list is empty.
 ///
 /// If an object with the same key already exists, then the old object will be overwritten with the new one.
 ///
