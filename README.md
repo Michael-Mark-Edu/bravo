@@ -6,10 +6,6 @@
 
 ~~Comprehensive~~ Very much incomplete (for now) ETS bindings for Gleam.
 
-This library is still in heavy development! Expect frequent breaking changes (this is indicated
-when the first number of the version increases). As it happens, this library just received a
-breaking change!
-
 This library is only compatible with the Erlang target!
 
 ## What is an ETS?
