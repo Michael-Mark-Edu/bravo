@@ -1,19 +1,20 @@
 -module(bravo).
 
--export([try_member/2]).
--export([try_take/2]).
--export([try_insert_new/3]).
--export([try_tab2list/1]).
--export([try_insert/3]).
--export([try_new/2]).
--export([try_lookup/2]).
--export([try_delete/1]).
--export([try_delete_key/2]).
--export([try_delete_all_objects/1]).
--export([try_delete_object/2]).
--export([try_tab2file/5]).
--export([try_file2tab/2]).
--export([inform/2]).
+-export([inform/2, try_delete/1, try_delete_all_objects/1, try_delete_key/2,
+         try_delete_object/2, try_file2tab/2, try_insert/3, try_insert_new/3,
+         try_lookup/2, try_member/2, try_new/2, try_tab2file/5, try_tab2list/1,
+         try_take/2]).
+
+inform(Name, Key) ->
+    Info = ets:info(Name),
+    {_, Target} = lists:keyfind(Key, 1, Info),
+    Target.
+
+get_singleton(Elem) ->
+    case Elem of
+        {Res, '$BRAVO_SINGLETON'} -> Res;
+        Other -> Other
+    end.
 
 try_insert(Name, Keypos, Objects) ->
     Condition = case is_tuple(lists:nth(1, Objects)) of
@@ -39,20 +40,6 @@ try_new(Name, Options) ->
         Other -> {ok, Other}
     end.
 
-try_lookup(Name, Key) ->
-    case lists:map(fun get_singleton/1, ets:lookup(Name, Key)) of
-        [] ->
-            Lookup = ets:lookup(Name, {Key, '$BRAVO_SINGLETON'}),
-            Output = lists:map(fun get_singleton/1, Lookup),
-            Output;
-        Other -> Other
-    end.
-
-get_singleton(Elem) ->
-    case Elem of
-        {Res, '$BRAVO_SINGLETON'} -> Res;
-        Other -> Other
-    end.
 
 try_delete(Name) ->
     case (catch ets:delete(Name)) of
@@ -60,14 +47,6 @@ try_delete(Name) ->
         _ -> true
     end.
 
-try_delete_key(Name, Key) ->
-    ets:delete(Name, Key).
-
-try_delete_all_objects(Name) ->
-    ets:delete_all_objects(Name).
-
-try_delete_object(Name, Object) ->
-    ets:delete_object(Name, Object).
 
 try_tab2file(Name, Filename, ObjectCount, Md5sum, Sync) ->
     A = if ObjectCount -> [object_count]; true -> [] end,
@@ -77,16 +56,6 @@ try_tab2file(Name, Filename, ObjectCount, Md5sum, Sync) ->
     Options = lists:append(C, D),
     ets:tab2file(Name, Filename, Options).
 
-try_file2tab(Filename, Verify) ->
-    ets:file2tab(Filename, [{verify, Verify}]).
-
-try_tab2list(Name) ->
-    ets:tab2list(Name).
-
-inform(Name, Key) ->
-    Info = ets:info(Name),
-    {_, Target} = lists:keyfind(Key, 1, Info),
-    Target.
 
 try_insert_new(Name, Keypos, Objects) ->
     Condition = case is_tuple(lists:nth(1, Objects)) of
@@ -106,14 +75,26 @@ try_insert_new(Name, Keypos, Objects) ->
             end
     end.
 
+try_lookup(Name, Key) ->
+    lists:map(fun get_singleton/1, ets:lookup(Name, Key)).
+
+try_delete_key(Name, Key) ->
+    ets:delete(Name, Key).
+
+try_delete_all_objects(Name) ->
+    ets:delete_all_objects(Name).
+
+try_delete_object(Name, Object) ->
+    ets:delete_object(Name, Object).
+
+try_file2tab(Filename, Verify) ->
+    ets:file2tab(Filename, [{verify, Verify}]).
+
+try_tab2list(Name) ->
+    ets:tab2list(Name).
+
 try_take(Name, Key) ->
-    case lists:map(fun get_singleton/1, ets:take(Name, Key)) of
-        [] ->
-            Lookup = ets:take(Name, {Key, '$BRAVO_SINGLETON'}),
-            Output = lists:map(fun get_singleton/1, Lookup),
-            Output;
-        Other -> Other
-    end.
+    lists:map(fun get_singleton/1, ets:take(Name, Key)).
 
 try_member(Name, Key) ->
     ets:member(Name, Key).
