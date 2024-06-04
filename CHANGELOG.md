@@ -3,6 +3,9 @@
 - Added `member` to all tables.
 - Added `take` to all tables.
 - Refactoring of Erlang FFI to improve readability and remove unused code.
+- Added "Bravo in 5 Minutes" section to `README.md`.
+- This library is no longer "very much incomplete" so the notice in `README.md`
+  has been removed.
 
 # v2.2.1
 - Added checking in `insert` functions for if the input list is empty.
@@ -13,8 +16,8 @@
 - Added `tab2file` to all tables.
 - Added `file2tab` to all tables.
 - Added `tab2list` to all tables.
-- Changelog link in README.md is now on the version number instead of a separate
-  label.
+- Changelog link in `README.md` is now on the version number instead of a
+  separate label.
 - Edited changelog so that everything fits within 80 columns.
 
 # v2.1.0
