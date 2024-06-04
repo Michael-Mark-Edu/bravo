@@ -1,5 +1,5 @@
 # v2.3.0 (unreleased)
-- Added `insert_new'
+- Added `insert_new`
 - Added `member`
 - Added `take`
 - Refactoring of Erlang FFI to improve readability and remove unused code.
