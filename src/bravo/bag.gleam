@@ -172,3 +172,26 @@ pub fn file2tab(
 pub fn tab2list(bag: Bag(t)) -> List(t) {
   bindings.try_tab2list(bag.table)
 }
+
+/// Inserts a list of tuples into a `Bag`. Unlike `insert`, this cannot overwrite objects and will return false if it tries to do so.
+///
+/// Returns a `Bool` representing if the inserting succeeded.
+/// - If `True`, all objects in the list were inserted.
+/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the `keypos` of the `Bag` is greater than the object tuple size or if the input list is empty.
+///
+pub fn insert_new(bag: Bag(t), objects: List(t)) -> Bool {
+  use <- bool.guard(list.is_empty(objects), False)
+  bindings.try_insert_new(bag.table, bag.keypos, objects)
+}
+
+/// Returns and removes all objects with `key` in the `Bag`, if any exist.
+///
+pub fn take(bag: Bag(t), key: a) -> List(t) {
+  bindings.try_take(bag.table, key)
+}
+
+/// Returns whether a `Bag` contains an object at `key`.
+///
+pub fn member(bag: Bag(t), key: a) -> Bool {
+  bindings.try_member(bag.table, key)
+}

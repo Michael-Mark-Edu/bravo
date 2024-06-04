@@ -179,3 +179,29 @@ pub fn file2tab(
 pub fn tab2list(oset: OSet(t)) -> List(t) {
   bindings.try_tab2list(oset.table)
 }
+
+/// Inserts a list of tuples into a `OSet`. Unlike `insert`, this cannot overwrite objects and will return false if it tries to do so.
+///
+/// Returns a `Bool` representing if the inserting succeeded.
+/// - If `True`, all objects in the list were inserted.
+/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the `keypos` of the `OSet` is greater than the object tuple size or if the input list is empty.
+///
+pub fn insert_new(oset: OSet(t), objects: List(t)) -> Bool {
+  use <- bool.guard(list.is_empty(objects), False)
+  bindings.try_insert_new(oset.table, oset.keypos, objects)
+}
+
+/// Returns and removes an object at `key` in the `OSet`, if such object exists.
+///
+pub fn take(oset: OSet(t), key: a) -> Option(t) {
+  case bindings.try_take(oset.table, key) {
+    [res] -> Some(res)
+    _ -> None
+  }
+}
+
+/// Returns whether a `OSet` contains an object at `key`.
+///
+pub fn member(oset: OSet(t), key: a) -> Bool {
+  bindings.try_member(oset.table, key)
+}

@@ -1,7 +1,7 @@
 # v2.3.0 (unreleased)
-- Added `insert_new`
-- Added `member`
-- Added `take`
+- Added `insert_new` to all tables.
+- Added `member` to all tables.
+- Added `take` to all tables.
 - Refactoring of Erlang FFI to improve readability and remove unused code.
 
 # v2.2.1

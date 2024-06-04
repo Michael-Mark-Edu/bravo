@@ -352,3 +352,59 @@ pub fn oset_dynamic_test() {
   oset.lookup(table, 1)
   |> should.equal(Some(dynamic.from(#(1, 2, 3))))
 }
+
+pub fn oset_insert_new_test() {
+  let assert Ok(table) = oset.new("oset22", 1, etc.Public)
+  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  oset.insert_new(table, [#(1, 2), #(3, 4)])
+  |> should.equal(True)
+  oset.insert_new(table, [#(1, 3), #(2, 4)])
+  |> should.equal(False)
+  oset.lookup(table, 1)
+  |> should.equal(Some(#(1, 2)))
+  oset.lookup(table, 2)
+  |> should.equal(None)
+}
+
+pub fn oset_take_test() {
+  let assert Ok(table) = oset.new("oset23", 1, etc.Public)
+  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  oset.insert(table, [#(1, 2), #(3, 4)])
+  |> should.equal(True)
+  oset.lookup(table, 1)
+  |> should.equal(Some(#(1, 2)))
+  oset.take(table, 1)
+  |> should.equal(Some(#(1, 2)))
+  oset.take(table, 1)
+  |> should.equal(None)
+  oset.lookup(table, 1)
+  |> should.equal(None)
+}
+
+pub fn oset_member_test() {
+  let assert Ok(table) = oset.new("oset24", 1, etc.Public)
+  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  oset.insert(table, [#(1, 2), #(3, 4)])
+  |> should.equal(True)
+  oset.member(table, 1)
+  |> should.equal(True)
+  oset.member(table, 2)
+  |> should.equal(False)
+  oset.delete_key(table, 1)
+  oset.member(table, 1)
+  |> should.equal(False)
+}
+
+pub fn oset_singleton_member_test() {
+  let assert Ok(table) = oset.new("oset25", 1, etc.Public)
+  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  oset.insert(table, [1, 3])
+  |> should.equal(True)
+  oset.member(table, 1)
+  |> should.equal(True)
+  oset.member(table, 2)
+  |> should.equal(False)
+  oset.delete_key(table, 1)
+  oset.member(table, 1)
+  |> should.equal(False)
+}

@@ -370,3 +370,59 @@ pub fn dbag_dynamic_test() {
   dbag.lookup(table, 1)
   |> should.equal([dynamic.from(#(1, 2, 3))])
 }
+
+pub fn dbag_insert_new_test() {
+  let assert Ok(table) = dbag.new("dbag22", 1, etc.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  dbag.insert_new(table, [#(1, 2), #(3, 4)])
+  |> should.equal(True)
+  dbag.insert_new(table, [#(1, 3), #(2, 4)])
+  |> should.equal(False)
+  dbag.lookup(table, 1)
+  |> should.equal([#(1, 2)])
+  dbag.lookup(table, 2)
+  |> should.equal([])
+}
+
+pub fn dbag_take_test() {
+  let assert Ok(table) = dbag.new("dbag23", 1, etc.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  dbag.insert(table, [#(1, 2), #(3, 4)])
+  |> should.equal(True)
+  dbag.lookup(table, 1)
+  |> should.equal([#(1, 2)])
+  dbag.take(table, 1)
+  |> should.equal([#(1, 2)])
+  dbag.take(table, 1)
+  |> should.equal([])
+  dbag.lookup(table, 1)
+  |> should.equal([])
+}
+
+pub fn dbag_member_test() {
+  let assert Ok(table) = dbag.new("dbag24", 1, etc.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  dbag.insert(table, [#(1, 2), #(3, 4)])
+  |> should.equal(True)
+  dbag.member(table, 1)
+  |> should.equal(True)
+  dbag.member(table, 2)
+  |> should.equal(False)
+  dbag.delete_key(table, 1)
+  dbag.member(table, 1)
+  |> should.equal(False)
+}
+
+pub fn dbag_singleton_member_test() {
+  let assert Ok(table) = dbag.new("dbag25", 1, etc.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  dbag.insert(table, [1, 3])
+  |> should.equal(True)
+  dbag.member(table, 1)
+  |> should.equal(True)
+  dbag.member(table, 2)
+  |> should.equal(False)
+  dbag.delete_key(table, 1)
+  dbag.member(table, 1)
+  |> should.equal(False)
+}

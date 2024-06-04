@@ -1,5 +1,4 @@
 //// This module provides functions to work with `DBag`s
-////
 
 import bravo/error.{type ErlangError}
 import bravo/etc.{type Access}
@@ -174,4 +173,27 @@ pub fn file2tab(
 ///
 pub fn tab2list(dbag: DBag(t)) -> List(t) {
   bindings.try_tab2list(dbag.table)
+}
+
+/// Inserts a list of tuples into a `DBag`. Unlike `insert`, this cannot overwrite objects and will return false if it tries to do so.
+///
+/// Returns a `Bool` representing if the inserting succeeded.
+/// - If `True`, all objects in the list were inserted.
+/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the `keypos` of the `DBag` is greater than the object tuple size or if the input list is empty.
+///
+pub fn insert_new(dbag: DBag(t), objects: List(t)) -> Bool {
+  use <- bool.guard(list.is_empty(objects), False)
+  bindings.try_insert_new(dbag.table, dbag.keypos, objects)
+}
+
+/// Returns and removes all objects with `key` in the `DBag`, if any exist.
+///
+pub fn take(dbag: DBag(t), key: a) -> List(t) {
+  bindings.try_take(dbag.table, key)
+}
+
+/// Returns whether a `DBag` contains an object at `key`.
+///
+pub fn member(dbag: DBag(t), key: a) -> Bool {
+  bindings.try_member(dbag.table, key)
 }
