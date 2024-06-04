@@ -1,4 +1,4 @@
-# v2.3.0 (unreleased)
+# v2.3.0
 - Added `insert_new` to all tables.
 - Added `member` to all tables.
 - Added `take` to all tables.
