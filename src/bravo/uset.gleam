@@ -177,3 +177,29 @@ pub fn file2tab(
 pub fn tab2list(uset: USet(t)) -> List(t) {
   bindings.try_tab2list(uset.table)
 }
+
+/// Inserts a list of tuples into a `USet`. Unlike `insert`, this cannot overwrite objects and will return false if it tries to do so.
+///
+/// Returns a `Bool` representing if the inserting succeeded.
+/// - If `True`, all objects in the list were inserted.
+/// - If `False`, _none_ of the objects in the list were inserted. This may occur if the `keypos` of the `USet` is greater than the object tuple size or if the input list is empty.
+///
+pub fn insert_new(uset: USet(t), objects: List(t)) -> Bool {
+  use <- bool.guard(list.is_empty(objects), False)
+  bindings.try_insert_new(uset.table, uset.keypos, objects)
+}
+
+/// Returns and removes an object at `key` in the `USet`, if such object exists.
+///
+pub fn take(uset: USet(t), key: a) -> Option(t) {
+  case bindings.try_take(uset.table, key) {
+    [res] -> Some(res)
+    _ -> None
+  }
+}
+
+/// Returns whether a `USet` contains an object at `key`.
+///
+pub fn member(uset: USet(t), key: a) -> Bool {
+  bindings.try_member(uset.table, key)
+}

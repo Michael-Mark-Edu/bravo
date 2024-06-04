@@ -45,6 +45,15 @@ pub fn try_tab2list(table: Atom) -> a
 @external(erlang, "bravo", "inform")
 pub fn inform(table: Atom, key: Atom) -> Dynamic
 
+@external(erlang, "bravo", "try_insert_new")
+pub fn try_insert_new(table: Atom, keypos: Int, list: List(a)) -> Bool
+
+@external(erlang, "bravo", "try_take")
+pub fn try_take(table: Atom, key: a) -> List(b)
+
+@external(erlang, "bravo", "try_member")
+pub fn try_member(table: Atom, key: a) -> Bool
+
 @external(erlang, "erlang", "tuple_size")
 pub fn tuple_size(tuple: a) -> Int
 

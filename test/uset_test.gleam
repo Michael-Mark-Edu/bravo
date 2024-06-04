@@ -352,3 +352,59 @@ pub fn uset_dynamic_test() {
   uset.lookup(table, 1)
   |> should.equal(Some(dynamic.from(#(1, 2, 3))))
 }
+
+pub fn uset_insert_new_test() {
+  let assert Ok(table) = uset.new("uset22", 1, etc.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert_new(table, [#(1, 2), #(3, 4)])
+  |> should.equal(True)
+  uset.insert_new(table, [#(1, 3), #(2, 4)])
+  |> should.equal(False)
+  uset.lookup(table, 1)
+  |> should.equal(Some(#(1, 2)))
+  uset.lookup(table, 2)
+  |> should.equal(None)
+}
+
+pub fn uset_take_test() {
+  let assert Ok(table) = uset.new("uset23", 1, etc.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, [#(1, 2), #(3, 4)])
+  |> should.equal(True)
+  uset.lookup(table, 1)
+  |> should.equal(Some(#(1, 2)))
+  uset.take(table, 1)
+  |> should.equal(Some(#(1, 2)))
+  uset.take(table, 1)
+  |> should.equal(None)
+  uset.lookup(table, 1)
+  |> should.equal(None)
+}
+
+pub fn uset_member_test() {
+  let assert Ok(table) = uset.new("uset24", 1, etc.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, [#(1, 2), #(3, 4)])
+  |> should.equal(True)
+  uset.member(table, 1)
+  |> should.equal(True)
+  uset.member(table, 2)
+  |> should.equal(False)
+  uset.delete_key(table, 1)
+  uset.member(table, 1)
+  |> should.equal(False)
+}
+
+pub fn uset_singleton_member_test() {
+  let assert Ok(table) = uset.new("uset25", 1, etc.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, [1, 3])
+  |> should.equal(True)
+  uset.member(table, 1)
+  |> should.equal(True)
+  uset.member(table, 2)
+  |> should.equal(False)
+  uset.delete_key(table, 1)
+  uset.member(table, 1)
+  |> should.equal(False)
+}
