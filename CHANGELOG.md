@@ -7,6 +7,8 @@ This is a breaking update!
   four for each of the table types, and a new `bravo.gleam` module which acts
   like `bravo/error` and `bravo/etc` combined. Less imports should be required
   now.
+- Changed how non-tuples are stored internally. It should now be more memory
+  efficient to store non-tuples.
 
 # v2.3.0
 - Added `insert_new` to all tables.
