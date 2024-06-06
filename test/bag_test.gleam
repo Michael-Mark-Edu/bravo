@@ -1,3 +1,4 @@
+import bravo
 import bravo/bag
 import bravo/error
 import bravo/etc
@@ -110,7 +111,7 @@ pub fn bag_bad_new_test() {
   let assert Ok(table) = bag.new("bag5", 1, etc.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.new("bag5", 1, etc.Public)
-  |> should.equal(Error(Some(error.Badarg)))
+  |> should.equal(Error(bravo.ErlangError("badarg")))
 }
 
 pub fn bag_bad_insert_test() {

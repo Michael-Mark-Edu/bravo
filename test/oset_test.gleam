@@ -1,3 +1,4 @@
+import bravo
 import bravo/error
 import bravo/etc
 import bravo/oset
@@ -110,7 +111,7 @@ pub fn oset_bad_new_test() {
   let assert Ok(table) = oset.new("oset5", 1, etc.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.new("oset5", 1, etc.Public)
-  |> should.equal(Error(Some(error.Badarg)))
+  |> should.equal(Error(bravo.ErlangError("badarg")))
 }
 
 pub fn oset_bad_insert_test() {

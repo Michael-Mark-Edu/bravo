@@ -1,3 +1,4 @@
+import bravo
 import bravo/error
 import bravo/etc
 import bravo/uset
@@ -110,7 +111,7 @@ pub fn uset_bad_new_test() {
   let assert Ok(table) = uset.new("uset5", 1, etc.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.new("uset5", 1, etc.Public)
-  |> should.equal(Error(Some(error.Badarg)))
+  |> should.equal(Error(bravo.ErlangError("badarg")))
 }
 
 pub fn uset_bad_insert_test() {

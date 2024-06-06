@@ -1,4 +1,4 @@
--module(bravo).
+-module(bravo_ffi).
 
 -export([inform/2, try_delete/1, try_delete_all_objects/1, try_delete_key/2,
          try_delete_object/2, try_file2tab/2, try_insert/3, try_insert_new/3,
@@ -36,7 +36,7 @@ try_insert(Name, Keypos, Objects) ->
 
 try_new(Name, Options) ->
     case (catch (ets:new(Name, Options))) of
-        {'EXIT', {Reason, _}} -> {error, Reason};
+        {'EXIT', {Reason, _}} -> {error, {erlang_error, atom_to_binary(Reason, utf8)}};
         Other -> {ok, Other}
     end.
 

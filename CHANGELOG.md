@@ -1,3 +1,7 @@
+# v3.0.0 (unreleased)
+This is a breaking update!
+- `new` now has a more reasonable error type.
+
 # v2.3.0
 - Added `insert_new` to all tables.
 - Added `member` to all tables.
@@ -29,7 +33,6 @@
 
 # v2.0.0
 This is a breaking update!
-
 - `bravo/object` has been completely deleted.
 - The table types are now typed. `insert` and `lookup` use these types now. As a
   result, tables are now restricted to only being able to store a single type of

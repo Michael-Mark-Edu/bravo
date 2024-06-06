@@ -1,5 +1,6 @@
 //// This module provides functions to work with `Bag`s
 
+import bravo.{type NewTableError, BadParameters}
 import bravo/error.{type ErlangError}
 import bravo/etc.{type Access}
 import bravo/internal/bindings
@@ -35,11 +36,14 @@ pub fn new(
   name: String,
   keypos: Int,
   access: Access,
-) -> Result(Bag(t), Option(ErlangError)) {
+) -> Result(Bag(t), NewTableError) {
   let atom = atom.create_from_string(name)
-  use <- bool.guard(keypos < 1, Error(None))
+  use <- bool.guard(
+    keypos < 1,
+    Error(BadParameters("Keypos must be a positive integer.")),
+  )
   use a <- result.try(
-    bindings.new(atom, [
+    bindings.try_new(atom, [
       new_option.Bag,
       case access {
         etc.Public -> new_option.Public
@@ -51,8 +55,7 @@ pub fn new(
       new_option.WriteConcurrency(new_option.Auto),
       new_option.ReadConcurrency(True),
       new_option.DecentralizedCounters(True),
-    ])
-    |> result.map_error(fn(e) { Some(e) }),
+    ]),
   )
   Ok(Bag(a, keypos))
 }

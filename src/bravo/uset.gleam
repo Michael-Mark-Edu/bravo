@@ -1,5 +1,6 @@
 //// This module provides functions to work with `USet`s
 
+import bravo.{type NewTableError, BadParameters}
 import bravo/error.{type ErlangError}
 import bravo/etc.{type Access}
 import bravo/internal/bindings
@@ -37,11 +38,14 @@ pub fn new(
   name: String,
   keypos: Int,
   access: Access,
-) -> Result(USet(t), Option(ErlangError)) {
+) -> Result(USet(t), NewTableError) {
   let atom = atom.create_from_string(name)
-  use <- bool.guard(keypos < 1, Error(None))
+  use <- bool.guard(
+    keypos < 1,
+    Error(BadParameters("Keypos must be a positive integer.")),
+  )
   use a <- result.try(
-    bindings.new(atom, [
+    bindings.try_new(atom, [
       new_option.Set,
       case access {
         etc.Public -> new_option.Public
@@ -53,8 +57,8 @@ pub fn new(
       new_option.WriteConcurrency(new_option.Auto),
       new_option.ReadConcurrency(True),
       new_option.DecentralizedCounters(True),
-    ])
-    |> result.map_error(fn(e) { Some(e) }),
+    ]),
+    // |> result.map_error(fn(e) { todo }),
   )
   Ok(USet(a, keypos))
 }
