@@ -9,14 +9,6 @@ inform(Name, Key) ->
   {_, Target} = lists:keyfind(Key, 1, Info),
   Target.
 
-get_singleton(Elem) ->
-  case Elem of
-    {Res, '$BRAVO_SINGLETON'} ->
-      Res;
-    Other ->
-      Other
-  end.
-
 try_insert(Name, Keypos, Objects) ->
   Condition =
     case is_tuple(lists:nth(1, Objects)) of
@@ -27,6 +19,7 @@ try_insert(Name, Keypos, Objects) ->
     end,
   case Condition of
     true ->
+      ets:insert('$BRAVOMETA', {Name, tuple}),
       case lists:all(fun(Elem) -> tuple_size(Elem) >= Keypos end, Objects) of
         true ->
           ets:insert(Name, Objects);
@@ -34,15 +27,23 @@ try_insert(Name, Keypos, Objects) ->
           false
       end;
     false ->
+      ets:insert('$BRAVOMETA', {Name, non_tuple}),
       case Keypos == 1 of
         true ->
-          ets:insert(Name, lists:map(fun(Elem) -> {Elem, '$BRAVO_SINGLETON'} end, Objects));
+          ets:insert(Name, lists:map(fun(Elem) -> {Elem} end, Objects));
         false ->
           false
       end
   end.
 
 try_new(Name, Options) ->
+  case ets:whereis('$BRAVOMETA') of
+    undefined ->
+      Meta = ets:new('$BRAVOMETA', [set, public, named_table, {keypos, 1}, {heir, none}]),
+      ets:insert(Meta, {Name, unknown});
+    Table ->
+      ets:insert(Table, {Name, unknown})
+  end,
   case catch ets:new(Name, Options) of
     {'EXIT', {Reason, _}} ->
       {error, {erlang_error, atom_to_binary(Reason, utf8)}};
@@ -97,6 +98,7 @@ try_insert_new(Name, Keypos, Objects) ->
     end,
   case Condition of
     true ->
+      ets:insert('$BRAVOMETA', {Name, tuple}),
       case lists:all(fun(Elem) -> tuple_size(Elem) >= Keypos end, Objects) of
         true ->
           ets:insert_new(Name, Objects);
@@ -104,16 +106,23 @@ try_insert_new(Name, Keypos, Objects) ->
           false
       end;
     false ->
+      ets:insert('$BRAVOMETA', {Name, non_tuple}),
       case Keypos == 1 of
         true ->
-          ets:insert_new(Name, lists:map(fun(Elem) -> {Elem, '$BRAVO_SINGLETON'} end, Objects));
+          ets:insert_new(Name, lists:map(fun(Elem) -> {Elem} end, Objects));
         false ->
           false
       end
   end.
 
 try_lookup(Name, Key) ->
-  lists:map(fun get_singleton/1, ets:lookup(Name, Key)).
+  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+    {_, unknown} -> [];
+    {_, tuple} -> ets:lookup(Name, Key);
+    {_, non_tuple} ->
+      Res = ets:lookup(Name, Key),
+      lists:map(fun(Elem) -> element(1, Elem) end, Res)
+  end.
 
 try_delete_key(Name, Key) ->
   ets:delete(Name, Key).
@@ -128,7 +137,13 @@ try_tab2list(Name) ->
   ets:tab2list(Name).
 
 try_take(Name, Key) ->
-  lists:map(fun get_singleton/1, ets:take(Name, Key)).
+  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+    {_, unknown} -> [];
+    {_, tuple} -> ets:take(Name, Key);
+    {_, non_tuple} ->
+      {Res} = ets:take(Name, {Key}),
+      Res
+  end.
 
 try_member(Name, Key) ->
   ets:member(Name, Key).
