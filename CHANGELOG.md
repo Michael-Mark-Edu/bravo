@@ -1,6 +1,12 @@
 # v3.0.0 (unreleased)
 This is a breaking update!
-- `new` now has a more reasonable error type.
+- Complete overhaul of the error system. Instead of using `Option` or
+  `ErlangError`, most failable functions are now `Result`s with error type
+  `BravoError`. Affected functions are `new`, `tab2file`, and `file2tab`.
+- All non-internal types and functions are now concentrated into five modules:
+  four for each of the table types, and a new `bravo.gleam` module which acts
+  like `bravo/error` and `bravo/etc` combined. Less imports should be required
+  now.
 
 # v2.3.0
 - Added `insert_new` to all tables.
