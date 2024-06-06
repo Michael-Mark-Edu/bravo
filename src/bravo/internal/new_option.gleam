@@ -1,4 +1,4 @@
-import bravo/etc.{type Term}
+pub type Term
 
 pub type NewOption {
   Set

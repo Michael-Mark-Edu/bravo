@@ -1,5 +1,4 @@
 import bravo
-import bravo/etc
 import bravo/oset
 import gleam/dict
 import gleam/dynamic
@@ -15,7 +14,7 @@ fn defer(defer: fn() -> a, block: fn() -> b) -> b {
 }
 
 pub fn oset_insert_lookup_delete_test() {
-  let assert Ok(table) = oset.new("oset1", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset1", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
@@ -28,7 +27,7 @@ pub fn oset_insert_lookup_delete_test() {
 }
 
 pub fn oset_multitype_test() {
-  let assert Ok(table) = oset.new("oset2", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset2", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("a", 1), #("b", 2)])
   |> should.equal(True)
@@ -41,7 +40,7 @@ pub fn oset_multitype_test() {
 }
 
 pub fn oset_large_test() {
-  let assert Ok(table) = oset.new("oset3", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset3", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [
     #(
@@ -94,7 +93,7 @@ pub fn oset_large_test() {
 }
 
 pub fn oset_keypos_test() {
-  let assert Ok(table) = oset.new("oset4", 2, etc.Public)
+  let assert Ok(table) = oset.new("oset4", 2, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
@@ -107,21 +106,21 @@ pub fn oset_keypos_test() {
 }
 
 pub fn oset_bad_new_test() {
-  let assert Ok(table) = oset.new("oset5", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset5", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
-  oset.new("oset5", 1, etc.Public)
+  oset.new("oset5", 1, bravo.Public)
   |> should.equal(Error(bravo.ErlangError("badarg")))
 }
 
 pub fn oset_bad_insert_test() {
-  let assert Ok(table) = oset.new("oset6", 3, etc.Public)
+  let assert Ok(table) = oset.new("oset6", 3, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("a", 1)])
   |> should.equal(False)
 }
 
 pub fn oset_multi_insert_test() {
-  let assert Ok(table) = oset.new("oset7", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset7", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#(100, 200)])
   |> should.equal(True)
@@ -134,7 +133,7 @@ pub fn oset_multi_insert_test() {
 }
 
 pub fn oset_large_multitype_test() {
-  let assert Ok(table) = oset.new("oset8", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset8", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [
     #(
@@ -165,10 +164,10 @@ pub fn oset_large_multitype_test() {
 }
 
 pub fn oset_delete_test() {
-  let assert Ok(table) = oset.new("oset9", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset9", 1, bravo.Public)
   oset.delete(table)
   |> should.equal(True)
-  let assert Ok(table) = oset.new("oset9", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset9", 1, bravo.Public)
   oset.delete(table)
   |> should.equal(True)
   oset.delete(table)
@@ -176,7 +175,7 @@ pub fn oset_delete_test() {
 }
 
 pub fn oset_singleton_test() {
-  let assert Ok(table) = oset.new("oset10", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset10", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#(1), #(2)])
   |> should.equal(True)
@@ -187,7 +186,7 @@ pub fn oset_singleton_test() {
 }
 
 pub fn oset_nontuple_test() {
-  let assert Ok(table) = oset.new("oset11", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset11", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [5])
   |> should.equal(True)
@@ -196,7 +195,7 @@ pub fn oset_nontuple_test() {
 }
 
 pub fn oset_nontuple_record_test() {
-  let assert Ok(table) = oset.new("oset12", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset12", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [Ok(5)])
   |> should.equal(True)
@@ -211,7 +210,7 @@ type Multirecord {
 }
 
 pub fn oset_nontuple_multirecord_test() {
-  let assert Ok(table) = oset.new("oset13", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset13", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [A(1), B(2, 3), C])
   |> should.equal(True)
@@ -224,7 +223,7 @@ pub fn oset_nontuple_multirecord_test() {
 }
 
 pub fn oset_delete_key_test() {
-  let assert Ok(table) = oset.new("oset14", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset14", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.equal(True)
@@ -238,7 +237,7 @@ pub fn oset_delete_key_test() {
 }
 
 pub fn oset_delete_all_objects_test() {
-  let assert Ok(table) = oset.new("oset15", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset15", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.equal(True)
@@ -250,7 +249,7 @@ pub fn oset_delete_all_objects_test() {
 }
 
 pub fn oset_delete_object_test() {
-  let assert Ok(table) = oset.new("oset16", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset16", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.equal(True)
@@ -262,7 +261,7 @@ pub fn oset_delete_object_test() {
 }
 
 pub fn oset_tab2file_test() {
-  let assert Ok(table) = oset.new("oset17", 2, etc.Public)
+  let assert Ok(table) = oset.new("oset17", 2, bravo.Public)
   oset.insert(table, [#("Hello", "World")])
   |> should.equal(True)
   oset.tab2file(table, "oset17", True, True, True)
@@ -284,7 +283,7 @@ pub fn oset_tab2file_test() {
 }
 
 pub fn oset_tab2list_test() {
-  let assert Ok(table) = oset.new("oset18", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset18", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.equal(True)
@@ -298,7 +297,7 @@ pub fn oset_tab2list_test() {
 }
 
 pub fn oset_tab2list_orderedness_test() {
-  let assert Ok(table) = oset.new("oset19", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset19", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [
     #("A"),
@@ -333,14 +332,14 @@ pub fn oset_tab2list_orderedness_test() {
 }
 
 pub fn oset_empty_insert_test() {
-  let assert Ok(table) = oset.new("oset20", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset20", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [])
   |> should.equal(False)
 }
 
 pub fn oset_dynamic_test() {
-  let assert Ok(table) = oset.new("oset21", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset21", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [
     dynamic.from(#("Hello", "World")),
@@ -354,7 +353,7 @@ pub fn oset_dynamic_test() {
 }
 
 pub fn oset_insert_new_test() {
-  let assert Ok(table) = oset.new("oset22", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset22", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert_new(table, [#(1, 2), #(3, 4)])
   |> should.equal(True)
@@ -367,7 +366,7 @@ pub fn oset_insert_new_test() {
 }
 
 pub fn oset_take_test() {
-  let assert Ok(table) = oset.new("oset23", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset23", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#(1, 2), #(3, 4)])
   |> should.equal(True)
@@ -382,7 +381,7 @@ pub fn oset_take_test() {
 }
 
 pub fn oset_member_test() {
-  let assert Ok(table) = oset.new("oset24", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset24", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#(1, 2), #(3, 4)])
   |> should.equal(True)
@@ -396,7 +395,7 @@ pub fn oset_member_test() {
 }
 
 pub fn oset_singleton_member_test() {
-  let assert Ok(table) = oset.new("oset25", 1, etc.Public)
+  let assert Ok(table) = oset.new("oset25", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [1, 3])
   |> should.equal(True)

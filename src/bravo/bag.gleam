@@ -1,7 +1,6 @@
 //// This module provides functions to work with `Bag`s
 
-import bravo.{type BravoError, BadParameters}
-import bravo/etc.{type Access}
+import bravo.{type Access, type BravoError, BadParameters}
 import bravo/internal/bindings
 import bravo/internal/new_option
 import gleam/bool
@@ -45,9 +44,9 @@ pub fn new(
     bindings.try_new(atom, [
       new_option.Bag,
       case access {
-        etc.Public -> new_option.Public
-        etc.Protected -> new_option.Protected
-        etc.Private -> new_option.Private
+        bravo.Public -> new_option.Public
+        bravo.Protected -> new_option.Protected
+        bravo.Private -> new_option.Private
       },
       new_option.NamedTable,
       new_option.Keypos(keypos),

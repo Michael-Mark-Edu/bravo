@@ -1,7 +1,6 @@
 //// This module provides functions to work with `DBag`s
 
-import bravo.{type BravoError, BadParameters}
-import bravo/etc.{type Access}
+import bravo.{type Access, type BravoError, BadParameters}
 import bravo/internal/bindings
 import bravo/internal/new_option
 import gleam/bool
@@ -12,7 +11,7 @@ import gleam/option.{type Option, None, Some}
 import gleam/result
 import gleam/string
 
-/// A duplicate bag etc. Keys may occur multiple times per table, and verbatim copies of an object can be stored.
+/// A duplicate bag bravo. Keys may occur multiple times per table, and verbatim copies of an object can be stored.
 ///
 pub opaque type DBag(t) {
   DBag(table: Atom, keypos: Int)
@@ -45,9 +44,9 @@ pub fn new(
     bindings.try_new(atom, [
       new_option.DuplicateBag,
       case access {
-        etc.Public -> new_option.Public
-        etc.Protected -> new_option.Protected
-        etc.Private -> new_option.Private
+        bravo.Public -> new_option.Public
+        bravo.Protected -> new_option.Protected
+        bravo.Private -> new_option.Private
       },
       new_option.NamedTable,
       new_option.Keypos(keypos),

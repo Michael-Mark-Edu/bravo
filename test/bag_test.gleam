@@ -1,6 +1,5 @@
 import bravo
 import bravo/bag
-import bravo/etc
 import gleam/dict
 import gleam/dynamic
 import gleam/list
@@ -15,7 +14,7 @@ fn defer(defer: fn() -> a, block: fn() -> b) -> b {
 }
 
 pub fn bag_insert_lookup_delete_test() {
-  let assert Ok(table) = bag.new("bag1", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag1", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
@@ -28,7 +27,7 @@ pub fn bag_insert_lookup_delete_test() {
 }
 
 pub fn bag_multitype_test() {
-  let assert Ok(table) = bag.new("bag2", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag2", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [#("a", 1), #("b", 2)])
   |> should.equal(True)
@@ -41,7 +40,7 @@ pub fn bag_multitype_test() {
 }
 
 pub fn bag_large_test() {
-  let assert Ok(table) = bag.new("bag3", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag3", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [
     #(
@@ -94,7 +93,7 @@ pub fn bag_large_test() {
 }
 
 pub fn bag_keypos_test() {
-  let assert Ok(table) = bag.new("bag4", 2, etc.Public)
+  let assert Ok(table) = bag.new("bag4", 2, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
@@ -107,21 +106,21 @@ pub fn bag_keypos_test() {
 }
 
 pub fn bag_bad_new_test() {
-  let assert Ok(table) = bag.new("bag5", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag5", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
-  bag.new("bag5", 1, etc.Public)
+  bag.new("bag5", 1, bravo.Public)
   |> should.equal(Error(bravo.ErlangError("badarg")))
 }
 
 pub fn bag_bad_insert_test() {
-  let assert Ok(table) = bag.new("bag6", 3, etc.Public)
+  let assert Ok(table) = bag.new("bag6", 3, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [#("a", 1)])
   |> should.equal(False)
 }
 
 pub fn bag_multi_insert_test() {
-  let assert Ok(table) = bag.new("bag7", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag7", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [#(100, 200)])
   |> should.equal(True)
@@ -134,7 +133,7 @@ pub fn bag_multi_insert_test() {
 }
 
 pub fn bag_large_multitype_test() {
-  let assert Ok(table) = bag.new("bag8", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag8", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [
     #(
@@ -165,10 +164,10 @@ pub fn bag_large_multitype_test() {
 }
 
 pub fn bag_delete_test() {
-  let assert Ok(table) = bag.new("bag9", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag9", 1, bravo.Public)
   bag.delete(table)
   |> should.equal(True)
-  let assert Ok(table) = bag.new("bag9", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag9", 1, bravo.Public)
   bag.delete(table)
   |> should.equal(True)
   bag.delete(table)
@@ -176,7 +175,7 @@ pub fn bag_delete_test() {
 }
 
 pub fn bag_singleton_test() {
-  let assert Ok(table) = bag.new("bag10", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag10", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [#(1), #(2)])
   |> should.equal(True)
@@ -187,7 +186,7 @@ pub fn bag_singleton_test() {
 }
 
 pub fn bag_nontuple_test() {
-  let assert Ok(table) = bag.new("bag11", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag11", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [5])
   |> should.equal(True)
@@ -196,7 +195,7 @@ pub fn bag_nontuple_test() {
 }
 
 pub fn bag_nontuple_record_test() {
-  let assert Ok(table) = bag.new("bag12", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag12", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [Ok(5)])
   |> should.equal(True)
@@ -211,7 +210,7 @@ type Multirecord {
 }
 
 pub fn bag_nontuple_multirecord_test() {
-  let assert Ok(table) = bag.new("bag13", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag13", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [A(1), B(2, 3), C])
   |> should.equal(True)
@@ -224,7 +223,7 @@ pub fn bag_nontuple_multirecord_test() {
 }
 
 pub fn bag_delete_key_test() {
-  let assert Ok(table) = bag.new("bag14", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag14", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [#("Hello", "World"), #("Bye", "World"), #("Bye", "Bye")])
   |> should.equal(True)
@@ -238,7 +237,7 @@ pub fn bag_delete_key_test() {
 }
 
 pub fn bag_delete_all_objects_test() {
-  let assert Ok(table) = bag.new("bag15", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag15", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [#("Hello", "World"), #("Bye", "World"), #("Bye", "Bye")])
   |> should.equal(True)
@@ -250,7 +249,7 @@ pub fn bag_delete_all_objects_test() {
 }
 
 pub fn bag_delete_object_test() {
-  let assert Ok(table) = bag.new("bag16", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag16", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [#("Hello", "World"), #("Bye", "World"), #("Bye", "Bye")])
   |> should.equal(True)
@@ -262,7 +261,7 @@ pub fn bag_delete_object_test() {
 }
 
 pub fn bag_tab2file_test() {
-  let assert Ok(table) = bag.new("bag17", 2, etc.Public)
+  let assert Ok(table) = bag.new("bag17", 2, bravo.Public)
   bag.insert(table, [#("Hello", "World")])
   |> should.equal(True)
   bag.tab2file(table, "bag17", True, True, True)
@@ -280,7 +279,7 @@ pub fn bag_tab2file_test() {
 }
 
 pub fn bag_tab2list_test() {
-  let assert Ok(table) = bag.new("bag18", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag18", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.equal(True)
@@ -294,7 +293,7 @@ pub fn bag_tab2list_test() {
 }
 
 pub fn bag_tab2list_orderedness_test() {
-  let assert Ok(table) = bag.new("bag19", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag19", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [
     #("A"),
@@ -329,14 +328,14 @@ pub fn bag_tab2list_orderedness_test() {
 }
 
 pub fn bag_empty_insert_test() {
-  let assert Ok(table) = bag.new("bag20", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag20", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [])
   |> should.equal(False)
 }
 
 pub fn bag_dynamic_test() {
-  let assert Ok(table) = bag.new("bag21", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag21", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [
     dynamic.from(#("Hello", "World")),
@@ -354,7 +353,7 @@ pub fn bag_dynamic_test() {
 }
 
 pub fn bag_insert_new_test() {
-  let assert Ok(table) = bag.new("bag22", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag22", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert_new(table, [#(1, 2), #(3, 4)])
   |> should.equal(True)
@@ -367,7 +366,7 @@ pub fn bag_insert_new_test() {
 }
 
 pub fn bag_take_test() {
-  let assert Ok(table) = bag.new("bag23", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag23", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [#(1, 2), #(3, 4)])
   |> should.equal(True)
@@ -382,7 +381,7 @@ pub fn bag_take_test() {
 }
 
 pub fn bag_member_test() {
-  let assert Ok(table) = bag.new("bag24", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag24", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [#(1, 2), #(3, 4)])
   |> should.equal(True)
@@ -396,7 +395,7 @@ pub fn bag_member_test() {
 }
 
 pub fn bag_singleton_member_test() {
-  let assert Ok(table) = bag.new("bag25", 1, etc.Public)
+  let assert Ok(table) = bag.new("bag25", 1, bravo.Public)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [1, 3])
   |> should.equal(True)

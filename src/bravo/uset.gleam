@@ -1,13 +1,11 @@
 //// This module provides functions to work with `USet`s
 
-import bravo.{type BravoError, BadParameters}
-import bravo/etc.{type Access}
+import bravo.{type Access, type BravoError, BadParameters}
 import bravo/internal/bindings
 import bravo/internal/new_option
 import gleam/bool
 import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
-import gleam/io
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
@@ -48,9 +46,9 @@ pub fn new(
     bindings.try_new(atom, [
       new_option.Set,
       case access {
-        etc.Public -> new_option.Public
-        etc.Protected -> new_option.Protected
-        etc.Private -> new_option.Private
+        bravo.Public -> new_option.Public
+        bravo.Protected -> new_option.Protected
+        bravo.Private -> new_option.Private
       },
       new_option.NamedTable,
       new_option.Keypos(keypos),
