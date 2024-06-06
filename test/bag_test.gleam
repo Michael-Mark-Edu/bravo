@@ -1,6 +1,5 @@
 import bravo
 import bravo/bag
-import bravo/error
 import bravo/etc
 import gleam/dict
 import gleam/dynamic

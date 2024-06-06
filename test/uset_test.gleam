@@ -1,5 +1,4 @@
 import bravo
-import bravo/error
 import bravo/etc
 import bravo/uset
 import gleam/dict

@@ -1,5 +1,4 @@
-import bravo.{type NewTableError}
-import bravo/error.{type ErlangError}
+import bravo.{type BravoError}
 import bravo/internal/new_option.{type NewOption}
 import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
@@ -8,7 +7,7 @@ import gleam/erlang/atom.{type Atom}
 pub fn try_new(
   table: Atom,
   options: List(NewOption),
-) -> Result(Atom, NewTableError)
+) -> Result(Atom, BravoError)
 
 @external(erlang, "bravo_ffi", "try_insert")
 pub fn try_insert(table: Atom, keypos: Int, list: List(a)) -> Bool
@@ -35,13 +34,13 @@ pub fn try_tab2file(
   object_count: Bool,
   md5sum: Bool,
   sync: Bool,
-) -> new_option.EmptyResult(ErlangError)
+) -> Result(Nil, BravoError)
 
 @external(erlang, "bravo_ffi", "try_file2tab")
 pub fn try_file2tab(
   filename: List(UtfCodepoint),
   verify: Bool,
-) -> Result(Atom, ErlangError)
+) -> Result(Atom, BravoError)
 
 @external(erlang, "bravo_ffi", "try_tab2list")
 pub fn try_tab2list(table: Atom) -> a

@@ -6,7 +6,7 @@
          try_take/2]).
 
 inform(Name, Key) ->
-    Info = ets:info(Name),
+    Info = catch(ets:info(Name)),
     {_, Target} = lists:keyfind(Key, 1, Info),
     Target.
 
@@ -54,7 +54,16 @@ try_tab2file(Name, Filename, ObjectCount, Md5sum, Sync) ->
     C = [{extended_info, lists:append(A, B)}],
     D = [{sync, Sync}],
     Options = lists:append(C, D),
-    ets:tab2file(Name, Filename, Options).
+    case (catch(ets:tab2file(Name, Filename, Options))) of
+        ok -> {ok, nil};
+        {'EXIT', {Reason, _}} -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
+    end.
+
+try_file2tab(Filename, Verify) ->
+    case (catch(ets:file2tab(Filename, [{verify, Verify}]))) of
+        {'EXIT', {Reason, _}} -> {error, {erlang_error, atom_to_binary(Reason, utf8)}};
+        Other -> Other
+    end.
 
 
 try_insert_new(Name, Keypos, Objects) ->
@@ -87,8 +96,6 @@ try_delete_all_objects(Name) ->
 try_delete_object(Name, Object) ->
     ets:delete_object(Name, Object).
 
-try_file2tab(Filename, Verify) ->
-    ets:file2tab(Filename, [{verify, Verify}]).
 
 try_tab2list(Name) ->
     ets:tab2list(Name).

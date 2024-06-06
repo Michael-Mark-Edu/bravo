@@ -1,7 +1,6 @@
 //// This module provides functions to work with `DBag`s
 
-import bravo.{type NewTableError, BadParameters}
-import bravo/error.{type ErlangError}
+import bravo.{type BravoError, BadParameters}
 import bravo/etc.{type Access}
 import bravo/internal/bindings
 import bravo/internal/new_option
@@ -36,7 +35,7 @@ pub fn new(
   name: String,
   keypos: Int,
   access: Access,
-) -> Result(DBag(t), NewTableError) {
+) -> Result(DBag(t), BravoError) {
   let atom = atom.create_from_string(name)
   use <- bool.guard(
     keypos < 1,
@@ -135,8 +134,8 @@ pub fn tab2file(
       sync,
     )
   {
-    new_option.Ok -> True
-    new_option.Error(_) -> False
+    Ok(Nil) -> True
+    Error(_) -> False
   }
 }
 
