@@ -1,5 +1,6 @@
 pub type BravoError {
-  BadParameters(String)
+  NonPositiveKeypos
+  DecodeFailure
   ErlangError(String)
 }
 

@@ -265,9 +265,9 @@ pub fn oset_tab2file_test() {
   oset.insert(table, [#("Hello", "World")])
   |> should.equal(True)
   oset.tab2file(table, "oset17", True, True, True)
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.delete(table)
-  let assert Some(new_table) =
+  let assert Ok(new_table) =
     oset.file2tab(
       "oset17",
       True,
@@ -277,7 +277,7 @@ pub fn oset_tab2file_test() {
   |> should.equal(Some(#("Hello", "World")))
   oset.delete(new_table)
   oset.file2tab("oset17", True, dynamic.tuple2(dynamic.int, dynamic.int))
-  |> should.equal(None)
+  |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("oset17")
   |> should.equal(Ok(Nil))
 }

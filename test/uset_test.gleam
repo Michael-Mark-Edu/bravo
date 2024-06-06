@@ -265,9 +265,9 @@ pub fn uset_tab2file_test() {
   uset.insert(table, [#("Hello", "World")])
   |> should.equal(True)
   uset.tab2file(table, "uset17", True, True, True)
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.delete(table)
-  let assert Some(new_table) =
+  let assert Ok(new_table) =
     uset.file2tab(
       "uset17",
       True,
@@ -277,7 +277,7 @@ pub fn uset_tab2file_test() {
   |> should.equal(Some(#("Hello", "World")))
   uset.delete(new_table)
   uset.file2tab("uset17", True, dynamic.tuple2(dynamic.int, dynamic.int))
-  |> should.equal(None)
+  |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("uset17")
   |> should.equal(Ok(Nil))
 }

@@ -3,7 +3,7 @@ import bravo/bag
 import gleam/dict
 import gleam/dynamic
 import gleam/list
-import gleam/option.{None, Some}
+import gleam/option.{Some}
 import gleeunit/should
 import simplifile
 
@@ -265,15 +265,15 @@ pub fn bag_tab2file_test() {
   bag.insert(table, [#("Hello", "World")])
   |> should.equal(True)
   bag.tab2file(table, "bag17", True, True, True)
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   bag.delete(table)
-  let assert Some(new_table) =
+  let assert Ok(new_table) =
     bag.file2tab("bag17", True, dynamic.tuple2(dynamic.string, dynamic.string))
   bag.lookup(new_table, "World")
   |> should.equal([#("Hello", "World")])
   bag.delete(new_table)
   bag.file2tab("bag17", True, dynamic.tuple2(dynamic.int, dynamic.int))
-  |> should.equal(None)
+  |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("bag17")
   |> should.equal(Ok(Nil))
 }

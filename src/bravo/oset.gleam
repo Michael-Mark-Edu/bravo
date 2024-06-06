@@ -1,6 +1,6 @@
 //// This module provides functions to work with `OSet`s
 
-import bravo.{type Access, type BravoError, BadParameters}
+import bravo.{type Access, type BravoError}
 import bravo/internal/bindings
 import bravo/internal/new_option
 import gleam/bool
@@ -38,10 +38,7 @@ pub fn new(
   access: Access,
 ) -> Result(OSet(t), BravoError) {
   let atom = atom.create_from_string(name)
-  use <- bool.guard(
-    keypos < 1,
-    Error(BadParameters("Keypos must be a positive integer.")),
-  )
+  use <- bool.guard(keypos < 1, Error(bravo.NonPositiveKeypos))
   use a <- result.try(
     bindings.try_new(atom, [
       new_option.OrderedSet,
@@ -126,19 +123,14 @@ pub fn tab2file(
   object_count: Bool,
   md5sum: Bool,
   sync: Bool,
-) -> Bool {
-  case
-    bindings.try_tab2file(
-      oset.table,
-      string.to_utf_codepoints(filename),
-      object_count,
-      md5sum,
-      sync,
-    )
-  {
-    Ok(Nil) -> True
-    Error(_) -> False
-  }
+) -> Result(Nil, BravoError) {
+  bindings.try_tab2file(
+    oset.table,
+    string.to_utf_codepoints(filename),
+    object_count,
+    md5sum,
+    sync,
+  )
 }
 
 /// Creates a `OSet` from file `filename` that was previously created by `tab2file`.
@@ -151,26 +143,25 @@ pub fn file2tab(
   filename: String,
   verify: Bool,
   decoder: fn(Dynamic) -> Result(t, _),
-) -> Option(OSet(t)) {
-  case bindings.try_file2tab(string.to_utf_codepoints(filename), verify) {
-    Error(_) -> None
-    Ok(name) -> {
-      let assert Ok(keypos) =
-        dynamic.int(bindings.inform(name, atom.create_from_string("keypos")))
-      let table = OSet(name, keypos)
-      use <- bool.guard(
-        !{
-          use obj <- list.all(tab2list(table))
-          case decoder(dynamic.from(obj)) {
-            Ok(_) -> True
-            Error(_) -> False
-          }
-        },
-        None,
-      )
-      Some(table)
-    }
-  }
+) -> Result(OSet(t), BravoError) {
+  use name <- result.try(bindings.try_file2tab(
+    string.to_utf_codepoints(filename),
+    verify,
+  ))
+  let assert Ok(keypos) =
+    dynamic.int(bindings.inform(name, atom.create_from_string("keypos")))
+  let table = OSet(name, keypos)
+  use <- bool.guard(
+    !{
+      use obj <- list.all(tab2list(table))
+      case decoder(dynamic.from(obj)) {
+        Ok(_) -> True
+        Error(_) -> False
+      }
+    },
+    Error(bravo.DecodeFailure),
+  )
+  Ok(table)
 }
 
 /// Returns a list containing all of the objects in the `OSet`.
