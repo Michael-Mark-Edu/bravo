@@ -88,8 +88,8 @@ For the sake of demonstration, this section will use the `USet`.
 First, we must create a `USet`. We must pass in a name, the table's `keypos` (recommended to leave
 this as 1) and a access specifier (not relevant unless you're working with processes/actors).
 ```gleam
-import bravo/uset
 import bravo
+import bravo/uset
 
 let assert Ok(table) = uset.new("MyTable", 1, bravo.Public)
 ```
