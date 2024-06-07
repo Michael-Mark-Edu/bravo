@@ -56,6 +56,7 @@ try_delete(Name) ->
     {'EXIT', _} ->
       false;
     _ ->
+      ets:insert('$BRAVOMETA', {Name, deleted}),
       true
   end.
 
@@ -85,6 +86,11 @@ try_file2tab(Filename, Verify) ->
     {'EXIT', {Reason, _}} ->
       {error, {erlang_error, atom_to_binary(Reason, utf8)}};
     Other ->
+      Name = element(2, Other),
+      ets:insert('$BRAVOMETA', {Name, case is_tuple(ets:lookup(Name, ets:first(Name))) of
+                                        true -> non_tuple;
+                                        false -> tuple
+                                      end}),
       Other
   end.
 
@@ -117,8 +123,12 @@ try_insert_new(Name, Keypos, Objects) ->
 
 try_lookup(Name, Key) ->
   case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
-    {_, unknown} -> [];
-    {_, tuple} -> ets:lookup(Name, Key);
+    {_, unknown} ->
+      [];
+    {_, deleted} ->
+      [];
+    {_, tuple} ->
+      ets:lookup(Name, Key);
     {_, non_tuple} ->
       Res = ets:lookup(Name, Key),
       lists:map(fun(Elem) -> element(1, Elem) end, Res)
@@ -134,12 +144,26 @@ try_delete_object(Name, Object) ->
   ets:delete_object(Name, Object).
 
 try_tab2list(Name) ->
-  ets:tab2list(Name).
+  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+    {_, unknown} ->
+      [];
+    {_, deleted} ->
+      [];
+    {_, tuple} ->
+      ets:tab2list(Name);
+    {_, non_tuple} ->
+      Res = ets:tab2list(Name),
+      lists:map(fun(Elem) -> element(1, Elem) end, Res)
+  end.
 
 try_take(Name, Key) ->
   case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
-    {_, unknown} -> [];
-    {_, tuple} -> ets:take(Name, Key);
+    {_, unknown} ->
+      [];
+    {_, deleted} ->
+      [];
+    {_, tuple} ->
+      ets:take(Name, Key);
     {_, non_tuple} ->
       {Res} = ets:take(Name, {Key}),
       Res

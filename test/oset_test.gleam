@@ -407,3 +407,44 @@ pub fn oset_singleton_member_test() {
   oset.member(table, 1)
   |> should.equal(False)
 }
+
+pub fn oset_tab2file_singleton_test() {
+  let assert Ok(table) = oset.new("oset26", 1, bravo.Public)
+  oset.insert(table, ["Hello"])
+  |> should.equal(True)
+  oset.tab2file(table, "oset26", True, True, True)
+  |> should.equal(Ok(Nil))
+  oset.delete(table)
+  let assert Ok(new_table) = oset.file2tab("oset26", True, dynamic.string)
+  oset.lookup(new_table, "Hello")
+  |> should.equal(Some("Hello"))
+  oset.delete(new_table)
+  oset.file2tab("oset26", True, dynamic.tuple2(dynamic.int, dynamic.int))
+  |> should.equal(Error(bravo.DecodeFailure))
+  simplifile.delete("oset26")
+  |> should.equal(Ok(Nil))
+}
+
+pub fn oset_tab2file_singleton_record_test() {
+  let assert Ok(table) = oset.new("oset27", 1, bravo.Public)
+  oset.insert(table, [Ok("Hello"), Error("World")])
+  |> should.equal(True)
+  oset.tab2file(table, "oset27", True, True, True)
+  |> should.equal(Ok(Nil))
+  oset.delete(table)
+  let assert Ok(new_table) =
+    oset.file2tab(
+      "oset27",
+      True,
+      dynamic.result(dynamic.string, dynamic.string),
+    )
+  oset.lookup(new_table, Ok("Hello"))
+  |> should.equal(Some(Ok("Hello")))
+  oset.lookup(new_table, Error("World"))
+  |> should.equal(Some(Error("World")))
+  oset.delete(new_table)
+  oset.file2tab("oset27", True, dynamic.tuple2(dynamic.int, dynamic.int))
+  |> should.equal(Error(bravo.DecodeFailure))
+  simplifile.delete("oset27")
+  |> should.equal(Ok(Nil))
+}

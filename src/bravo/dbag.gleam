@@ -147,13 +147,20 @@ pub fn file2tab(
   let assert Ok(keypos) =
     dynamic.int(bindings.inform(name, atom.create_from_string("keypos")))
   let table = DBag(name, keypos)
+  list.map(tab2list(table), fn(obj: t) {
+    delete_object(table, obj)
+    case bindings.tuple_size(obj) {
+      1 -> insert(table, [bindings.element(1, obj)])
+      _ -> insert(table, [obj])
+    }
+  })
   use <- bool.guard(
     !{
       use obj <- list.all(tab2list(table))
-      case decoder(dynamic.from(obj)) {
-        Ok(_) -> True
-        Error(_) -> False
-      }
+      obj
+      |> dynamic.from
+      |> decoder
+      |> result.is_ok
     },
     Error(bravo.DecodeFailure),
   )

@@ -407,3 +407,44 @@ pub fn uset_singleton_member_test() {
   uset.member(table, 1)
   |> should.equal(False)
 }
+
+pub fn uset_tab2file_singleton_test() {
+  let assert Ok(table) = uset.new("uset26", 1, bravo.Public)
+  uset.insert(table, ["Hello"])
+  |> should.equal(True)
+  uset.tab2file(table, "uset26", True, True, True)
+  |> should.equal(Ok(Nil))
+  uset.delete(table)
+  let assert Ok(new_table) = uset.file2tab("uset26", True, dynamic.string)
+  uset.lookup(new_table, "Hello")
+  |> should.equal(Some("Hello"))
+  uset.delete(new_table)
+  uset.file2tab("uset26", True, dynamic.tuple2(dynamic.int, dynamic.int))
+  |> should.equal(Error(bravo.DecodeFailure))
+  simplifile.delete("uset26")
+  |> should.equal(Ok(Nil))
+}
+
+pub fn uset_tab2file_singleton_record_test() {
+  let assert Ok(table) = uset.new("uset27", 1, bravo.Public)
+  uset.insert(table, [Ok("Hello"), Error("World")])
+  |> should.equal(True)
+  uset.tab2file(table, "uset27", True, True, True)
+  |> should.equal(Ok(Nil))
+  uset.delete(table)
+  let assert Ok(new_table) =
+    uset.file2tab(
+      "uset27",
+      True,
+      dynamic.result(dynamic.string, dynamic.string),
+    )
+  uset.lookup(new_table, Ok("Hello"))
+  |> should.equal(Some(Ok("Hello")))
+  uset.lookup(new_table, Error("World"))
+  |> should.equal(Some(Error("World")))
+  uset.delete(new_table)
+  uset.file2tab("uset27", True, dynamic.tuple2(dynamic.int, dynamic.int))
+  |> should.equal(Error(bravo.DecodeFailure))
+  simplifile.delete("uset27")
+  |> should.equal(Ok(Nil))
+}

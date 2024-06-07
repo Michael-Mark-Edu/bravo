@@ -425,3 +425,44 @@ pub fn dbag_singleton_member_test() {
   dbag.member(table, 1)
   |> should.equal(False)
 }
+
+pub fn dbag_tab2file_singleton_test() {
+  let assert Ok(table) = dbag.new("dbag26", 1, bravo.Public)
+  dbag.insert(table, ["Hello"])
+  |> should.equal(True)
+  dbag.tab2file(table, "dbag26", True, True, True)
+  |> should.equal(Ok(Nil))
+  dbag.delete(table)
+  let assert Ok(new_table) = dbag.file2tab("dbag26", True, dynamic.string)
+  dbag.lookup(new_table, "Hello")
+  |> should.equal(["Hello"])
+  dbag.delete(new_table)
+  dbag.file2tab("dbag26", True, dynamic.tuple2(dynamic.int, dynamic.int))
+  |> should.equal(Error(bravo.DecodeFailure))
+  simplifile.delete("dbag26")
+  |> should.equal(Ok(Nil))
+}
+
+pub fn dbag_tab2file_singleton_record_test() {
+  let assert Ok(table) = dbag.new("dbag27", 1, bravo.Public)
+  dbag.insert(table, [Ok("Hello"), Error("World")])
+  |> should.equal(True)
+  dbag.tab2file(table, "dbag27", True, True, True)
+  |> should.equal(Ok(Nil))
+  dbag.delete(table)
+  let assert Ok(new_table) =
+    dbag.file2tab(
+      "dbag27",
+      True,
+      dynamic.result(dynamic.string, dynamic.string),
+    )
+  dbag.lookup(new_table, Ok("Hello"))
+  |> should.equal([Ok("Hello")])
+  dbag.lookup(new_table, Error("World"))
+  |> should.equal([Error("World")])
+  dbag.delete(new_table)
+  dbag.file2tab("dbag27", True, dynamic.tuple2(dynamic.int, dynamic.int))
+  |> should.equal(Error(bravo.DecodeFailure))
+  simplifile.delete("dbag27")
+  |> should.equal(Ok(Nil))
+}
