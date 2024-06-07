@@ -29,8 +29,7 @@ pub opaque type USet(t) {
 /// - `Private`: Only the parent process can read or write to the `USet`.
 ///
 /// Returns a result of the created `USet`, which can be used by other functions in this module.
-/// If this function errors with `None`, then you likely put in an illegal `keypos` value.
-/// Otherwise, something went wrong in the FFI layer and an error occured in Erlang land.
+/// Can have error types `ErlangError` and `NonPositiveKeypos`.
 ///
 pub fn new(
   name: String,
@@ -117,6 +116,8 @@ pub fn delete_object(uset: USet(t), object: t) -> Nil {
 /// - `md5sum`: Stores a md5 checksum of the table and its objects. This can detect even single bitflips, but is computationally expensive.
 /// - `sync`: Blocks the process until the file has been successfully written.
 ///
+/// Can have error type `ErlangError`.
+///
 pub fn tab2file(
   uset: USet(t),
   filename: String,
@@ -138,6 +139,8 @@ pub fn tab2file(
 /// For type safety reasons, a dynamic decoder must be provided, and the decoder must not fail for all objects in the table.
 ///
 /// If the flag `verify` is set, then checks are performed to ensure the data is correct. This can be slow if `tab2file` was ran with `md5sum` enabled.
+///
+/// Can have error types `DecodeFailure` and `ErlangError`.
 ///
 pub fn file2tab(
   filename: String,
