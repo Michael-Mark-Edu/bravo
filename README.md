@@ -97,8 +97,7 @@ This will return a `Result` containing the table, if the table creation succeede
 already exists a table with the same name, this function will fail.
 
 This table will be empty, so we'll need to insert some _objects_ into it. An object can be of any
-type, but it should ideally be a tuple (due to how Bravo handles non-tuples, it's more memory
-efficient to use a size-1 tuple instead of a non-tuple, but this may change in the future).
+type, but it should ideally be a tuple.
 
 To insert, we use the `insert` function, which takes in a list of objects.
 ```gleam
