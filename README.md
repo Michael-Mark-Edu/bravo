@@ -51,7 +51,7 @@ gleam add bravo gleam_erlang
 
 ## Example
 ```gleam
-import bravo/etc
+import bravo
 import bravo/uset
 import gleam/io
 import gleam/option.{Some}
@@ -59,7 +59,7 @@ import gleam/option.{Some}
 pub fn main() {
   // Create a new ETS table. There are multiple options, but here we are using
   // a USet (an alias for "set" in Erlang terms)
-  let assert Ok(table) = uset.new("MyTable", 1, etc.Public)
+  let assert Ok(table) = uset.new("MyTable", 1, bravo.Public)
 
   // We can then insert tuples into this table
   uset.insert(table, [#("Hello", "world!")])
@@ -89,9 +89,9 @@ First, we must create a `USet`. We must pass in a name, the table's `keypos` (re
 this as 1) and a access specifier (not relevant unless you're working with processes/actors).
 ```gleam
 import bravo/uset
-import bravo/etc
+import bravo
 
-let assert Ok(table) = uset.new("MyTable", 1, etc.Public)
+let assert Ok(table) = uset.new("MyTable", 1, bravo.Public)
 ```
 This will return a `Result` containing the table, if the table creation succeeded. If there
 already exists a table with the same name, this function will fail.
