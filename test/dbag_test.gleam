@@ -439,6 +439,18 @@ pub fn dbag_tab2file_singleton_test() {
   dbag.delete(new_table)
   dbag.file2tab("dbag26", True, dynamic.tuple2(dynamic.int, dynamic.int))
   |> should.equal(Error(bravo.DecodeFailure))
+
+  let assert Ok(newer_table) = dbag.new("dbag26", 1, bravo.Public)
+  dbag.insert(newer_table, [#("Hello")])
+  |> should.equal(True)
+  dbag.tab2file(newer_table, "dbag26", True, True, True)
+  |> should.equal(Ok(Nil))
+  dbag.delete(newer_table)
+  let assert Ok(newest_table) = dbag.file2tab("dbag26", True, dynamic.string)
+  dbag.lookup(newest_table, "Hello")
+  |> should.equal(["Hello"])
+  dbag.delete(newest_table)
+
   simplifile.delete("dbag26")
   |> should.equal(Ok(Nil))
 }

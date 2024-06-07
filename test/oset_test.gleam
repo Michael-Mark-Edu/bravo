@@ -421,6 +421,18 @@ pub fn oset_tab2file_singleton_test() {
   oset.delete(new_table)
   oset.file2tab("oset26", True, dynamic.tuple2(dynamic.int, dynamic.int))
   |> should.equal(Error(bravo.DecodeFailure))
+
+  let assert Ok(newer_table) = oset.new("oset26", 1, bravo.Public)
+  oset.insert(newer_table, [#("Hello")])
+  |> should.equal(True)
+  oset.tab2file(newer_table, "oset26", True, True, True)
+  |> should.equal(Ok(Nil))
+  oset.delete(newer_table)
+  let assert Ok(newest_table) = oset.file2tab("oset26", True, dynamic.string)
+  oset.lookup(newest_table, "Hello")
+  |> should.equal(Some("Hello"))
+  oset.delete(newest_table)
+
   simplifile.delete("oset26")
   |> should.equal(Ok(Nil))
 }

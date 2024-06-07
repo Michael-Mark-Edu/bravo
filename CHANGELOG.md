@@ -10,6 +10,7 @@ This is a breaking update!
 - Changed how non-tuples are stored internally. It should now be more memory
   efficient to store non-tuples.
 - Fixed issues with the interaction between non-tuple tables and `file2tab`.
+- `file2tab` now deletes the table it creates if it fails to decode.
 
 # v2.3.0
 - Added `insert_new` to all tables.

@@ -421,6 +421,18 @@ pub fn uset_tab2file_singleton_test() {
   uset.delete(new_table)
   uset.file2tab("uset26", True, dynamic.tuple2(dynamic.int, dynamic.int))
   |> should.equal(Error(bravo.DecodeFailure))
+
+  let assert Ok(newer_table) = uset.new("uset26", 1, bravo.Public)
+  uset.insert(newer_table, [#("Hello")])
+  |> should.equal(True)
+  uset.tab2file(newer_table, "uset26", True, True, True)
+  |> should.equal(Ok(Nil))
+  uset.delete(newer_table)
+  let assert Ok(newest_table) = uset.file2tab("uset26", True, dynamic.string)
+  uset.lookup(newest_table, "Hello")
+  |> should.equal(Some("Hello"))
+  uset.delete(newest_table)
+
   simplifile.delete("uset26")
   |> should.equal(Ok(Nil))
 }

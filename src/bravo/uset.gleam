@@ -159,16 +159,17 @@ pub fn file2tab(
     }
   })
   use <- bool.guard(
-    !{
+    {
       use obj <- list.all(tab2list(table))
       obj
       |> dynamic.from
       |> decoder
       |> result.is_ok
     },
-    Error(bravo.DecodeFailure),
+    Ok(table),
   )
-  Ok(table)
+  delete(table)
+  Error(bravo.DecodeFailure)
 }
 
 /// Returns a list containing all of the objects in the `USet`.
