@@ -1,4 +1,4 @@
-# v3.0.0 (unreleased)
+# v3.0.0
 This is a breaking update!
 - Complete overhaul of the error system. Instead of using `Option` or
   `ErlangError`, most failable functions are now `Result`s with error type
