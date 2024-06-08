@@ -1,8 +1,9 @@
 -module(bravo_ffi).
 
 -export([inform/2, try_delete/1, try_delete_all_objects/1, try_delete_key/2,
-         try_delete_object/2, try_file2tab/2, try_insert/3, try_insert_new/3, try_lookup/2,
-         try_member/2, try_new/2, try_tab2file/5, try_tab2list/1, try_take/2]).
+         try_delete_object/2, try_file2tab/2, try_first/1, try_insert/3,
+         try_insert_new/3, try_last/1, try_lookup/2, try_member/2, try_new/2,
+         try_next/2, try_prev/2, try_tab2file/5, try_tab2list/1, try_take/2]).
 
 inform(Name, Key) ->
   Info = catch ets:info(Name),
@@ -171,3 +172,51 @@ try_take(Name, Key) ->
 
 try_member(Name, Key) ->
   ets:member(Name, Key).
+
+try_first(Name) ->
+  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+    {_, unknown} ->
+      [];
+    {_, deleted} ->
+      [];
+    {_, tuple} ->
+      case ets:first(Name) of
+        '$end_of_table' -> none;
+        Val -> {some, Val}
+      end;
+    {_, non_tuple} ->
+      case ets:first(Name) of
+        '$end_of_table' -> {none};
+        Val -> {some, lists:nth(1, lists:map(fun(Elem) -> element(1, Elem) end, Val))}
+      end
+  end.
+
+try_last(Name) ->
+  case ets:last(Name) of
+    '$end_of_table' -> none;
+    Key -> {some, Key}
+  end.
+
+try_next(Name, Key) ->
+  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+    {_, unknown} ->
+      [];
+    {_, deleted} ->
+      [];
+    {_, tuple} ->
+      case ets:next(Name, Key) of
+        '$end_of_table' -> none;
+        Val -> {some, Val}
+      end;
+    {_, non_tuple} ->
+      case ets:next(Name, Key) of
+        '$end_of_table' -> none;
+        Val -> {some, lists:nth(1, lists:map(fun(Elem) -> element(1, Elem) end, Val))}
+      end
+  end.
+
+try_prev(Name, Key) ->
+  case ets:prev(Name, Key) of
+    '$end_of_table' -> none;
+    Val -> {some, Val}
+  end.

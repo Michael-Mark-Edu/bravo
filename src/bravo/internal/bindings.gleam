@@ -2,6 +2,7 @@ import bravo.{type BravoError}
 import bravo/internal/new_option.{type NewOption}
 import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
+import gleam/option.{type Option}
 
 @external(erlang, "bravo_ffi", "try_new")
 pub fn try_new(
@@ -56,6 +57,18 @@ pub fn try_take(table: Atom, key: a) -> List(b)
 
 @external(erlang, "bravo_ffi", "try_member")
 pub fn try_member(table: Atom, key: a) -> Bool
+
+@external(erlang, "bravo_ffi", "try_first")
+pub fn try_first(table: Atom) -> Option(a)
+
+@external(erlang, "bravo_ffi", "try_last")
+pub fn try_last(table: Atom) -> Option(a)
+
+@external(erlang, "bravo_ffi", "try_next")
+pub fn try_next(table: Atom, key: a) -> Option(a)
+
+@external(erlang, "bravo_ffi", "try_prev")
+pub fn try_prev(table: Atom, key: a) -> Option(a)
 
 @external(erlang, "erlang", "tuple_size")
 pub fn tuple_size(tuple: a) -> Int

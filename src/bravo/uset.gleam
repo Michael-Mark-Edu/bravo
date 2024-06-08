@@ -208,3 +208,19 @@ pub fn take(uset: USet(t), key: a) -> Option(t) {
 pub fn member(uset: USet(t), key: a) -> Bool {
   bindings.try_member(uset.table, key)
 }
+
+pub fn first(uset: USet(t)) -> Option(a) {
+  bindings.try_first(uset.table)
+}
+
+pub fn last(uset: USet(t)) -> Option(a) {
+  bindings.try_last(uset.table)
+}
+
+pub fn next(uset: USet(t), key: a) -> Option(a) {
+  bindings.try_next(uset.table, key)
+}
+
+pub fn prev(uset: USet(t), key: a) -> Option(a) {
+  bindings.try_prev(uset.table, key)
+}

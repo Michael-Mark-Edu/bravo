@@ -2,6 +2,7 @@ import bravo
 import bravo/oset
 import gleam/dict
 import gleam/dynamic
+import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 import gleeunit/should
@@ -459,4 +460,50 @@ pub fn oset_tab2file_singleton_record_test() {
   |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("oset27")
   |> should.equal(Ok(Nil))
+}
+
+pub fn oset_flnp_test() {
+  let assert Ok(table) = oset.new("oset28", 1, bravo.Public)
+  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  oset.insert(table, [
+    #("A"),
+    #("Q"),
+    #("C"),
+    #("R"),
+    #("Z"),
+    #("B"),
+    #("S"),
+    #("F"),
+    #("Da"),
+    #("DA"),
+    #("Db"),
+    #("a"),
+  ])
+  |> should.equal(True)
+  let assert Some(a) = table |> oset.first
+  let assert Some(b) = table |> oset.next(a)
+  let assert Some(c) = table |> oset.next(b)
+  let assert Some(d) = table |> oset.next(c)
+  let assert Some(e) = table |> oset.next(d)
+  let assert Some(f) = table |> oset.next(e)
+  let assert Some(g) = table |> oset.next(f)
+  let assert Some(h) = table |> oset.next(g)
+  let assert Some(i) = table |> oset.next(h)
+  let assert Some(j) = table |> oset.next(i)
+  let assert Some(k) = table |> oset.next(j)
+  let assert Some(l) = table |> oset.next(k)
+  oset.lookup(table, a) |> should.equal(Some(#("A")))
+  oset.lookup(table, b) |> should.equal(Some(#("B")))
+  oset.lookup(table, c) |> should.equal(Some(#("C")))
+  oset.lookup(table, d) |> should.equal(Some(#("DA")))
+  oset.lookup(table, e) |> should.equal(Some(#("Da")))
+  oset.lookup(table, f) |> should.equal(Some(#("Db")))
+  oset.lookup(table, g) |> should.equal(Some(#("F")))
+  oset.lookup(table, h) |> should.equal(Some(#("Q")))
+  oset.lookup(table, i) |> should.equal(Some(#("R")))
+  oset.lookup(table, j) |> should.equal(Some(#("S")))
+  oset.lookup(table, k) |> should.equal(Some(#("Z")))
+  oset.lookup(table, l) |> should.equal(Some(#("a")))
+  table |> oset.next(l) |> should.equal(None)
+  None
 }

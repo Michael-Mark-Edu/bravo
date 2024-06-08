@@ -210,3 +210,19 @@ pub fn take(oset: OSet(t), key: a) -> Option(t) {
 pub fn member(oset: OSet(t), key: a) -> Bool {
   bindings.try_member(oset.table, key)
 }
+
+pub fn first(oset: OSet(t)) -> Option(a) {
+  bindings.try_first(oset.table)
+}
+
+pub fn last(oset: OSet(t)) -> Option(a) {
+  bindings.try_last(oset.table)
+}
+
+pub fn next(oset: OSet(t), key: a) -> Option(a) {
+  bindings.try_next(oset.table, key)
+}
+
+pub fn prev(oset: OSet(t), key: a) -> Option(a) {
+  bindings.try_prev(oset.table, key)
+}
