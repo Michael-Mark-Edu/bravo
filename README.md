@@ -97,7 +97,9 @@ This will return a `Result` containing the table, if the table creation succeede
 already exists a table with the same name, this function will fail.
 
 This table will be empty, so we'll need to insert some _objects_ into it. An object can be of any
-type, but it should ideally be a tuple.
+type, but it should ideally be a tuple. (Note: it is better to use a non-tuple over a size-1 tuple!
+It is theoretically more memory efficient to use non-tuples, and some functions like `file2tab`
+generate tables with the non-tuple variant regardless of what you put in.)
 
 To insert, we use the `insert` function, which takes in a list of objects.
 ```gleam

@@ -134,6 +134,8 @@ pub fn tab2file(
 ///
 /// If the flag `verify` is set, then checks are performed to ensure the data is correct. This can be slow if `tab2file` was ran with `md5sum` enabled.
 ///
+/// Size-1 tuples are stored as non-tuples internally and this information is not saved to disk, so you must decode the non-tuple version of the type.
+///
 /// Can have error types `DecodeFailure` and `ErlangError`.
 ///
 pub fn file2tab(
