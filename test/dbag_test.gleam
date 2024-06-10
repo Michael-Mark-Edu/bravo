@@ -3,7 +3,7 @@ import bravo/dbag
 import gleam/dict
 import gleam/dynamic
 import gleam/list
-import gleam/option.{Some}
+import gleam/option.{None, Some}
 import gleeunit/should
 import simplifile
 
@@ -477,4 +477,86 @@ pub fn dbag_tab2file_singleton_record_test() {
   |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("dbag27")
   |> should.equal(Ok(Nil))
+}
+
+pub fn dbag_fn_test() {
+  let assert Ok(table) = dbag.new("dbag28", 1, bravo.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  let dataset = [
+    "A", "Q", "C", "R", "Z", "Z", "B", "S", "F", "Da", "DA", "Db", "a",
+  ]
+  dbag.insert(table, dataset)
+  |> should.equal(True)
+  let assert Some(a) = table |> dbag.first
+  let assert Some(b) = table |> dbag.next(a)
+  let assert Some(c) = table |> dbag.next(b)
+  let assert Some(d) = table |> dbag.next(c)
+  let assert Some(e) = table |> dbag.next(d)
+  let assert Some(f) = table |> dbag.next(e)
+  let assert Some(g) = table |> dbag.next(f)
+  let assert Some(h) = table |> dbag.next(g)
+  let assert Some(i) = table |> dbag.next(h)
+  let assert Some(j) = table |> dbag.next(i)
+  let assert Some(k) = table |> dbag.next(j)
+  let assert Some(l) = table |> dbag.next(k)
+  let list = []
+  let list = list.append(dbag.lookup(table, a), list)
+  let list = list.append(dbag.lookup(table, b), list)
+  let list = list.append(dbag.lookup(table, c), list)
+  let list = list.append(dbag.lookup(table, d), list)
+  let list = list.append(dbag.lookup(table, e), list)
+  let list = list.append(dbag.lookup(table, f), list)
+  let list = list.append(dbag.lookup(table, g), list)
+  let list = list.append(dbag.lookup(table, h), list)
+  let list = list.append(dbag.lookup(table, i), list)
+  let list = list.append(dbag.lookup(table, j), list)
+  let list = list.append(dbag.lookup(table, k), list)
+  let list = list.append(dbag.lookup(table, l), list)
+  list.map(dataset, fn(elem) {
+    list.contains(list, elem)
+    |> should.equal(True)
+  })
+  table |> dbag.next(l) |> should.equal(None)
+  None
+}
+
+pub fn dbag_lp_test() {
+  let assert Ok(table) = dbag.new("dbag29", 1, bravo.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  let dataset = [
+    "A", "Q", "C", "R", "Z", "Z", "B", "S", "F", "Da", "DA", "Db", "a",
+  ]
+  dbag.insert(table, dataset)
+  |> should.equal(True)
+  let assert Some(a) = table |> dbag.last
+  let assert Some(b) = table |> dbag.prev(a)
+  let assert Some(c) = table |> dbag.prev(b)
+  let assert Some(d) = table |> dbag.prev(c)
+  let assert Some(e) = table |> dbag.prev(d)
+  let assert Some(f) = table |> dbag.prev(e)
+  let assert Some(g) = table |> dbag.prev(f)
+  let assert Some(h) = table |> dbag.prev(g)
+  let assert Some(i) = table |> dbag.prev(h)
+  let assert Some(j) = table |> dbag.prev(i)
+  let assert Some(k) = table |> dbag.prev(j)
+  let assert Some(l) = table |> dbag.prev(k)
+  let list = []
+  let list = list.append(dbag.lookup(table, a), list)
+  let list = list.append(dbag.lookup(table, b), list)
+  let list = list.append(dbag.lookup(table, c), list)
+  let list = list.append(dbag.lookup(table, d), list)
+  let list = list.append(dbag.lookup(table, e), list)
+  let list = list.append(dbag.lookup(table, f), list)
+  let list = list.append(dbag.lookup(table, g), list)
+  let list = list.append(dbag.lookup(table, h), list)
+  let list = list.append(dbag.lookup(table, i), list)
+  let list = list.append(dbag.lookup(table, j), list)
+  let list = list.append(dbag.lookup(table, k), list)
+  let list = list.append(dbag.lookup(table, l), list)
+  list.map(dataset, fn(elem) {
+    list.contains(list, elem)
+    |> should.equal(True)
+  })
+  table |> dbag.prev(l) |> should.equal(None)
+  None
 }

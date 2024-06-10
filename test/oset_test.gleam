@@ -462,7 +462,7 @@ pub fn oset_tab2file_singleton_record_test() {
   |> should.equal(Ok(Nil))
 }
 
-pub fn oset_flnp_test() {
+pub fn oset_fn_test() {
   let assert Ok(table) = oset.new("oset28", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [
@@ -505,5 +505,51 @@ pub fn oset_flnp_test() {
   oset.lookup(table, k) |> should.equal(Some(#("Z")))
   oset.lookup(table, l) |> should.equal(Some(#("a")))
   table |> oset.next(l) |> should.equal(None)
+  None
+}
+
+pub fn oset_lp_test() {
+  let assert Ok(table) = oset.new("oset28", 1, bravo.Public)
+  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  oset.insert(table, [
+    #("A"),
+    #("Q"),
+    #("C"),
+    #("R"),
+    #("Z"),
+    #("B"),
+    #("S"),
+    #("F"),
+    #("Da"),
+    #("DA"),
+    #("Db"),
+    #("a"),
+  ])
+  |> should.equal(True)
+  let assert Some(a) = table |> oset.last
+  let assert Some(b) = table |> oset.prev(a)
+  let assert Some(c) = table |> oset.prev(b)
+  let assert Some(d) = table |> oset.prev(c)
+  let assert Some(e) = table |> oset.prev(d)
+  let assert Some(f) = table |> oset.prev(e)
+  let assert Some(g) = table |> oset.prev(f)
+  let assert Some(h) = table |> oset.prev(g)
+  let assert Some(i) = table |> oset.prev(h)
+  let assert Some(j) = table |> oset.prev(i)
+  let assert Some(k) = table |> oset.prev(j)
+  let assert Some(l) = table |> oset.prev(k)
+  oset.lookup(table, a) |> should.equal(Some(#("a")))
+  oset.lookup(table, b) |> should.equal(Some(#("Z")))
+  oset.lookup(table, c) |> should.equal(Some(#("S")))
+  oset.lookup(table, d) |> should.equal(Some(#("R")))
+  oset.lookup(table, e) |> should.equal(Some(#("Q")))
+  oset.lookup(table, f) |> should.equal(Some(#("F")))
+  oset.lookup(table, g) |> should.equal(Some(#("Db")))
+  oset.lookup(table, h) |> should.equal(Some(#("Da")))
+  oset.lookup(table, i) |> should.equal(Some(#("DA")))
+  oset.lookup(table, j) |> should.equal(Some(#("C")))
+  oset.lookup(table, k) |> should.equal(Some(#("B")))
+  oset.lookup(table, l) |> should.equal(Some(#("A")))
+  table |> oset.prev(l) |> should.equal(None)
   None
 }

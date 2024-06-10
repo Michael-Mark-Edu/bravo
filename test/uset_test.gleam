@@ -2,6 +2,7 @@ import bravo
 import bravo/uset
 import gleam/dict
 import gleam/dynamic
+import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 import gleeunit/should
@@ -459,4 +460,82 @@ pub fn uset_tab2file_singleton_record_test() {
   |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("uset27")
   |> should.equal(Ok(Nil))
+}
+
+pub fn uset_fn_test() {
+  let assert Ok(table) = uset.new("uset28", 1, bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
+  uset.insert(table, dataset)
+  |> should.equal(True)
+  let assert Some(a) = table |> uset.first
+  let assert Some(b) = table |> uset.next(a)
+  let assert Some(c) = table |> uset.next(b)
+  let assert Some(d) = table |> uset.next(c)
+  let assert Some(e) = table |> uset.next(d)
+  let assert Some(f) = table |> uset.next(e)
+  let assert Some(g) = table |> uset.next(f)
+  let assert Some(h) = table |> uset.next(g)
+  let assert Some(i) = table |> uset.next(h)
+  let assert Some(j) = table |> uset.next(i)
+  let assert Some(k) = table |> uset.next(j)
+  let assert Some(l) = table |> uset.next(k)
+  let list = []
+  let list = [uset.lookup(table, a), ..list]
+  let list = [uset.lookup(table, b), ..list]
+  let list = [uset.lookup(table, c), ..list]
+  let list = [uset.lookup(table, d), ..list]
+  let list = [uset.lookup(table, e), ..list]
+  let list = [uset.lookup(table, f), ..list]
+  let list = [uset.lookup(table, g), ..list]
+  let list = [uset.lookup(table, h), ..list]
+  let list = [uset.lookup(table, i), ..list]
+  let list = [uset.lookup(table, j), ..list]
+  let list = [uset.lookup(table, k), ..list]
+  let list = [uset.lookup(table, l), ..list]
+  list.map(dataset, fn(elem) {
+    list.contains(list, Some(elem))
+    |> should.equal(True)
+  })
+  table |> uset.next(l) |> should.equal(None)
+  None
+}
+
+pub fn uset_lp_test() {
+  let assert Ok(table) = uset.new("uset29", 1, bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
+  uset.insert(table, dataset)
+  |> should.equal(True)
+  let assert Some(a) = table |> uset.last
+  let assert Some(b) = table |> uset.prev(a)
+  let assert Some(c) = table |> uset.prev(b)
+  let assert Some(d) = table |> uset.prev(c)
+  let assert Some(e) = table |> uset.prev(d)
+  let assert Some(f) = table |> uset.prev(e)
+  let assert Some(g) = table |> uset.prev(f)
+  let assert Some(h) = table |> uset.prev(g)
+  let assert Some(i) = table |> uset.prev(h)
+  let assert Some(j) = table |> uset.prev(i)
+  let assert Some(k) = table |> uset.prev(j)
+  let assert Some(l) = table |> uset.prev(k)
+  let list = []
+  let list = [uset.lookup(table, a), ..list]
+  let list = [uset.lookup(table, b), ..list]
+  let list = [uset.lookup(table, c), ..list]
+  let list = [uset.lookup(table, d), ..list]
+  let list = [uset.lookup(table, e), ..list]
+  let list = [uset.lookup(table, f), ..list]
+  let list = [uset.lookup(table, g), ..list]
+  let list = [uset.lookup(table, h), ..list]
+  let list = [uset.lookup(table, i), ..list]
+  let list = [uset.lookup(table, j), ..list]
+  let list = [uset.lookup(table, k), ..list]
+  let list = [uset.lookup(table, l), ..list]
+  list.map(dataset, fn(elem) {
+    list.contains(list, Some(elem))
+    |> should.equal(True)
+  })
+  table |> uset.prev(l) |> should.equal(None)
+  None
 }

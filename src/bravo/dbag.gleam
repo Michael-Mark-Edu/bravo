@@ -7,6 +7,7 @@ import gleam/bool
 import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
 import gleam/list
+import gleam/option.{type Option}
 import gleam/result
 import gleam/string
 
@@ -200,4 +201,20 @@ pub fn take(dbag: DBag(t), key: a) -> List(t) {
 ///
 pub fn member(dbag: DBag(t), key: a) -> Bool {
   bindings.try_member(dbag.table, key)
+}
+
+pub fn first(dbag: DBag(t)) -> Option(a) {
+  bindings.try_first(dbag.table)
+}
+
+pub fn last(dbag: DBag(t)) -> Option(a) {
+  bindings.try_last(dbag.table)
+}
+
+pub fn next(dbag: DBag(t), key: a) -> Option(a) {
+  bindings.try_next(dbag.table, key)
+}
+
+pub fn prev(dbag: DBag(t), key: a) -> Option(a) {
+  bindings.try_prev(dbag.table, key)
 }

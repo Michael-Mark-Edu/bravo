@@ -3,7 +3,7 @@ import bravo/bag
 import gleam/dict
 import gleam/dynamic
 import gleam/list
-import gleam/option.{Some}
+import gleam/option.{None, Some}
 import gleeunit/should
 import simplifile
 
@@ -455,4 +455,82 @@ pub fn bag_tab2file_singleton_record_test() {
   |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("bag27")
   |> should.equal(Ok(Nil))
+}
+
+pub fn bag_fn_test() {
+  let assert Ok(table) = bag.new("bag28", 1, bravo.Public)
+  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
+  bag.insert(table, dataset)
+  |> should.equal(True)
+  let assert Some(a) = table |> bag.first
+  let assert Some(b) = table |> bag.next(a)
+  let assert Some(c) = table |> bag.next(b)
+  let assert Some(d) = table |> bag.next(c)
+  let assert Some(e) = table |> bag.next(d)
+  let assert Some(f) = table |> bag.next(e)
+  let assert Some(g) = table |> bag.next(f)
+  let assert Some(h) = table |> bag.next(g)
+  let assert Some(i) = table |> bag.next(h)
+  let assert Some(j) = table |> bag.next(i)
+  let assert Some(k) = table |> bag.next(j)
+  let assert Some(l) = table |> bag.next(k)
+  let list = []
+  let list = [bag.lookup(table, a), ..list]
+  let list = [bag.lookup(table, b), ..list]
+  let list = [bag.lookup(table, c), ..list]
+  let list = [bag.lookup(table, d), ..list]
+  let list = [bag.lookup(table, e), ..list]
+  let list = [bag.lookup(table, f), ..list]
+  let list = [bag.lookup(table, g), ..list]
+  let list = [bag.lookup(table, h), ..list]
+  let list = [bag.lookup(table, i), ..list]
+  let list = [bag.lookup(table, j), ..list]
+  let list = [bag.lookup(table, k), ..list]
+  let list = [bag.lookup(table, l), ..list]
+  list.map(dataset, fn(elem) {
+    list.contains(list, [elem])
+    |> should.equal(True)
+  })
+  table |> bag.next(l) |> should.equal(None)
+  None
+}
+
+pub fn bag_lp_test() {
+  let assert Ok(table) = bag.new("bag29", 1, bravo.Public)
+  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
+  bag.insert(table, dataset)
+  |> should.equal(True)
+  let assert Some(a) = table |> bag.last
+  let assert Some(b) = table |> bag.prev(a)
+  let assert Some(c) = table |> bag.prev(b)
+  let assert Some(d) = table |> bag.prev(c)
+  let assert Some(e) = table |> bag.prev(d)
+  let assert Some(f) = table |> bag.prev(e)
+  let assert Some(g) = table |> bag.prev(f)
+  let assert Some(h) = table |> bag.prev(g)
+  let assert Some(i) = table |> bag.prev(h)
+  let assert Some(j) = table |> bag.prev(i)
+  let assert Some(k) = table |> bag.prev(j)
+  let assert Some(l) = table |> bag.prev(k)
+  let list = []
+  let list = [bag.lookup(table, a), ..list]
+  let list = [bag.lookup(table, b), ..list]
+  let list = [bag.lookup(table, c), ..list]
+  let list = [bag.lookup(table, d), ..list]
+  let list = [bag.lookup(table, e), ..list]
+  let list = [bag.lookup(table, f), ..list]
+  let list = [bag.lookup(table, g), ..list]
+  let list = [bag.lookup(table, h), ..list]
+  let list = [bag.lookup(table, i), ..list]
+  let list = [bag.lookup(table, j), ..list]
+  let list = [bag.lookup(table, k), ..list]
+  let list = [bag.lookup(table, l), ..list]
+  list.map(dataset, fn(elem) {
+    list.contains(list, [elem])
+    |> should.equal(True)
+  })
+  table |> bag.prev(l) |> should.equal(None)
+  None
 }

@@ -186,15 +186,27 @@ try_first(Name) ->
       end;
     {_, non_tuple} ->
       case ets:first(Name) of
-        '$end_of_table' -> {none};
-        Val -> {some, lists:nth(1, lists:map(fun(Elem) -> element(1, Elem) end, Val))}
+        '$end_of_table' -> none;
+        Val -> {some, Val}
       end
   end.
 
 try_last(Name) ->
-  case ets:last(Name) of
-    '$end_of_table' -> none;
-    Key -> {some, Key}
+  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+    {_, unknown} ->
+      [];
+    {_, deleted} ->
+      [];
+    {_, tuple} ->
+      case ets:last(Name) of
+        '$end_of_table' -> none;
+        Val -> {some, Val}
+      end;
+    {_, non_tuple} ->
+      case ets:last(Name) of
+        '$end_of_table' -> none;
+        Val -> {some, Val}
+      end
   end.
 
 try_next(Name, Key) ->
@@ -211,12 +223,24 @@ try_next(Name, Key) ->
     {_, non_tuple} ->
       case ets:next(Name, Key) of
         '$end_of_table' -> none;
-        Val -> {some, lists:nth(1, lists:map(fun(Elem) -> element(1, Elem) end, Val))}
+        Val -> {some, Val}
       end
   end.
 
 try_prev(Name, Key) ->
-  case ets:prev(Name, Key) of
-    '$end_of_table' -> none;
-    Val -> {some, Val}
+  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+    {_, unknown} ->
+      [];
+    {_, deleted} ->
+      [];
+    {_, tuple} ->
+      case ets:prev(Name, Key) of
+        '$end_of_table' -> none;
+        Val -> {some, Val}
+      end;
+    {_, non_tuple} ->
+      case ets:prev(Name, Key) of
+        '$end_of_table' -> none;
+        Val -> {some, Val}
+      end
   end.
