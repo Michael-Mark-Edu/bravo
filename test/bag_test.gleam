@@ -2,7 +2,6 @@ import bravo
 import bravo/bag
 import gleam/dict
 import gleam/dynamic
-import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 import gleeunit/should
