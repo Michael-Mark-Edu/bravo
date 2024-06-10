@@ -476,20 +476,20 @@ pub fn bag_fn_test() {
   let assert Some(k) = table |> bag.next(j)
   let assert Some(l) = table |> bag.next(k)
   let list = []
-  let list = [bag.lookup(table, a), ..list]
-  let list = [bag.lookup(table, b), ..list]
-  let list = [bag.lookup(table, c), ..list]
-  let list = [bag.lookup(table, d), ..list]
-  let list = [bag.lookup(table, e), ..list]
-  let list = [bag.lookup(table, f), ..list]
-  let list = [bag.lookup(table, g), ..list]
-  let list = [bag.lookup(table, h), ..list]
-  let list = [bag.lookup(table, i), ..list]
-  let list = [bag.lookup(table, j), ..list]
-  let list = [bag.lookup(table, k), ..list]
-  let list = [bag.lookup(table, l), ..list]
+  let list = list.append(bag.lookup(table, a), list)
+  let list = list.append(bag.lookup(table, b), list)
+  let list = list.append(bag.lookup(table, c), list)
+  let list = list.append(bag.lookup(table, d), list)
+  let list = list.append(bag.lookup(table, e), list)
+  let list = list.append(bag.lookup(table, f), list)
+  let list = list.append(bag.lookup(table, g), list)
+  let list = list.append(bag.lookup(table, h), list)
+  let list = list.append(bag.lookup(table, i), list)
+  let list = list.append(bag.lookup(table, j), list)
+  let list = list.append(bag.lookup(table, k), list)
+  let list = list.append(bag.lookup(table, l), list)
   list.map(dataset, fn(elem) {
-    list.contains(list, [elem])
+    list.contains(list, elem)
     |> should.equal(True)
   })
   table |> bag.next(l) |> should.equal(None)
@@ -515,20 +515,20 @@ pub fn bag_lp_test() {
   let assert Some(k) = table |> bag.prev(j)
   let assert Some(l) = table |> bag.prev(k)
   let list = []
-  let list = [bag.lookup(table, a), ..list]
-  let list = [bag.lookup(table, b), ..list]
-  let list = [bag.lookup(table, c), ..list]
-  let list = [bag.lookup(table, d), ..list]
-  let list = [bag.lookup(table, e), ..list]
-  let list = [bag.lookup(table, f), ..list]
-  let list = [bag.lookup(table, g), ..list]
-  let list = [bag.lookup(table, h), ..list]
-  let list = [bag.lookup(table, i), ..list]
-  let list = [bag.lookup(table, j), ..list]
-  let list = [bag.lookup(table, k), ..list]
-  let list = [bag.lookup(table, l), ..list]
+  let list = list.append(bag.lookup(table, a), list)
+  let list = list.append(bag.lookup(table, b), list)
+  let list = list.append(bag.lookup(table, c), list)
+  let list = list.append(bag.lookup(table, d), list)
+  let list = list.append(bag.lookup(table, e), list)
+  let list = list.append(bag.lookup(table, f), list)
+  let list = list.append(bag.lookup(table, g), list)
+  let list = list.append(bag.lookup(table, h), list)
+  let list = list.append(bag.lookup(table, i), list)
+  let list = list.append(bag.lookup(table, j), list)
+  let list = list.append(bag.lookup(table, k), list)
+  let list = list.append(bag.lookup(table, l), list)
   list.map(dataset, fn(elem) {
-    list.contains(list, [elem])
+    list.contains(list, elem)
     |> should.equal(True)
   })
   table |> bag.prev(l) |> should.equal(None)
