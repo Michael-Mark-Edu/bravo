@@ -1,3 +1,9 @@
+# v3.1.0
+- Added `first` to all tables.
+- Added `last` to all tables.
+- Added `next` to all tables.
+- Added `prev` to all tables.
+
 # v3.0.0
 This is a breaking update!
 - Complete overhaul of the error system. Instead of using `Option` or
