@@ -6,6 +6,7 @@ import bravo/internal/new_option
 import gleam/bool
 import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
+import gleam/io
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
