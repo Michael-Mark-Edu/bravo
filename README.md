@@ -1,5 +1,5 @@
 # bravo
-### [v3.0.0-rc.1 (This is a breaking update!)](https://github.com/Michael-Mark-Edu/bravo/blob/main/CHANGELOG.md#v300)
+### [v3.0.0 (This is a breaking update!)](https://github.com/Michael-Mark-Edu/bravo/blob/main/CHANGELOG.md#v300)
 
 [![Package Version](https://img.shields.io/hexpm/v/bravo)](https://hex.pm/packages/bravo)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/bravo/)
