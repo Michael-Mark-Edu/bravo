@@ -11,7 +11,7 @@ import gleam/option.{type Option, None, Some}
 import gleam/result
 import gleam/string
 
-/// An unordered set. Keys may only occur once per table, and objects are unordered.
+/// An unordered set. Keys may only occur once per table, and keys are unordered.
 ///
 /// In order for a lookup match to occur, entries must have the same value _and type_.
 ///
@@ -209,18 +209,34 @@ pub fn member(uset: USet(t), key: a) -> Bool {
   bindings.try_member(uset.table, key)
 }
 
+/// Returns the first key (not the object!) in the table, if it exists.
+///
+/// `USet`s are unordered, so the order of keys is unknown.
+///
 pub fn first(uset: USet(t)) -> Option(a) {
   bindings.try_first(uset.table)
 }
 
+/// Returns the last key (not the object!) in the table, if it exists.
+///
+/// `USet`s are unordered, so the order of keys is unknown.
+///
 pub fn last(uset: USet(t)) -> Option(a) {
   bindings.try_last(uset.table)
 }
 
+/// Given a key, returns the next key (not the object!) after it in the table, if it exists.
+///
+/// `USet`s are unordered, so the order of keys is unknown.
+///
 pub fn next(uset: USet(t), key: a) -> Option(a) {
   bindings.try_next(uset.table, key)
 }
 
+/// Given a key, returns the previous key (not the object!) before it in the table, if it exists.
+///
+/// `USet`s are unordered, so the order of keys is unknown.
+///
 pub fn prev(uset: USet(t), key: a) -> Option(a) {
   bindings.try_prev(uset.table, key)
 }

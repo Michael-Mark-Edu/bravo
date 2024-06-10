@@ -11,7 +11,9 @@ import gleam/option.{type Option, None, Some}
 import gleam/result
 import gleam/string
 
-/// An ordered set. Keys may only occur once per table, and objects are ordered (this comes at a performance cost).
+/// An ordered set. Keys may only occur once per table, and keys are ordered (this comes at a performance cost).
+///
+/// The specific order of keys is based on the [Erlang documentation.](https://www.erlang.org/doc/system/expressions.html#term-comparisons)
 ///
 /// In order for a lookup match to occur, entries must _coerce into the same value_. Two values may match even if they have different types.
 ///
@@ -211,18 +213,34 @@ pub fn member(oset: OSet(t), key: a) -> Bool {
   bindings.try_member(oset.table, key)
 }
 
+/// Returns the first key (not the object!) in the table, if it exists.
+///
+/// `OSet`s _are_ ordered as per the Erlang documentation.
+///
 pub fn first(oset: OSet(t)) -> Option(a) {
   bindings.try_first(oset.table)
 }
 
+/// Returns the last key (not the object!) in the table, if it exists.
+///
+/// `OSet`s _are_ ordered as per the Erlang documentation.
+///
 pub fn last(oset: OSet(t)) -> Option(a) {
   bindings.try_last(oset.table)
 }
 
+/// Given a key, returns the next key (not the object!) after it in the table, if it exists.
+///
+/// `OSet`s _are_ ordered as per the Erlang documentation.
+///
 pub fn next(oset: OSet(t), key: a) -> Option(a) {
   bindings.try_next(oset.table, key)
 }
 
+/// Given a key, returns the previous key (not the object!) before it in the table, if it exists.
+///
+/// `OSet`s _are_ ordered as per the Erlang documentation.
+///
 pub fn prev(oset: OSet(t), key: a) -> Option(a) {
   bindings.try_prev(oset.table, key)
 }

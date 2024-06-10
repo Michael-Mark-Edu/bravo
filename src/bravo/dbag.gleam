@@ -203,18 +203,34 @@ pub fn member(dbag: DBag(t), key: a) -> Bool {
   bindings.try_member(dbag.table, key)
 }
 
+/// Returns the first key (not the object!) in the table, if it exists.
+///
+/// `DBag`s are unordered, so the order of keys is unknown.
+///
 pub fn first(dbag: DBag(t)) -> Option(a) {
   bindings.try_first(dbag.table)
 }
 
+/// Returns the last key (not the object!) in the table, if it exists.
+///
+/// `DBag`s are unordered, so the order of keys is unknown.
+///
 pub fn last(dbag: DBag(t)) -> Option(a) {
   bindings.try_last(dbag.table)
 }
 
+/// Given a key, returns the next key (not the object!) after it in the table, if it exists.
+///
+/// `DBag`s are unordered, so the order of keys is unknown.
+///
 pub fn next(dbag: DBag(t), key: a) -> Option(a) {
   bindings.try_next(dbag.table, key)
 }
 
+/// Given a key, returns the previous key (not the object!) before it in the table, if it exists.
+///
+/// `DBag`s are unordered, so the order of keys is unknown.
+///
 pub fn prev(dbag: DBag(t), key: a) -> Option(a) {
   bindings.try_prev(dbag.table, key)
 }
