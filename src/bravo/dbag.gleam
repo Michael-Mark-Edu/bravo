@@ -31,9 +31,9 @@ pub opaque type DBag(t) {
 /// Can have error types `ErlangError` and `NonPositiveKeypos`.
 ///
 pub fn new(
-  name: String,
-  keypos: Int,
-  access: Access,
+  name name: String,
+  keypos keypos: Int,
+  access access: Access,
 ) -> Result(DBag(t), BravoError) {
   let atom = atom.create_from_string(name)
   use <- bool.guard(keypos < 1, Error(bravo.NonPositiveKeypos))
@@ -63,7 +63,7 @@ pub fn new(
 ///
 /// If an object with the same key already exists, then the old object will be overwritten with the new one.
 ///
-pub fn insert(dbag: DBag(t), objects: List(t)) -> Bool {
+pub fn insert(with dbag: DBag(t), insert objects: List(t)) -> Bool {
   use <- bool.guard(list.is_empty(objects), False)
   bindings.try_insert(dbag.table, dbag.keypos, objects)
 }
@@ -72,7 +72,7 @@ pub fn insert(dbag: DBag(t), objects: List(t)) -> Bool {
 ///
 /// Returns an list containing the objects, if any match.
 ///
-pub fn lookup(dbag: DBag(t), key: a) -> List(t) {
+pub fn lookup(with dbag: DBag(t), at key: a) -> List(t) {
   bindings.try_lookup(dbag.table, key)
 }
 
@@ -80,20 +80,20 @@ pub fn lookup(dbag: DBag(t), key: a) -> List(t) {
 ///
 /// Table lifetime is static, and memory is only freed when the owner process is killed! Don't forget to call this function!
 ///
-pub fn delete(dbag: DBag(t)) -> Bool {
+pub fn delete(with dbag: DBag(t)) -> Bool {
   bindings.try_delete(dbag.table)
 }
 
 /// Deletes all objects addressed by `key`, if any exist. If nothing does, this does nothing.
 ///
-pub fn delete_key(dbag: DBag(t), key: a) -> Nil {
+pub fn delete_key(with dbag: DBag(t), at key: a) -> Nil {
   bindings.try_delete_key(dbag.table, key)
   Nil
 }
 
 /// Deletes all objects in the `DBag`. This is atomic and isolated.
 ///
-pub fn delete_all_objects(dbag: DBag(t)) -> Nil {
+pub fn delete_all_objects(with dbag: DBag(t)) -> Nil {
   bindings.try_delete_all_objects(dbag.table)
   Nil
 }
@@ -102,7 +102,7 @@ pub fn delete_all_objects(dbag: DBag(t)) -> Nil {
 ///
 /// If there are multiple of the same object, then they will all be deleted.
 ///
-pub fn delete_object(dbag: DBag(t), object: t) -> Nil {
+pub fn delete_object(with dbag: DBag(t), target object: t) -> Nil {
   bindings.try_delete_object(dbag.table, object)
   Nil
 }
@@ -117,11 +117,11 @@ pub fn delete_object(dbag: DBag(t), object: t) -> Nil {
 /// Can have error type `ErlangError`.
 ///
 pub fn tab2file(
-  dbag: DBag(t),
-  filename: String,
-  object_count: Bool,
-  md5sum: Bool,
-  sync: Bool,
+  with dbag: DBag(t),
+  to filename: String,
+  object_count object_count: Bool,
+  md5sum md5sum: Bool,
+  sync sync: Bool,
 ) -> Result(Nil, BravoError) {
   bindings.try_tab2file(
     dbag.table,
@@ -143,9 +143,9 @@ pub fn tab2file(
 /// Can have error types `DecodeFailure` and `ErlangError`.
 ///
 pub fn file2tab(
-  filename: String,
-  verify: Bool,
-  decoder: fn(Dynamic) -> Result(t, _),
+  from filename: String,
+  verify verify: Bool,
+  using decoder: fn(Dynamic) -> Result(t, _),
 ) -> Result(DBag(t), BravoError) {
   use name <- result.try(bindings.try_file2tab(
     string.to_utf_codepoints(filename),
@@ -177,7 +177,7 @@ pub fn file2tab(
 
 /// Returns a list containing all of the objects in the `Ddbag`.
 ///
-pub fn tab2list(dbag: DBag(t)) -> List(t) {
+pub fn tab2list(with dbag: DBag(t)) -> List(t) {
   bindings.try_tab2list(dbag.table)
 }
 
@@ -187,20 +187,20 @@ pub fn tab2list(dbag: DBag(t)) -> List(t) {
 /// - If `True`, all objects in the list were inserted.
 /// - If `False`, _none_ of the objects in the list were inserted. This may occur if the `keypos` of the `DBag` is greater than the object tuple size or if the input list is empty.
 ///
-pub fn insert_new(dbag: DBag(t), objects: List(t)) -> Bool {
+pub fn insert_new(with dbag: DBag(t), insert objects: List(t)) -> Bool {
   use <- bool.guard(list.is_empty(objects), False)
   bindings.try_insert_new(dbag.table, dbag.keypos, objects)
 }
 
 /// Returns and removes all objects with `key` in the `DBag`, if any exist.
 ///
-pub fn take(dbag: DBag(t), key: a) -> List(t) {
+pub fn take(with dbag: DBag(t), at key: a) -> List(t) {
   bindings.try_take(dbag.table, key)
 }
 
 /// Returns whether a `DBag` contains an object at `key`.
 ///
-pub fn member(dbag: DBag(t), key: a) -> Bool {
+pub fn member(with dbag: DBag(t), at key: a) -> Bool {
   bindings.try_member(dbag.table, key)
 }
 
@@ -208,7 +208,7 @@ pub fn member(dbag: DBag(t), key: a) -> Bool {
 ///
 /// `DBag`s are unordered, so the order of keys is unknown.
 ///
-pub fn first(dbag: DBag(t)) -> Option(a) {
+pub fn first(with dbag: DBag(t)) -> Option(a) {
   bindings.try_first(dbag.table)
 }
 
@@ -216,7 +216,7 @@ pub fn first(dbag: DBag(t)) -> Option(a) {
 ///
 /// `DBag`s are unordered, so the order of keys is unknown.
 ///
-pub fn last(dbag: DBag(t)) -> Option(a) {
+pub fn last(with dbag: DBag(t)) -> Option(a) {
   bindings.try_last(dbag.table)
 }
 
@@ -224,7 +224,7 @@ pub fn last(dbag: DBag(t)) -> Option(a) {
 ///
 /// `DBag`s are unordered, so the order of keys is unknown.
 ///
-pub fn next(dbag: DBag(t), key: a) -> Option(a) {
+pub fn next(with dbag: DBag(t), from key: a) -> Option(a) {
   bindings.try_next(dbag.table, key)
 }
 
@@ -232,6 +232,6 @@ pub fn next(dbag: DBag(t), key: a) -> Option(a) {
 ///
 /// `DBag`s are unordered, so the order of keys is unknown.
 ///
-pub fn prev(dbag: DBag(t), key: a) -> Option(a) {
+pub fn prev(with dbag: DBag(t), from key: a) -> Option(a) {
   bindings.try_prev(dbag.table, key)
 }

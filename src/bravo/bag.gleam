@@ -31,9 +31,9 @@ pub opaque type Bag(t) {
 /// Can have error types `ErlangError` and `NonPositiveKeypos`.
 ///
 pub fn new(
-  name: String,
-  keypos: Int,
-  access: Access,
+  name name: String,
+  keypos keypos: Int,
+  access access: Access,
 ) -> Result(Bag(t), BravoError) {
   let atom = atom.create_from_string(name)
   use <- bool.guard(keypos < 1, Error(bravo.NonPositiveKeypos))
@@ -63,7 +63,7 @@ pub fn new(
 ///
 /// If an object with the same key already exists, then the old object will be overwritten with the new one.
 ///
-pub fn insert(bag: Bag(t), objects: List(t)) -> Bool {
+pub fn insert(with bag: Bag(t), insert objects: List(t)) -> Bool {
   use <- bool.guard(list.is_empty(objects), False)
   bindings.try_insert(bag.table, bag.keypos, objects)
 }
@@ -72,7 +72,7 @@ pub fn insert(bag: Bag(t), objects: List(t)) -> Bool {
 ///
 /// Returns an list containing the objects, if any match.
 ///
-pub fn lookup(bag: Bag(t), key: a) -> List(t) {
+pub fn lookup(with bag: Bag(t), at key: a) -> List(t) {
   bindings.try_lookup(bag.table, key)
 }
 
@@ -80,27 +80,27 @@ pub fn lookup(bag: Bag(t), key: a) -> List(t) {
 ///
 /// Table lifetime is static, and memory is only freed when the owner process is killed! Don't forget to call this function!
 ///
-pub fn delete(bag: Bag(t)) -> Bool {
+pub fn delete(with bag: Bag(t)) -> Bool {
   bindings.try_delete(bag.table)
 }
 
 /// Deletes all objects addressed by `key`, if any exist. If nothing does, this does nothing.
 ///
-pub fn delete_key(bag: Bag(t), key: a) -> Nil {
+pub fn delete_key(with bag: Bag(t), at key: a) -> Nil {
   bindings.try_delete_key(bag.table, key)
   Nil
 }
 
 /// Deletes all objects in the `Bag`. This is atomic and isolated.
 ///
-pub fn delete_all_objects(bag: Bag(t)) -> Nil {
+pub fn delete_all_objects(with bag: Bag(t)) -> Nil {
   bindings.try_delete_all_objects(bag.table)
   Nil
 }
 
 /// Deletes a specific object in the `Bag`. Other objects with the same key are unaffected.
 ///
-pub fn delete_object(bag: Bag(t), object: t) -> Nil {
+pub fn delete_object(with bag: Bag(t), target object: t) -> Nil {
   bindings.try_delete_object(bag.table, object)
   Nil
 }
@@ -115,11 +115,11 @@ pub fn delete_object(bag: Bag(t), object: t) -> Nil {
 /// Can have error type `ErlangError`.
 ///
 pub fn tab2file(
-  bag: Bag(t),
-  filename: String,
-  object_count: Bool,
-  md5sum: Bool,
-  sync: Bool,
+  with bag: Bag(t),
+  to filename: String,
+  object_count object_count: Bool,
+  md5sum md5sum: Bool,
+  sync sync: Bool,
 ) -> Result(Nil, BravoError) {
   bindings.try_tab2file(
     bag.table,
@@ -141,9 +141,9 @@ pub fn tab2file(
 /// Can have error types `DecodeFailure` and `ErlangError`.
 ///
 pub fn file2tab(
-  filename: String,
-  verify: Bool,
-  decoder: fn(Dynamic) -> Result(t, _),
+  from filename: String,
+  verify verify: Bool,
+  using decoder: fn(Dynamic) -> Result(t, _),
 ) -> Result(Bag(t), BravoError) {
   use name <- result.try(bindings.try_file2tab(
     string.to_utf_codepoints(filename),
@@ -175,7 +175,7 @@ pub fn file2tab(
 
 /// Returns a list containing all of the objects in the `Bag`.
 ///
-pub fn tab2list(bag: Bag(t)) -> List(t) {
+pub fn tab2list(with bag: Bag(t)) -> List(t) {
   bindings.try_tab2list(bag.table)
 }
 
@@ -185,20 +185,20 @@ pub fn tab2list(bag: Bag(t)) -> List(t) {
 /// - If `True`, all objects in the list were inserted.
 /// - If `False`, _none_ of the objects in the list were inserted. This may occur if the `keypos` of the `Bag` is greater than the object tuple size or if the input list is empty.
 ///
-pub fn insert_new(bag: Bag(t), objects: List(t)) -> Bool {
+pub fn insert_new(with bag: Bag(t), insert objects: List(t)) -> Bool {
   use <- bool.guard(list.is_empty(objects), False)
   bindings.try_insert_new(bag.table, bag.keypos, objects)
 }
 
 /// Returns and removes all objects with `key` in the `Bag`, if any exist.
 ///
-pub fn take(bag: Bag(t), key: a) -> List(t) {
+pub fn take(with bag: Bag(t), at key: a) -> List(t) {
   bindings.try_take(bag.table, key)
 }
 
 /// Returns whether a `Bag` contains an object at `key`.
 ///
-pub fn member(bag: Bag(t), key: a) -> Bool {
+pub fn member(with bag: Bag(t), at key: a) -> Bool {
   bindings.try_member(bag.table, key)
 }
 
@@ -206,7 +206,7 @@ pub fn member(bag: Bag(t), key: a) -> Bool {
 ///
 /// `Bag`s are unordered, so the order of keys is unknown.
 ///
-pub fn first(bag: Bag(t)) -> Option(a) {
+pub fn first(with bag: Bag(t)) -> Option(a) {
   bindings.try_first(bag.table)
 }
 
@@ -214,7 +214,7 @@ pub fn first(bag: Bag(t)) -> Option(a) {
 ///
 /// `Bag`s are unordered, so the order of keys is unknown.
 ///
-pub fn last(bag: Bag(t)) -> Option(a) {
+pub fn last(with bag: Bag(t)) -> Option(a) {
   bindings.try_last(bag.table)
 }
 
@@ -222,7 +222,7 @@ pub fn last(bag: Bag(t)) -> Option(a) {
 ///
 /// `Bag`s are unordered, so the order of keys is unknown.
 ///
-pub fn next(bag: Bag(t), key: a) -> Option(a) {
+pub fn next(with bag: Bag(t), from key: a) -> Option(a) {
   bindings.try_next(bag.table, key)
 }
 
@@ -230,6 +230,6 @@ pub fn next(bag: Bag(t), key: a) -> Option(a) {
 ///
 /// `Bag`s are unordered, so the order of keys is unknown.
 ///
-pub fn prev(bag: Bag(t), key: a) -> Option(a) {
+pub fn prev(with bag: Bag(t), from key: a) -> Option(a) {
   bindings.try_prev(bag.table, key)
 }

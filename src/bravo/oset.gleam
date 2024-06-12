@@ -35,9 +35,9 @@ pub opaque type OSet(t) {
 /// Can have error types `ErlangError` and `NonPositiveKeypos`.
 ///
 pub fn new(
-  name: String,
-  keypos: Int,
-  access: Access,
+  name name: String,
+  keypos keypos: Int,
+  access access: Access,
 ) -> Result(OSet(t), BravoError) {
   let atom = atom.create_from_string(name)
   use <- bool.guard(keypos < 1, Error(bravo.NonPositiveKeypos))
@@ -67,7 +67,7 @@ pub fn new(
 ///
 /// If an object with the same key already exists, then the old object will be overwritten with the new one.
 ///
-pub fn insert(oset: OSet(t), objects: List(t)) -> Bool {
+pub fn insert(with oset: OSet(t), insert objects: List(t)) -> Bool {
   use <- bool.guard(list.is_empty(objects), False)
   bindings.try_insert(oset.table, oset.keypos, objects)
 }
@@ -76,7 +76,7 @@ pub fn insert(oset: OSet(t), objects: List(t)) -> Bool {
 ///
 /// Returns an `Option` containing the object, if it exists.
 ///
-pub fn lookup(oset: OSet(t), key: a) -> Option(t) {
+pub fn lookup(with oset: OSet(t), at key: a) -> Option(t) {
   case bindings.try_lookup(oset.table, key) {
     [res] -> Some(res)
     _ -> None
@@ -87,27 +87,27 @@ pub fn lookup(oset: OSet(t), key: a) -> Option(t) {
 ///
 /// Table lifetime is static, and memory is only freed when the owner process is killed! Don't forget to call this function!
 ///
-pub fn delete(oset: OSet(t)) -> Bool {
+pub fn delete(with oset: OSet(t)) -> Bool {
   bindings.try_delete(oset.table)
 }
 
 /// Deletes the object addressed by `key`, if it exists. If it doesn't, this does nothing.
 ///
-pub fn delete_key(oset: OSet(t), key: a) -> Nil {
+pub fn delete_key(with oset: OSet(t), at key: a) -> Nil {
   bindings.try_delete_key(oset.table, key)
   Nil
 }
 
 /// Deletes all objects in the `OSet`. This is atomic and isolated.
 ///
-pub fn delete_all_objects(oset: OSet(t)) -> Nil {
+pub fn delete_all_objects(with oset: OSet(t)) -> Nil {
   bindings.try_delete_all_objects(oset.table)
   Nil
 }
 
 /// Deletes a specific object in the `OSet`. This is more useful in `Bag`s and `DBag`s.
 ///
-pub fn delete_object(oset: OSet(t), object: t) -> Nil {
+pub fn delete_object(with oset: OSet(t), target object: t) -> Nil {
   bindings.try_delete_object(oset.table, object)
   Nil
 }
@@ -122,11 +122,11 @@ pub fn delete_object(oset: OSet(t), object: t) -> Nil {
 /// Can have error type `ErlangError`.
 ///
 pub fn tab2file(
-  oset: OSet(t),
-  filename: String,
-  object_count: Bool,
-  md5sum: Bool,
-  sync: Bool,
+  with oset: OSet(t),
+  to filename: String,
+  object_count object_count: Bool,
+  md5sum md5sum: Bool,
+  sync sync: Bool,
 ) -> Result(Nil, BravoError) {
   bindings.try_tab2file(
     oset.table,
@@ -148,9 +148,9 @@ pub fn tab2file(
 /// Can have error types `DecodeFailure` and `ErlangError`.
 ///
 pub fn file2tab(
-  filename: String,
-  verify: Bool,
-  decoder: fn(Dynamic) -> Result(t, _),
+  from filename: String,
+  verify verify: Bool,
+  using decoder: fn(Dynamic) -> Result(t, _),
 ) -> Result(OSet(t), BravoError) {
   use name <- result.try(bindings.try_file2tab(
     string.to_utf_codepoints(filename),
@@ -184,7 +184,7 @@ pub fn file2tab(
 ///
 /// The list returned is ordered.
 ///
-pub fn tab2list(oset: OSet(t)) -> List(t) {
+pub fn tab2list(with oset: OSet(t)) -> List(t) {
   bindings.try_tab2list(oset.table)
 }
 
@@ -194,14 +194,14 @@ pub fn tab2list(oset: OSet(t)) -> List(t) {
 /// - If `True`, all objects in the list were inserted.
 /// - If `False`, _none_ of the objects in the list were inserted. This may occur if the `keypos` of the `OSet` is greater than the object tuple size or if the input list is empty.
 ///
-pub fn insert_new(oset: OSet(t), objects: List(t)) -> Bool {
+pub fn insert_new(with oset: OSet(t), insert objects: List(t)) -> Bool {
   use <- bool.guard(list.is_empty(objects), False)
   bindings.try_insert_new(oset.table, oset.keypos, objects)
 }
 
 /// Returns and removes an object at `key` in the `OSet`, if such object exists.
 ///
-pub fn take(oset: OSet(t), key: a) -> Option(t) {
+pub fn take(with oset: OSet(t), at key: a) -> Option(t) {
   case bindings.try_take(oset.table, key) {
     [res] -> Some(res)
     _ -> None
@@ -210,7 +210,7 @@ pub fn take(oset: OSet(t), key: a) -> Option(t) {
 
 /// Returns whether a `OSet` contains an object at `key`.
 ///
-pub fn member(oset: OSet(t), key: a) -> Bool {
+pub fn member(with oset: OSet(t), at key: a) -> Bool {
   bindings.try_member(oset.table, key)
 }
 
@@ -218,7 +218,7 @@ pub fn member(oset: OSet(t), key: a) -> Bool {
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
 ///
-pub fn first(oset: OSet(t)) -> Option(a) {
+pub fn first(with oset: OSet(t)) -> Option(a) {
   bindings.try_first(oset.table)
 }
 
@@ -226,7 +226,7 @@ pub fn first(oset: OSet(t)) -> Option(a) {
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
 ///
-pub fn last(oset: OSet(t)) -> Option(a) {
+pub fn last(with oset: OSet(t)) -> Option(a) {
   bindings.try_last(oset.table)
 }
 
@@ -234,7 +234,7 @@ pub fn last(oset: OSet(t)) -> Option(a) {
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
 ///
-pub fn next(oset: OSet(t), key: a) -> Option(a) {
+pub fn next(with oset: OSet(t), from key: a) -> Option(a) {
   bindings.try_next(oset.table, key)
 }
 
@@ -242,6 +242,6 @@ pub fn next(oset: OSet(t), key: a) -> Option(a) {
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
 ///
-pub fn prev(oset: OSet(t), key: a) -> Option(a) {
+pub fn prev(with oset: OSet(t), from key: a) -> Option(a) {
   bindings.try_prev(oset.table, key)
 }

@@ -33,9 +33,9 @@ pub opaque type USet(t) {
 /// Can have error types `ErlangError` and `NonPositiveKeypos`.
 ///
 pub fn new(
-  name: String,
-  keypos: Int,
-  access: Access,
+  name name: String,
+  keypos keypos: Int,
+  access access: Access,
 ) -> Result(USet(t), BravoError) {
   let atom = atom.create_from_string(name)
   use <- bool.guard(keypos < 1, Error(bravo.NonPositiveKeypos))
@@ -65,7 +65,7 @@ pub fn new(
 ///
 /// If an object with the same key already exists, then the old object will be overwritten with the new one.
 ///
-pub fn insert(uset: USet(t), objects: List(t)) -> Bool {
+pub fn insert(with uset: USet(t), insert objects: List(t)) -> Bool {
   use <- bool.guard(list.is_empty(objects), False)
   bindings.try_insert(uset.table, uset.keypos, objects)
 }
@@ -74,7 +74,7 @@ pub fn insert(uset: USet(t), objects: List(t)) -> Bool {
 ///
 /// Returns an `Option` containing the object, if it exists.
 ///
-pub fn lookup(uset: USet(t), key: a) -> Option(t) {
+pub fn lookup(with uset: USet(t), at key: a) -> Option(t) {
   case bindings.try_lookup(uset.table, key) {
     [res] -> Some(res)
     _ -> None
@@ -85,27 +85,27 @@ pub fn lookup(uset: USet(t), key: a) -> Option(t) {
 ///
 /// Table lifetime is static, and memory is only freed when the owner process is killed! Don't forget to call this function!
 ///
-pub fn delete(uset: USet(t)) -> Bool {
+pub fn delete(with uset: USet(t)) -> Bool {
   bindings.try_delete(uset.table)
 }
 
 /// Deletes the object addressed by `key`, if it exists. If it doesn't, this does nothing.
 ///
-pub fn delete_key(uset: USet(t), key: a) -> Nil {
+pub fn delete_key(with uset: USet(t), at key: a) -> Nil {
   bindings.try_delete_key(uset.table, key)
   Nil
 }
 
 /// Deletes all objects in the `USet`. This is atomic and isolated.
 ///
-pub fn delete_all_objects(uset: USet(t)) -> Nil {
+pub fn delete_all_objects(with uset: USet(t)) -> Nil {
   bindings.try_delete_all_objects(uset.table)
   Nil
 }
 
 /// Deletes a specific object in the `USet`. This is more useful in `Bag`s and `DBag`s.
 ///
-pub fn delete_object(uset: USet(t), object: t) -> Nil {
+pub fn delete_object(with uset: USet(t), target object: t) -> Nil {
   bindings.try_delete_object(uset.table, object)
   Nil
 }
@@ -120,11 +120,11 @@ pub fn delete_object(uset: USet(t), object: t) -> Nil {
 /// Can have error type `ErlangError`.
 ///
 pub fn tab2file(
-  uset: USet(t),
-  filename: String,
-  object_count: Bool,
-  md5sum: Bool,
-  sync: Bool,
+  with uset: USet(t),
+  to filename: String,
+  object_count object_count: Bool,
+  md5sum md5sum: Bool,
+  sync sync: Bool,
 ) -> Result(Nil, BravoError) {
   bindings.try_tab2file(
     uset.table,
@@ -146,9 +146,9 @@ pub fn tab2file(
 /// Can have error types `DecodeFailure` and `ErlangError`.
 ///
 pub fn file2tab(
-  filename: String,
-  verify: Bool,
-  decoder: fn(Dynamic) -> Result(t, _),
+  from filename: String,
+  verify verify: Bool,
+  using decoder: fn(Dynamic) -> Result(t, _),
 ) -> Result(USet(t), BravoError) {
   use name <- result.try(bindings.try_file2tab(
     string.to_utf_codepoints(filename),
@@ -180,7 +180,7 @@ pub fn file2tab(
 
 /// Returns a list containing all of the objects in the `USet`.
 ///
-pub fn tab2list(uset: USet(t)) -> List(t) {
+pub fn tab2list(with uset: USet(t)) -> List(t) {
   bindings.try_tab2list(uset.table)
 }
 
@@ -190,14 +190,14 @@ pub fn tab2list(uset: USet(t)) -> List(t) {
 /// - If `True`, all objects in the list were inserted.
 /// - If `False`, _none_ of the objects in the list were inserted. This may occur if the `keypos` of the `USet` is greater than the object tuple size or if the input list is empty.
 ///
-pub fn insert_new(uset: USet(t), objects: List(t)) -> Bool {
+pub fn insert_new(with uset: USet(t), insert objects: List(t)) -> Bool {
   use <- bool.guard(list.is_empty(objects), False)
   bindings.try_insert_new(uset.table, uset.keypos, objects)
 }
 
 /// Returns and removes an object at `key` in the `USet`, if such object exists.
 ///
-pub fn take(uset: USet(t), key: a) -> Option(t) {
+pub fn take(with uset: USet(t), at key: a) -> Option(t) {
   case bindings.try_take(uset.table, key) {
     [res] -> Some(res)
     _ -> None
@@ -206,7 +206,7 @@ pub fn take(uset: USet(t), key: a) -> Option(t) {
 
 /// Returns whether a `USet` contains an object at `key`.
 ///
-pub fn member(uset: USet(t), key: a) -> Bool {
+pub fn member(with uset: USet(t), at key: a) -> Bool {
   bindings.try_member(uset.table, key)
 }
 
@@ -214,7 +214,7 @@ pub fn member(uset: USet(t), key: a) -> Bool {
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
 ///
-pub fn first(uset: USet(t)) -> Option(a) {
+pub fn first(with uset: USet(t)) -> Option(a) {
   bindings.try_first(uset.table)
 }
 
@@ -222,7 +222,7 @@ pub fn first(uset: USet(t)) -> Option(a) {
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
 ///
-pub fn last(uset: USet(t)) -> Option(a) {
+pub fn last(with uset: USet(t)) -> Option(a) {
   bindings.try_last(uset.table)
 }
 
@@ -230,7 +230,7 @@ pub fn last(uset: USet(t)) -> Option(a) {
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
 ///
-pub fn next(uset: USet(t), key: a) -> Option(a) {
+pub fn next(with uset: USet(t), from key: a) -> Option(a) {
   bindings.try_next(uset.table, key)
 }
 
@@ -238,6 +238,6 @@ pub fn next(uset: USet(t), key: a) -> Option(a) {
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
 ///
-pub fn prev(uset: USet(t), key: a) -> Option(a) {
+pub fn prev(with uset: USet(t), from key: a) -> Option(a) {
   bindings.try_prev(uset.table, key)
 }
