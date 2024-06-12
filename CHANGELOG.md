@@ -2,7 +2,7 @@
 This is a breaking update!
 - Replaced _all_ instances where a function returns an `Option(x)` to instead
   return a `Result(x, Nil)`.
-    - Thanks @Ipil for bringing this to my attention. It is Gleam convention to
+    - Thanks @lpil for bringing this to my attention. It is Gleam convention to
       return a `Result(x, Nil)` to signify a returned type can be nothing, and
       `Option(x)` is only used for function parameters that are nullable. In
       order to follow Gleam Convention, all `Option`s are now `Result`s.
