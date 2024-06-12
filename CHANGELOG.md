@@ -1,3 +1,6 @@
+# v3.2.0
+- Added parameter labels to all functions.
+
 # v3.1.0
 - Added `first` to all tables.
 - Added `last` to all tables.
