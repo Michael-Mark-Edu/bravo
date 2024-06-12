@@ -8,7 +8,6 @@ import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
 import gleam/io
 import gleam/list
-import gleam/option.{type Option, None, Some}
 import gleam/result
 import gleam/string
 
@@ -72,12 +71,12 @@ pub fn insert(with uset: USet(t), insert objects: List(t)) -> Bool {
 
 /// Gets an object from a `USet`.
 ///
-/// Returns an `Option` containing the object, if it exists.
+/// Returns an `Result` containing the object, if it exists.
 ///
-pub fn lookup(with uset: USet(t), at key: a) -> Option(t) {
+pub fn lookup(with uset: USet(t), at key: a) -> Result(t, Nil) {
   case bindings.try_lookup(uset.table, key) {
-    [res] -> Some(res)
-    _ -> None
+    [res] -> Ok(res)
+    _ -> Error(Nil)
   }
 }
 
@@ -197,10 +196,10 @@ pub fn insert_new(with uset: USet(t), insert objects: List(t)) -> Bool {
 
 /// Returns and removes an object at `key` in the `USet`, if such object exists.
 ///
-pub fn take(with uset: USet(t), at key: a) -> Option(t) {
+pub fn take(with uset: USet(t), at key: a) -> Result(t, Nil) {
   case bindings.try_take(uset.table, key) {
-    [res] -> Some(res)
-    _ -> None
+    [res] -> Ok(res)
+    _ -> Error(Nil)
   }
 }
 
@@ -214,7 +213,7 @@ pub fn member(with uset: USet(t), at key: a) -> Bool {
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
 ///
-pub fn first(with uset: USet(t)) -> Option(a) {
+pub fn first(with uset: USet(t)) -> Result(a, Nil) {
   bindings.try_first(uset.table)
 }
 
@@ -222,7 +221,7 @@ pub fn first(with uset: USet(t)) -> Option(a) {
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
 ///
-pub fn last(with uset: USet(t)) -> Option(a) {
+pub fn last(with uset: USet(t)) -> Result(a, Nil) {
   bindings.try_last(uset.table)
 }
 
@@ -230,7 +229,7 @@ pub fn last(with uset: USet(t)) -> Option(a) {
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
 ///
-pub fn next(with uset: USet(t), from key: a) -> Option(a) {
+pub fn next(with uset: USet(t), from key: a) -> Result(a, Nil) {
   bindings.try_next(uset.table, key)
 }
 
@@ -238,6 +237,6 @@ pub fn next(with uset: USet(t), from key: a) -> Option(a) {
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
 ///
-pub fn prev(with uset: USet(t), from key: a) -> Option(a) {
+pub fn prev(with uset: USet(t), from key: a) -> Result(a, Nil) {
   bindings.try_prev(uset.table, key)
 }

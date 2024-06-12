@@ -8,7 +8,6 @@ import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
 import gleam/io
 import gleam/list
-import gleam/option.{type Option, None, Some}
 import gleam/result
 import gleam/string
 
@@ -74,12 +73,12 @@ pub fn insert(with oset: OSet(t), insert objects: List(t)) -> Bool {
 
 /// Gets an object from a `OSet`.
 ///
-/// Returns an `Option` containing the object, if it exists.
+/// Returns an `Result` containing the object, if it exists.
 ///
-pub fn lookup(with oset: OSet(t), at key: a) -> Option(t) {
+pub fn lookup(with oset: OSet(t), at key: a) -> Result(t, Nil) {
   case bindings.try_lookup(oset.table, key) {
-    [res] -> Some(res)
-    _ -> None
+    [res] -> Ok(res)
+    _ -> Error(Nil)
   }
 }
 
@@ -201,10 +200,10 @@ pub fn insert_new(with oset: OSet(t), insert objects: List(t)) -> Bool {
 
 /// Returns and removes an object at `key` in the `OSet`, if such object exists.
 ///
-pub fn take(with oset: OSet(t), at key: a) -> Option(t) {
+pub fn take(with oset: OSet(t), at key: a) -> Result(t, Nil) {
   case bindings.try_take(oset.table, key) {
-    [res] -> Some(res)
-    _ -> None
+    [res] -> Ok(res)
+    _ -> Error(Nil)
   }
 }
 
@@ -218,7 +217,7 @@ pub fn member(with oset: OSet(t), at key: a) -> Bool {
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
 ///
-pub fn first(with oset: OSet(t)) -> Option(a) {
+pub fn first(with oset: OSet(t)) -> Result(a, Nil) {
   bindings.try_first(oset.table)
 }
 
@@ -226,7 +225,7 @@ pub fn first(with oset: OSet(t)) -> Option(a) {
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
 ///
-pub fn last(with oset: OSet(t)) -> Option(a) {
+pub fn last(with oset: OSet(t)) -> Result(a, Nil) {
   bindings.try_last(oset.table)
 }
 
@@ -234,7 +233,7 @@ pub fn last(with oset: OSet(t)) -> Option(a) {
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
 ///
-pub fn next(with oset: OSet(t), from key: a) -> Option(a) {
+pub fn next(with oset: OSet(t), from key: a) -> Result(a, Nil) {
   bindings.try_next(oset.table, key)
 }
 
@@ -242,6 +241,6 @@ pub fn next(with oset: OSet(t), from key: a) -> Option(a) {
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
 ///
-pub fn prev(with oset: OSet(t), from key: a) -> Option(a) {
+pub fn prev(with oset: OSet(t), from key: a) -> Result(a, Nil) {
   bindings.try_prev(oset.table, key)
 }

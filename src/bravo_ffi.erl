@@ -181,13 +181,13 @@ try_first(Name) ->
       [];
     {_, tuple} ->
       case ets:first(Name) of
-        '$end_of_table' -> none;
-        Val -> {some, Val}
+        '$end_of_table' -> {error, nil};
+        Val -> {ok, Val}
       end;
     {_, non_tuple} ->
       case ets:first(Name) of
-        '$end_of_table' -> none;
-        Val -> {some, Val}
+        '$end_of_table' -> {error, nil};
+        Val -> {ok, Val}
       end
   end.
 
@@ -199,13 +199,13 @@ try_last(Name) ->
       [];
     {_, tuple} ->
       case ets:last(Name) of
-        '$end_of_table' -> none;
-        Val -> {some, Val}
+        '$end_of_table' -> {error, nil};
+        Val -> {ok, Val}
       end;
     {_, non_tuple} ->
       case ets:last(Name) of
-        '$end_of_table' -> none;
-        Val -> {some, Val}
+        '$end_of_table' -> {error, nil};
+        Val -> {ok, Val}
       end
   end.
 
@@ -217,13 +217,13 @@ try_next(Name, Key) ->
       [];
     {_, tuple} ->
       case ets:next(Name, Key) of
-        '$end_of_table' -> none;
-        Val -> {some, Val}
+        '$end_of_table' -> {error, nil};
+        Val -> {ok, Val}
       end;
     {_, non_tuple} ->
       case ets:next(Name, Key) of
-        '$end_of_table' -> none;
-        Val -> {some, Val}
+        '$end_of_table' -> {error, nil};
+        Val -> {ok, Val}
       end
   end.
 
@@ -235,12 +235,12 @@ try_prev(Name, Key) ->
       [];
     {_, tuple} ->
       case ets:prev(Name, Key) of
-        '$end_of_table' -> none;
-        Val -> {some, Val}
+        '$end_of_table' -> {error, nil};
+        Val -> {ok, Val}
       end;
     {_, non_tuple} ->
       case ets:prev(Name, Key) of
-        '$end_of_table' -> none;
-        Val -> {some, Val}
+        '$end_of_table' -> {error, nil};
+        Val -> {ok, Val}
       end
   end.

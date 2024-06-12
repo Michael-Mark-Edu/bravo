@@ -4,7 +4,6 @@ import gleam/dict
 import gleam/dynamic
 import gleam/io
 import gleam/list
-import gleam/option.{None, Some}
 import gleeunit/should
 import simplifile
 
@@ -145,7 +144,7 @@ pub fn dbag_large_multitype_test() {
       #(25, 30),
       dict.from_list([#(35, 40)]),
       Ok(45),
-      Some(50),
+      Ok(50),
     ),
   ])
   |> should.equal(True)
@@ -159,7 +158,7 @@ pub fn dbag_large_multitype_test() {
       #(25, 30),
       dict.from_list([#(35, 40)]),
       Ok(45),
-      Some(50),
+      Ok(50),
     ),
   ])
 }
@@ -488,18 +487,18 @@ pub fn dbag_fn_test() {
   ]
   dbag.insert(table, dataset)
   |> should.equal(True)
-  let assert Some(a) = table |> dbag.first
-  let assert Some(b) = table |> dbag.next(a)
-  let assert Some(c) = table |> dbag.next(b)
-  let assert Some(d) = table |> dbag.next(c)
-  let assert Some(e) = table |> dbag.next(d)
-  let assert Some(f) = table |> dbag.next(e)
-  let assert Some(g) = table |> dbag.next(f)
-  let assert Some(h) = table |> dbag.next(g)
-  let assert Some(i) = table |> dbag.next(h)
-  let assert Some(j) = table |> dbag.next(i)
-  let assert Some(k) = table |> dbag.next(j)
-  let assert Some(l) = table |> dbag.next(k)
+  let assert Ok(a) = table |> dbag.first
+  let assert Ok(b) = table |> dbag.next(a)
+  let assert Ok(c) = table |> dbag.next(b)
+  let assert Ok(d) = table |> dbag.next(c)
+  let assert Ok(e) = table |> dbag.next(d)
+  let assert Ok(f) = table |> dbag.next(e)
+  let assert Ok(g) = table |> dbag.next(f)
+  let assert Ok(h) = table |> dbag.next(g)
+  let assert Ok(i) = table |> dbag.next(h)
+  let assert Ok(j) = table |> dbag.next(i)
+  let assert Ok(k) = table |> dbag.next(j)
+  let assert Ok(l) = table |> dbag.next(k)
   let list = []
   let list = list.append(dbag.lookup(table, a), list)
   let list = list.append(dbag.lookup(table, b), list)
@@ -517,8 +516,8 @@ pub fn dbag_fn_test() {
     list.contains(list, elem)
     |> should.equal(True)
   })
-  table |> dbag.next(l) |> should.equal(None)
-  None
+  table |> dbag.next(l) |> should.equal(Error(Nil))
+  Error(Nil)
 }
 
 pub fn dbag_lp_test() {
@@ -529,18 +528,18 @@ pub fn dbag_lp_test() {
   ]
   dbag.insert(table, dataset)
   |> should.equal(True)
-  let assert Some(a) = table |> dbag.last
-  let assert Some(b) = table |> dbag.prev(a)
-  let assert Some(c) = table |> dbag.prev(b)
-  let assert Some(d) = table |> dbag.prev(c)
-  let assert Some(e) = table |> dbag.prev(d)
-  let assert Some(f) = table |> dbag.prev(e)
-  let assert Some(g) = table |> dbag.prev(f)
-  let assert Some(h) = table |> dbag.prev(g)
-  let assert Some(i) = table |> dbag.prev(h)
-  let assert Some(j) = table |> dbag.prev(i)
-  let assert Some(k) = table |> dbag.prev(j)
-  let assert Some(l) = table |> dbag.prev(k)
+  let assert Ok(a) = table |> dbag.last
+  let assert Ok(b) = table |> dbag.prev(a)
+  let assert Ok(c) = table |> dbag.prev(b)
+  let assert Ok(d) = table |> dbag.prev(c)
+  let assert Ok(e) = table |> dbag.prev(d)
+  let assert Ok(f) = table |> dbag.prev(e)
+  let assert Ok(g) = table |> dbag.prev(f)
+  let assert Ok(h) = table |> dbag.prev(g)
+  let assert Ok(i) = table |> dbag.prev(h)
+  let assert Ok(j) = table |> dbag.prev(i)
+  let assert Ok(k) = table |> dbag.prev(j)
+  let assert Ok(l) = table |> dbag.prev(k)
   let list = []
   let list = list.append(dbag.lookup(table, a), list)
   let list = list.append(dbag.lookup(table, b), list)
@@ -558,6 +557,6 @@ pub fn dbag_lp_test() {
     list.contains(list, elem)
     |> should.equal(True)
   })
-  table |> dbag.prev(l) |> should.equal(None)
-  None
+  table |> dbag.prev(l) |> should.equal(Error(Nil))
+  Error(Nil)
 }

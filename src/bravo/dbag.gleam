@@ -8,7 +8,6 @@ import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
 import gleam/io
 import gleam/list
-import gleam/option.{type Option}
 import gleam/result
 import gleam/string
 
@@ -208,7 +207,7 @@ pub fn member(with dbag: DBag(t), at key: a) -> Bool {
 ///
 /// `DBag`s are unordered, so the order of keys is unknown.
 ///
-pub fn first(with dbag: DBag(t)) -> Option(a) {
+pub fn first(with dbag: DBag(t)) -> Result(a, Nil) {
   bindings.try_first(dbag.table)
 }
 
@@ -216,7 +215,7 @@ pub fn first(with dbag: DBag(t)) -> Option(a) {
 ///
 /// `DBag`s are unordered, so the order of keys is unknown.
 ///
-pub fn last(with dbag: DBag(t)) -> Option(a) {
+pub fn last(with dbag: DBag(t)) -> Result(a, Nil) {
   bindings.try_last(dbag.table)
 }
 
@@ -224,7 +223,7 @@ pub fn last(with dbag: DBag(t)) -> Option(a) {
 ///
 /// `DBag`s are unordered, so the order of keys is unknown.
 ///
-pub fn next(with dbag: DBag(t), from key: a) -> Option(a) {
+pub fn next(with dbag: DBag(t), from key: a) -> Result(a, Nil) {
   bindings.try_next(dbag.table, key)
 }
 
@@ -232,6 +231,6 @@ pub fn next(with dbag: DBag(t), from key: a) -> Option(a) {
 ///
 /// `DBag`s are unordered, so the order of keys is unknown.
 ///
-pub fn prev(with dbag: DBag(t), from key: a) -> Option(a) {
+pub fn prev(with dbag: DBag(t), from key: a) -> Result(a, Nil) {
   bindings.try_prev(dbag.table, key)
 }

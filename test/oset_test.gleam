@@ -4,7 +4,6 @@ import gleam/dict
 import gleam/dynamic
 import gleam/io
 import gleam/list
-import gleam/option.{None, Some}
 import gleeunit/should
 import simplifile
 
@@ -20,11 +19,11 @@ pub fn oset_insert_lookup_delete_test() {
   oset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
   oset.lookup(table, 100)
-  |> should.equal(Some(#(100, 200)))
+  |> should.equal(Ok(#(100, 200)))
   oset.lookup(table, 300)
-  |> should.equal(Some(#(300, 500)))
+  |> should.equal(Ok(#(300, 500)))
   oset.lookup(table, 600)
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn oset_multitype_test() {
@@ -33,11 +32,11 @@ pub fn oset_multitype_test() {
   oset.insert(table, [#("a", 1), #("b", 2)])
   |> should.equal(True)
   oset.lookup(table, "a")
-  |> should.equal(Some(#("a", 1)))
+  |> should.equal(Ok(#("a", 1)))
   oset.lookup(table, "b")
-  |> should.equal(Some(#("b", 2)))
+  |> should.equal(Ok(#("b", 2)))
   oset.lookup(table, "c")
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn oset_large_test() {
@@ -69,7 +68,7 @@ pub fn oset_large_test() {
   |> should.equal(True)
   oset.lookup(table, 900)
   |> should.equal(
-    Some(#(
+    Ok(#(
       900,
       800,
       700,
@@ -99,11 +98,11 @@ pub fn oset_keypos_test() {
   oset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
   oset.lookup(table, 200)
-  |> should.equal(Some(#(100, 200)))
+  |> should.equal(Ok(#(100, 200)))
   oset.lookup(table, 500)
-  |> should.equal(Some(#(300, 500)))
+  |> should.equal(Ok(#(300, 500)))
   oset.lookup(table, 100)
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn oset_bad_new_test() {
@@ -126,11 +125,11 @@ pub fn oset_multi_insert_test() {
   oset.insert(table, [#(100, 200)])
   |> should.equal(True)
   oset.lookup(table, 100)
-  |> should.equal(Some(#(100, 200)))
+  |> should.equal(Ok(#(100, 200)))
   oset.insert(table, [#(100, 300), #(100, 400)])
   |> should.equal(True)
   oset.lookup(table, 100)
-  |> should.equal(Some(#(100, 400)))
+  |> should.equal(Ok(#(100, 400)))
 }
 
 pub fn oset_large_multitype_test() {
@@ -145,13 +144,13 @@ pub fn oset_large_multitype_test() {
       #(25, 30),
       dict.from_list([#(35, 40)]),
       Ok(45),
-      Some(50),
+      Ok(50),
     ),
   ])
   |> should.equal(True)
   oset.lookup(table, "String")
   |> should.equal(
-    Some(#(
+    Ok(#(
       "String",
       5,
       10.0,
@@ -159,7 +158,7 @@ pub fn oset_large_multitype_test() {
       #(25, 30),
       dict.from_list([#(35, 40)]),
       Ok(45),
-      Some(50),
+      Ok(50),
     )),
   )
 }
@@ -181,9 +180,9 @@ pub fn oset_singleton_test() {
   oset.insert(table, [#(1), #(2)])
   |> should.equal(True)
   oset.lookup(table, 1)
-  |> should.equal(Some(#(1)))
+  |> should.equal(Ok(#(1)))
   oset.lookup(table, 2)
-  |> should.equal(Some(#(2)))
+  |> should.equal(Ok(#(2)))
 }
 
 pub fn oset_nontuple_test() {
@@ -192,7 +191,7 @@ pub fn oset_nontuple_test() {
   oset.insert(table, [5])
   |> should.equal(True)
   oset.lookup(table, 5)
-  |> should.equal(Some(5))
+  |> should.equal(Ok(5))
 }
 
 pub fn oset_nontuple_record_test() {
@@ -201,7 +200,7 @@ pub fn oset_nontuple_record_test() {
   oset.insert(table, [Ok(5)])
   |> should.equal(True)
   oset.lookup(table, Ok(5))
-  |> should.equal(Some(Ok(5)))
+  |> should.equal(Ok(Ok(5)))
 }
 
 type Multirecord {
@@ -216,11 +215,11 @@ pub fn oset_nontuple_multirecord_test() {
   oset.insert(table, [A(1), B(2, 3), C])
   |> should.equal(True)
   oset.lookup(table, A(1))
-  |> should.equal(Some(A(1)))
+  |> should.equal(Ok(A(1)))
   oset.lookup(table, B(2, 3))
-  |> should.equal(Some(B(2, 3)))
+  |> should.equal(Ok(B(2, 3)))
   oset.lookup(table, C)
-  |> should.equal(Some(C))
+  |> should.equal(Ok(C))
 }
 
 pub fn oset_delete_key_test() {
@@ -229,12 +228,12 @@ pub fn oset_delete_key_test() {
   oset.insert(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.equal(True)
   oset.lookup(table, "Bye")
-  |> should.equal(Some(#("Bye", "World")))
+  |> should.equal(Ok(#("Bye", "World")))
   oset.delete_key(table, "Bye")
   oset.lookup(table, "Bye")
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
   oset.lookup(table, "Hello")
-  |> should.equal(Some(#("Hello", "World")))
+  |> should.equal(Ok(#("Hello", "World")))
 }
 
 pub fn oset_delete_all_objects_test() {
@@ -244,9 +243,9 @@ pub fn oset_delete_all_objects_test() {
   |> should.equal(True)
   oset.delete_all_objects(table)
   oset.lookup(table, "Hello")
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
   oset.lookup(table, "Bye")
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn oset_delete_object_test() {
@@ -256,9 +255,9 @@ pub fn oset_delete_object_test() {
   |> should.equal(True)
   oset.delete_object(table, #("Bye", "World"))
   oset.lookup(table, "Hello")
-  |> should.equal(Some(#("Hello", "World")))
+  |> should.equal(Ok(#("Hello", "World")))
   oset.lookup(table, "Bye")
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn oset_tab2file_test() {
@@ -275,7 +274,7 @@ pub fn oset_tab2file_test() {
       dynamic.tuple2(dynamic.string, dynamic.string),
     )
   oset.lookup(new_table, "World")
-  |> should.equal(Some(#("Hello", "World")))
+  |> should.equal(Ok(#("Hello", "World")))
   oset.delete(new_table)
   oset.file2tab("oset17", True, dynamic.tuple2(dynamic.int, dynamic.int))
   |> should.equal(Error(bravo.DecodeFailure))
@@ -348,9 +347,9 @@ pub fn oset_dynamic_test() {
   ])
   |> should.equal(True)
   oset.lookup(table, "Hello")
-  |> should.equal(Some(dynamic.from(#("Hello", "World"))))
+  |> should.equal(Ok(dynamic.from(#("Hello", "World"))))
   oset.lookup(table, 1)
-  |> should.equal(Some(dynamic.from(#(1, 2, 3))))
+  |> should.equal(Ok(dynamic.from(#(1, 2, 3))))
 }
 
 pub fn oset_insert_new_test() {
@@ -361,9 +360,9 @@ pub fn oset_insert_new_test() {
   oset.insert_new(table, [#(1, 3), #(2, 4)])
   |> should.equal(False)
   oset.lookup(table, 1)
-  |> should.equal(Some(#(1, 2)))
+  |> should.equal(Ok(#(1, 2)))
   oset.lookup(table, 2)
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn oset_take_test() {
@@ -372,13 +371,13 @@ pub fn oset_take_test() {
   oset.insert(table, [#(1, 2), #(3, 4)])
   |> should.equal(True)
   oset.lookup(table, 1)
-  |> should.equal(Some(#(1, 2)))
+  |> should.equal(Ok(#(1, 2)))
   oset.take(table, 1)
-  |> should.equal(Some(#(1, 2)))
+  |> should.equal(Ok(#(1, 2)))
   oset.take(table, 1)
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
   oset.lookup(table, 1)
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn oset_member_test() {
@@ -418,7 +417,7 @@ pub fn oset_tab2file_singleton_test() {
   oset.delete(table)
   let assert Ok(new_table) = oset.file2tab("oset26", True, dynamic.string)
   oset.lookup(new_table, "Hello")
-  |> should.equal(Some("Hello"))
+  |> should.equal(Ok("Hello"))
   oset.delete(new_table)
   oset.file2tab("oset26", True, dynamic.tuple2(dynamic.int, dynamic.int))
   |> should.equal(Error(bravo.DecodeFailure))
@@ -431,7 +430,7 @@ pub fn oset_tab2file_singleton_test() {
   oset.delete(newer_table)
   let assert Ok(newest_table) = oset.file2tab("oset26", True, dynamic.string)
   oset.lookup(newest_table, "Hello")
-  |> should.equal(Some("Hello"))
+  |> should.equal(Ok("Hello"))
   oset.delete(newest_table)
 
   simplifile.delete("oset26")
@@ -452,9 +451,9 @@ pub fn oset_tab2file_singleton_record_test() {
       dynamic.result(dynamic.string, dynamic.string),
     )
   oset.lookup(new_table, Ok("Hello"))
-  |> should.equal(Some(Ok("Hello")))
+  |> should.equal(Ok(Ok("Hello")))
   oset.lookup(new_table, Error("World"))
-  |> should.equal(Some(Error("World")))
+  |> should.equal(Ok(Error("World")))
   oset.delete(new_table)
   oset.file2tab("oset27", True, dynamic.tuple2(dynamic.int, dynamic.int))
   |> should.equal(Error(bravo.DecodeFailure))
@@ -480,32 +479,32 @@ pub fn oset_fn_test() {
     #("a"),
   ])
   |> should.equal(True)
-  let assert Some(a) = table |> oset.first
-  let assert Some(b) = table |> oset.next(a)
-  let assert Some(c) = table |> oset.next(b)
-  let assert Some(d) = table |> oset.next(c)
-  let assert Some(e) = table |> oset.next(d)
-  let assert Some(f) = table |> oset.next(e)
-  let assert Some(g) = table |> oset.next(f)
-  let assert Some(h) = table |> oset.next(g)
-  let assert Some(i) = table |> oset.next(h)
-  let assert Some(j) = table |> oset.next(i)
-  let assert Some(k) = table |> oset.next(j)
-  let assert Some(l) = table |> oset.next(k)
-  oset.lookup(table, a) |> should.equal(Some(#("A")))
-  oset.lookup(table, b) |> should.equal(Some(#("B")))
-  oset.lookup(table, c) |> should.equal(Some(#("C")))
-  oset.lookup(table, d) |> should.equal(Some(#("DA")))
-  oset.lookup(table, e) |> should.equal(Some(#("Da")))
-  oset.lookup(table, f) |> should.equal(Some(#("Db")))
-  oset.lookup(table, g) |> should.equal(Some(#("F")))
-  oset.lookup(table, h) |> should.equal(Some(#("Q")))
-  oset.lookup(table, i) |> should.equal(Some(#("R")))
-  oset.lookup(table, j) |> should.equal(Some(#("S")))
-  oset.lookup(table, k) |> should.equal(Some(#("Z")))
-  oset.lookup(table, l) |> should.equal(Some(#("a")))
-  table |> oset.next(l) |> should.equal(None)
-  None
+  let assert Ok(a) = table |> oset.first
+  let assert Ok(b) = table |> oset.next(a)
+  let assert Ok(c) = table |> oset.next(b)
+  let assert Ok(d) = table |> oset.next(c)
+  let assert Ok(e) = table |> oset.next(d)
+  let assert Ok(f) = table |> oset.next(e)
+  let assert Ok(g) = table |> oset.next(f)
+  let assert Ok(h) = table |> oset.next(g)
+  let assert Ok(i) = table |> oset.next(h)
+  let assert Ok(j) = table |> oset.next(i)
+  let assert Ok(k) = table |> oset.next(j)
+  let assert Ok(l) = table |> oset.next(k)
+  oset.lookup(table, a) |> should.equal(Ok(#("A")))
+  oset.lookup(table, b) |> should.equal(Ok(#("B")))
+  oset.lookup(table, c) |> should.equal(Ok(#("C")))
+  oset.lookup(table, d) |> should.equal(Ok(#("DA")))
+  oset.lookup(table, e) |> should.equal(Ok(#("Da")))
+  oset.lookup(table, f) |> should.equal(Ok(#("Db")))
+  oset.lookup(table, g) |> should.equal(Ok(#("F")))
+  oset.lookup(table, h) |> should.equal(Ok(#("Q")))
+  oset.lookup(table, i) |> should.equal(Ok(#("R")))
+  oset.lookup(table, j) |> should.equal(Ok(#("S")))
+  oset.lookup(table, k) |> should.equal(Ok(#("Z")))
+  oset.lookup(table, l) |> should.equal(Ok(#("a")))
+  table |> oset.next(l) |> should.equal(Error(Nil))
+  Error(Nil)
 }
 
 pub fn oset_lp_test() {
@@ -526,30 +525,30 @@ pub fn oset_lp_test() {
     #("a"),
   ])
   |> should.equal(True)
-  let assert Some(a) = table |> oset.last
-  let assert Some(b) = table |> oset.prev(a)
-  let assert Some(c) = table |> oset.prev(b)
-  let assert Some(d) = table |> oset.prev(c)
-  let assert Some(e) = table |> oset.prev(d)
-  let assert Some(f) = table |> oset.prev(e)
-  let assert Some(g) = table |> oset.prev(f)
-  let assert Some(h) = table |> oset.prev(g)
-  let assert Some(i) = table |> oset.prev(h)
-  let assert Some(j) = table |> oset.prev(i)
-  let assert Some(k) = table |> oset.prev(j)
-  let assert Some(l) = table |> oset.prev(k)
-  oset.lookup(table, a) |> should.equal(Some(#("a")))
-  oset.lookup(table, b) |> should.equal(Some(#("Z")))
-  oset.lookup(table, c) |> should.equal(Some(#("S")))
-  oset.lookup(table, d) |> should.equal(Some(#("R")))
-  oset.lookup(table, e) |> should.equal(Some(#("Q")))
-  oset.lookup(table, f) |> should.equal(Some(#("F")))
-  oset.lookup(table, g) |> should.equal(Some(#("Db")))
-  oset.lookup(table, h) |> should.equal(Some(#("Da")))
-  oset.lookup(table, i) |> should.equal(Some(#("DA")))
-  oset.lookup(table, j) |> should.equal(Some(#("C")))
-  oset.lookup(table, k) |> should.equal(Some(#("B")))
-  oset.lookup(table, l) |> should.equal(Some(#("A")))
-  table |> oset.prev(l) |> should.equal(None)
-  None
+  let assert Ok(a) = table |> oset.last
+  let assert Ok(b) = table |> oset.prev(a)
+  let assert Ok(c) = table |> oset.prev(b)
+  let assert Ok(d) = table |> oset.prev(c)
+  let assert Ok(e) = table |> oset.prev(d)
+  let assert Ok(f) = table |> oset.prev(e)
+  let assert Ok(g) = table |> oset.prev(f)
+  let assert Ok(h) = table |> oset.prev(g)
+  let assert Ok(i) = table |> oset.prev(h)
+  let assert Ok(j) = table |> oset.prev(i)
+  let assert Ok(k) = table |> oset.prev(j)
+  let assert Ok(l) = table |> oset.prev(k)
+  oset.lookup(table, a) |> should.equal(Ok(#("a")))
+  oset.lookup(table, b) |> should.equal(Ok(#("Z")))
+  oset.lookup(table, c) |> should.equal(Ok(#("S")))
+  oset.lookup(table, d) |> should.equal(Ok(#("R")))
+  oset.lookup(table, e) |> should.equal(Ok(#("Q")))
+  oset.lookup(table, f) |> should.equal(Ok(#("F")))
+  oset.lookup(table, g) |> should.equal(Ok(#("Db")))
+  oset.lookup(table, h) |> should.equal(Ok(#("Da")))
+  oset.lookup(table, i) |> should.equal(Ok(#("DA")))
+  oset.lookup(table, j) |> should.equal(Ok(#("C")))
+  oset.lookup(table, k) |> should.equal(Ok(#("B")))
+  oset.lookup(table, l) |> should.equal(Ok(#("A")))
+  table |> oset.prev(l) |> should.equal(Error(Nil))
+  Error(Nil)
 }

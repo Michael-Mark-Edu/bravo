@@ -4,7 +4,6 @@ import gleam/dict
 import gleam/dynamic
 import gleam/io
 import gleam/list
-import gleam/option.{None, Some}
 import gleeunit/should
 import simplifile
 
@@ -20,11 +19,11 @@ pub fn uset_insert_lookup_delete_test() {
   uset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
   uset.lookup(table, 100)
-  |> should.equal(Some(#(100, 200)))
+  |> should.equal(Ok(#(100, 200)))
   uset.lookup(table, 300)
-  |> should.equal(Some(#(300, 500)))
+  |> should.equal(Ok(#(300, 500)))
   uset.lookup(table, 600)
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn uset_multitype_test() {
@@ -33,11 +32,11 @@ pub fn uset_multitype_test() {
   uset.insert(table, [#("a", 1), #("b", 2)])
   |> should.equal(True)
   uset.lookup(table, "a")
-  |> should.equal(Some(#("a", 1)))
+  |> should.equal(Ok(#("a", 1)))
   uset.lookup(table, "b")
-  |> should.equal(Some(#("b", 2)))
+  |> should.equal(Ok(#("b", 2)))
   uset.lookup(table, "c")
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn uset_large_test() {
@@ -69,7 +68,7 @@ pub fn uset_large_test() {
   |> should.equal(True)
   uset.lookup(table, 900)
   |> should.equal(
-    Some(#(
+    Ok(#(
       900,
       800,
       700,
@@ -99,11 +98,11 @@ pub fn uset_keypos_test() {
   uset.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(True)
   uset.lookup(table, 200)
-  |> should.equal(Some(#(100, 200)))
+  |> should.equal(Ok(#(100, 200)))
   uset.lookup(table, 500)
-  |> should.equal(Some(#(300, 500)))
+  |> should.equal(Ok(#(300, 500)))
   uset.lookup(table, 100)
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn uset_bad_new_test() {
@@ -126,11 +125,11 @@ pub fn uset_multi_insert_test() {
   uset.insert(table, [#(100, 200)])
   |> should.equal(True)
   uset.lookup(table, 100)
-  |> should.equal(Some(#(100, 200)))
+  |> should.equal(Ok(#(100, 200)))
   uset.insert(table, [#(100, 300), #(100, 400)])
   |> should.equal(True)
   uset.lookup(table, 100)
-  |> should.equal(Some(#(100, 400)))
+  |> should.equal(Ok(#(100, 400)))
 }
 
 pub fn uset_large_multitype_test() {
@@ -145,13 +144,13 @@ pub fn uset_large_multitype_test() {
       #(25, 30),
       dict.from_list([#(35, 40)]),
       Ok(45),
-      Some(50),
+      Ok(50),
     ),
   ])
   |> should.equal(True)
   uset.lookup(table, "String")
   |> should.equal(
-    Some(#(
+    Ok(#(
       "String",
       5,
       10.0,
@@ -159,7 +158,7 @@ pub fn uset_large_multitype_test() {
       #(25, 30),
       dict.from_list([#(35, 40)]),
       Ok(45),
-      Some(50),
+      Ok(50),
     )),
   )
 }
@@ -181,9 +180,9 @@ pub fn uset_singleton_test() {
   uset.insert(table, [#(1), #(2)])
   |> should.equal(True)
   uset.lookup(table, 1)
-  |> should.equal(Some(#(1)))
+  |> should.equal(Ok(#(1)))
   uset.lookup(table, 2)
-  |> should.equal(Some(#(2)))
+  |> should.equal(Ok(#(2)))
 }
 
 pub fn uset_nontuple_test() {
@@ -192,7 +191,7 @@ pub fn uset_nontuple_test() {
   uset.insert(table, [5])
   |> should.equal(True)
   uset.lookup(table, 5)
-  |> should.equal(Some(5))
+  |> should.equal(Ok(5))
 }
 
 pub fn uset_nontuple_record_test() {
@@ -201,7 +200,7 @@ pub fn uset_nontuple_record_test() {
   uset.insert(table, [Ok(5)])
   |> should.equal(True)
   uset.lookup(table, Ok(5))
-  |> should.equal(Some(Ok(5)))
+  |> should.equal(Ok(Ok(5)))
 }
 
 type Multirecord {
@@ -216,11 +215,11 @@ pub fn uset_nontuple_multirecord_test() {
   uset.insert(table, [A(1), B(2, 3), C])
   |> should.equal(True)
   uset.lookup(table, A(1))
-  |> should.equal(Some(A(1)))
+  |> should.equal(Ok(A(1)))
   uset.lookup(table, B(2, 3))
-  |> should.equal(Some(B(2, 3)))
+  |> should.equal(Ok(B(2, 3)))
   uset.lookup(table, C)
-  |> should.equal(Some(C))
+  |> should.equal(Ok(C))
 }
 
 pub fn uset_delete_key_test() {
@@ -229,12 +228,12 @@ pub fn uset_delete_key_test() {
   uset.insert(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.equal(True)
   uset.lookup(table, "Bye")
-  |> should.equal(Some(#("Bye", "World")))
+  |> should.equal(Ok(#("Bye", "World")))
   uset.delete_key(table, "Bye")
   uset.lookup(table, "Bye")
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
   uset.lookup(table, "Hello")
-  |> should.equal(Some(#("Hello", "World")))
+  |> should.equal(Ok(#("Hello", "World")))
 }
 
 pub fn uset_delete_all_objects_test() {
@@ -244,9 +243,9 @@ pub fn uset_delete_all_objects_test() {
   |> should.equal(True)
   uset.delete_all_objects(table)
   uset.lookup(table, "Hello")
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
   uset.lookup(table, "Bye")
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn uset_delete_object_test() {
@@ -256,9 +255,9 @@ pub fn uset_delete_object_test() {
   |> should.equal(True)
   uset.delete_object(table, #("Bye", "World"))
   uset.lookup(table, "Hello")
-  |> should.equal(Some(#("Hello", "World")))
+  |> should.equal(Ok(#("Hello", "World")))
   uset.lookup(table, "Bye")
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn uset_tab2file_test() {
@@ -275,7 +274,7 @@ pub fn uset_tab2file_test() {
       dynamic.tuple2(dynamic.string, dynamic.string),
     )
   uset.lookup(new_table, "World")
-  |> should.equal(Some(#("Hello", "World")))
+  |> should.equal(Ok(#("Hello", "World")))
   uset.delete(new_table)
   uset.file2tab("uset17", True, dynamic.tuple2(dynamic.int, dynamic.int))
   |> should.equal(Error(bravo.DecodeFailure))
@@ -348,9 +347,9 @@ pub fn uset_dynamic_test() {
   ])
   |> should.equal(True)
   uset.lookup(table, "Hello")
-  |> should.equal(Some(dynamic.from(#("Hello", "World"))))
+  |> should.equal(Ok(dynamic.from(#("Hello", "World"))))
   uset.lookup(table, 1)
-  |> should.equal(Some(dynamic.from(#(1, 2, 3))))
+  |> should.equal(Ok(dynamic.from(#(1, 2, 3))))
 }
 
 pub fn uset_insert_new_test() {
@@ -361,9 +360,9 @@ pub fn uset_insert_new_test() {
   uset.insert_new(table, [#(1, 3), #(2, 4)])
   |> should.equal(False)
   uset.lookup(table, 1)
-  |> should.equal(Some(#(1, 2)))
+  |> should.equal(Ok(#(1, 2)))
   uset.lookup(table, 2)
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn uset_take_test() {
@@ -372,13 +371,13 @@ pub fn uset_take_test() {
   uset.insert(table, [#(1, 2), #(3, 4)])
   |> should.equal(True)
   uset.lookup(table, 1)
-  |> should.equal(Some(#(1, 2)))
+  |> should.equal(Ok(#(1, 2)))
   uset.take(table, 1)
-  |> should.equal(Some(#(1, 2)))
+  |> should.equal(Ok(#(1, 2)))
   uset.take(table, 1)
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
   uset.lookup(table, 1)
-  |> should.equal(None)
+  |> should.equal(Error(Nil))
 }
 
 pub fn uset_member_test() {
@@ -418,7 +417,7 @@ pub fn uset_tab2file_singleton_test() {
   uset.delete(table)
   let assert Ok(new_table) = uset.file2tab("uset26", True, dynamic.string)
   uset.lookup(new_table, "Hello")
-  |> should.equal(Some("Hello"))
+  |> should.equal(Ok("Hello"))
   uset.delete(new_table)
   uset.file2tab("uset26", True, dynamic.tuple2(dynamic.int, dynamic.int))
   |> should.equal(Error(bravo.DecodeFailure))
@@ -431,7 +430,7 @@ pub fn uset_tab2file_singleton_test() {
   uset.delete(newer_table)
   let assert Ok(newest_table) = uset.file2tab("uset26", True, dynamic.string)
   uset.lookup(newest_table, "Hello")
-  |> should.equal(Some("Hello"))
+  |> should.equal(Ok("Hello"))
   uset.delete(newest_table)
 
   simplifile.delete("uset26")
@@ -452,9 +451,9 @@ pub fn uset_tab2file_singleton_record_test() {
       dynamic.result(dynamic.string, dynamic.string),
     )
   uset.lookup(new_table, Ok("Hello"))
-  |> should.equal(Some(Ok("Hello")))
+  |> should.equal(Ok(Ok("Hello")))
   uset.lookup(new_table, Error("World"))
-  |> should.equal(Some(Error("World")))
+  |> should.equal(Ok(Error("World")))
   uset.delete(new_table)
   uset.file2tab("uset27", True, dynamic.tuple2(dynamic.int, dynamic.int))
   |> should.equal(Error(bravo.DecodeFailure))
@@ -468,18 +467,18 @@ pub fn uset_fn_test() {
   let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
   uset.insert(table, dataset)
   |> should.equal(True)
-  let assert Some(a) = table |> uset.first
-  let assert Some(b) = table |> uset.next(a)
-  let assert Some(c) = table |> uset.next(b)
-  let assert Some(d) = table |> uset.next(c)
-  let assert Some(e) = table |> uset.next(d)
-  let assert Some(f) = table |> uset.next(e)
-  let assert Some(g) = table |> uset.next(f)
-  let assert Some(h) = table |> uset.next(g)
-  let assert Some(i) = table |> uset.next(h)
-  let assert Some(j) = table |> uset.next(i)
-  let assert Some(k) = table |> uset.next(j)
-  let assert Some(l) = table |> uset.next(k)
+  let assert Ok(a) = table |> uset.first
+  let assert Ok(b) = table |> uset.next(a)
+  let assert Ok(c) = table |> uset.next(b)
+  let assert Ok(d) = table |> uset.next(c)
+  let assert Ok(e) = table |> uset.next(d)
+  let assert Ok(f) = table |> uset.next(e)
+  let assert Ok(g) = table |> uset.next(f)
+  let assert Ok(h) = table |> uset.next(g)
+  let assert Ok(i) = table |> uset.next(h)
+  let assert Ok(j) = table |> uset.next(i)
+  let assert Ok(k) = table |> uset.next(j)
+  let assert Ok(l) = table |> uset.next(k)
   let list = []
   let list = [uset.lookup(table, a), ..list]
   let list = [uset.lookup(table, b), ..list]
@@ -494,11 +493,11 @@ pub fn uset_fn_test() {
   let list = [uset.lookup(table, k), ..list]
   let list = [uset.lookup(table, l), ..list]
   list.map(dataset, fn(elem) {
-    list.contains(list, Some(elem))
+    list.contains(list, Ok(elem))
     |> should.equal(True)
   })
-  table |> uset.next(l) |> should.equal(None)
-  None
+  table |> uset.next(l) |> should.equal(Error(Nil))
+  Error(Nil)
 }
 
 pub fn uset_lp_test() {
@@ -507,18 +506,18 @@ pub fn uset_lp_test() {
   let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
   uset.insert(table, dataset)
   |> should.equal(True)
-  let assert Some(a) = table |> uset.last
-  let assert Some(b) = table |> uset.prev(a)
-  let assert Some(c) = table |> uset.prev(b)
-  let assert Some(d) = table |> uset.prev(c)
-  let assert Some(e) = table |> uset.prev(d)
-  let assert Some(f) = table |> uset.prev(e)
-  let assert Some(g) = table |> uset.prev(f)
-  let assert Some(h) = table |> uset.prev(g)
-  let assert Some(i) = table |> uset.prev(h)
-  let assert Some(j) = table |> uset.prev(i)
-  let assert Some(k) = table |> uset.prev(j)
-  let assert Some(l) = table |> uset.prev(k)
+  let assert Ok(a) = table |> uset.last
+  let assert Ok(b) = table |> uset.prev(a)
+  let assert Ok(c) = table |> uset.prev(b)
+  let assert Ok(d) = table |> uset.prev(c)
+  let assert Ok(e) = table |> uset.prev(d)
+  let assert Ok(f) = table |> uset.prev(e)
+  let assert Ok(g) = table |> uset.prev(f)
+  let assert Ok(h) = table |> uset.prev(g)
+  let assert Ok(i) = table |> uset.prev(h)
+  let assert Ok(j) = table |> uset.prev(i)
+  let assert Ok(k) = table |> uset.prev(j)
+  let assert Ok(l) = table |> uset.prev(k)
   let list = []
   let list = [uset.lookup(table, a), ..list]
   let list = [uset.lookup(table, b), ..list]
@@ -533,9 +532,9 @@ pub fn uset_lp_test() {
   let list = [uset.lookup(table, k), ..list]
   let list = [uset.lookup(table, l), ..list]
   list.map(dataset, fn(elem) {
-    list.contains(list, Some(elem))
+    list.contains(list, Ok(elem))
     |> should.equal(True)
   })
-  table |> uset.prev(l) |> should.equal(None)
-  None
+  table |> uset.prev(l) |> should.equal(Error(Nil))
+  Error(Nil)
 }
