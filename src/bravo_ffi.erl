@@ -40,7 +40,7 @@ try_insert(Name, Keypos, Objects) ->
 try_new(Name, Options) ->
   case ets:whereis('$BRAVOMETA') of
     undefined ->
-      Meta = ets:new('$BRAVOMETA', [set, public, named_table, {keypos, 1}, {heir, none}]),
+      Meta = ets:new('$BRAVOMETA', [set, private, named_table, {keypos, 1}, {heir, none}]),
       ets:insert(Meta, {Name, unknown});
     Table ->
       ets:insert(Table, {Name, unknown})
