@@ -1,4 +1,4 @@
-# v4.0.0 (unreleased)
+# v4.0.0
 This is a breaking update!
 - Replaced _all_ instances where a function returns an `Option(x)` to instead
   return a `Result(x, Nil)`.

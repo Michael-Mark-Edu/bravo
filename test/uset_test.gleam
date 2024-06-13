@@ -2,7 +2,6 @@ import bravo
 import bravo/uset
 import gleam/dict
 import gleam/dynamic
-import gleam/io
 import gleam/list
 import gleeunit/should
 import simplifile
