@@ -54,7 +54,6 @@ gleam add bravo gleam_erlang
 import bravo
 import bravo/uset
 import gleam/io
-import gleam/option.{Some}
 
 pub fn main() {
   // Create a new ETS table. There are multiple options, but here we are using
@@ -65,7 +64,7 @@ pub fn main() {
   uset.insert(table, [#("Hello", "world!")])
 
   // Then we can lookup the object from the table
-  let assert Some(object) = uset.lookup(table, "Hello")
+  let assert Ok(object) = uset.lookup(table, "Hello")
   io.print(object.0 <> ", " <> object.1) // "Hello, world!"
 
   // ETS tables have static lifetimes,
@@ -116,7 +115,7 @@ simply takes in the table and a key (in this case, the first element of the tupl
 object (or list of objects in the case of `Bag` and `DBag`) if it was found.
 ```gleam
 uset.lookup(table, "Hello")
-|> should.equal(Some(#("Hello", "World")))
+|> should.equal(Ok(#("Hello", "World")))
 ```
 
 Theoretically, this is all you need to be able to use Bravo, but there are more functions that
