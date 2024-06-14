@@ -1,6 +1,11 @@
 # v4.0.1 (unreleased)
 - Changed the table types internally to store tids instead of atoms
     - This should result in better performance without changing the API.
+- Improved behavior of tables in asynchronous, especially around `Access` types.
+    - Now, instead of crashing the process upon access violation, relevant
+      functions now act like the table is completely empty. However, this isn't
+      ideal, but the only practical solution would be to change the return types
+      of functions, which would be a breaking change.
 
 # v4.0.0
 This is a breaking update!
