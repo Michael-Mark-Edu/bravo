@@ -5,7 +5,8 @@ import bravo/internal/bindings
 import bravo/internal/new_option
 import gleam/bool
 import gleam/dynamic.{type Dynamic}
-import gleam/erlang/atom.{type Atom}
+import gleam/erlang.{type Reference}
+import gleam/erlang/atom
 import gleam/io
 import gleam/list
 import gleam/result
@@ -14,7 +15,7 @@ import gleam/string
 /// A bag table. Keys may occur multiple times per table, but objects cannot be copied verbatim.
 ///
 pub opaque type Bag(t) {
-  Bag(table: Atom, keypos: Int)
+  Bag(table: Reference, keypos: Int)
 }
 
 /// Creates a new ETS table configured as a bag: keys may only occur multiple times per table, but objects cannot be copied verbatim.
@@ -51,7 +52,8 @@ pub fn new(
       new_option.DecentralizedCounters(True),
     ]),
   )
-  Ok(Bag(a, keypos))
+  let assert Ok(tid) = bindings.try_whereis(a)
+  Ok(Bag(tid, keypos))
 }
 
 /// Inserts a list of tuples into a `Bag`.

@@ -5,7 +5,8 @@ import bravo/internal/bindings
 import bravo/internal/new_option
 import gleam/bool
 import gleam/dynamic.{type Dynamic}
-import gleam/erlang/atom.{type Atom}
+import gleam/erlang.{type Reference}
+import gleam/erlang/atom
 import gleam/io
 import gleam/list
 import gleam/result
@@ -18,7 +19,7 @@ import gleam/string
 /// In order for a lookup match to occur, entries must _coerce into the same value_. Two values may match even if they have different types.
 ///
 pub opaque type OSet(t) {
-  OSet(table: Atom, keypos: Int)
+  OSet(table: Reference, keypos: Int)
 }
 
 /// Creates a new ETS table configured as an ordered set: keys may only occur once per table, and objects are ordered (this comes at a performance cost).
@@ -55,7 +56,8 @@ pub fn new(
       new_option.DecentralizedCounters(True),
     ]),
   )
-  Ok(OSet(a, keypos))
+  let assert Ok(tid) = bindings.try_whereis(a)
+  Ok(OSet(tid, keypos))
 }
 
 /// Inserts a list of tuples into a `OSet`.
