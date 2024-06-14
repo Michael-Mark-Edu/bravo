@@ -1,4 +1,8 @@
-# v4.0.0 (unreleased)
+# v4.0.1 (unreleased)
+- Changed the table types internally to store tids instead of atoms
+    - This should result in better performance without changing the API.
+
+# v4.0.0
 This is a breaking update!
 - Replaced _all_ instances where a function returns an `Option(x)` to instead
   return a `Result(x, Nil)`.
