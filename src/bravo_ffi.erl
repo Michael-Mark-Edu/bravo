@@ -41,7 +41,7 @@ try_insert(Name, Keypos, Objects) ->
 try_new(Name, Options) ->
   case ets:whereis('$BRAVOMETA') of
     undefined ->
-      Meta = ets:new('$BRAVOMETA', [set, private, named_table, {keypos, 1}, {heir, none}]),
+      Meta = ets:new('$BRAVOMETA', [set, public, named_table, {keypos, 1}, {heir, none}]),
       ets:insert(Meta, {Name, unknown});
     Table ->
       ets:insert(Table, {Name, unknown})
@@ -124,7 +124,7 @@ try_insert_new(Name, Keypos, Objects) ->
   end.
 
 try_lookup(Name, Key) ->
-  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
     {_, unknown} ->
       [];
     {_, deleted} ->
@@ -134,7 +134,11 @@ try_lookup(Name, Key) ->
     {_, non_tuple} ->
       Res = ets:lookup(Name, Key),
       lists:map(fun(Elem) -> element(1, Elem) end, Res)
+  end) of
+    {'EXIT', _} -> [];
+    Other -> Other
   end.
+
 
 try_delete_key(Name, Key) ->
   ets:delete(Name, Key).
@@ -146,7 +150,7 @@ try_delete_object(Name, Object) ->
   ets:delete_object(Name, Object).
 
 try_tab2list(Name) ->
-  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
     {_, unknown} ->
       [];
     {_, deleted} ->
@@ -156,10 +160,13 @@ try_tab2list(Name) ->
     {_, non_tuple} ->
       Res = ets:tab2list(Name),
       lists:map(fun(Elem) -> element(1, Elem) end, Res)
+  end) of
+    {'EXIT', _} -> [];
+    Other -> Other
   end.
 
 try_take(Name, Key) ->
-  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
     {_, unknown} ->
       [];
     {_, deleted} ->
@@ -169,13 +176,16 @@ try_take(Name, Key) ->
     {_, non_tuple} ->
       {Res} = ets:take(Name, {Key}),
       Res
+  end) of
+    {'EXIT', _} -> [];
+    Other -> Other
   end.
 
 try_member(Name, Key) ->
   ets:member(Name, Key).
 
 try_first(Name) ->
-  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
     {_, unknown} ->
       [];
     {_, deleted} ->
@@ -190,10 +200,13 @@ try_first(Name) ->
         '$end_of_table' -> {error, nil};
         Val -> {ok, Val}
       end
+  end) of
+    {'EXIT', _} -> {error, nil};
+    Other -> Other
   end.
 
 try_last(Name) ->
-  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
     {_, unknown} ->
       [];
     {_, deleted} ->
@@ -208,10 +221,14 @@ try_last(Name) ->
         '$end_of_table' -> {error, nil};
         Val -> {ok, Val}
       end
+  end) of
+    {'EXIT', _} -> {error, nil};
+    Other -> Other
   end.
 
+
 try_next(Name, Key) ->
-  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
     {_, unknown} ->
       [];
     {_, deleted} ->
@@ -226,10 +243,13 @@ try_next(Name, Key) ->
         '$end_of_table' -> {error, nil};
         Val -> {ok, Val}
       end
+  end) of
+    {'EXIT', _} -> {error, nil};
+    Other -> Other
   end.
 
 try_prev(Name, Key) ->
-  case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+  case catch (case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
     {_, unknown} ->
       [];
     {_, deleted} ->
@@ -244,6 +264,9 @@ try_prev(Name, Key) ->
         '$end_of_table' -> {error, nil};
         Val -> {ok, Val}
       end
+  end) of
+    {'EXIT', _} -> {error, nil};
+    Other -> Other
   end.
 
 try_whereis(Atom) ->

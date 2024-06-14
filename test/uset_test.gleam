@@ -1,9 +1,15 @@
 import bravo
+import bravo/internal/bindings
 import bravo/uset
 import gleam/dict
 import gleam/dynamic
+import gleam/erlang/atom
+import gleam/erlang/process
 import gleam/io
 import gleam/list
+import gleam/option
+import gleam/otp/actor
+import gleam/otp/task
 import gleeunit/should
 import simplifile
 
@@ -537,4 +543,41 @@ pub fn uset_lp_test() {
   })
   table |> uset.prev(l) |> should.equal(Error(Nil))
   Error(Nil)
+}
+
+// TODO: Replace the internal binding calls here with actual functions
+pub fn uset_async_test() {
+  let assert Ok(table) = uset.new("uset30", 1, bravo.Private)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, [#("Hello", "World")])
+  let assert Ok(ref) =
+    "uset30"
+    |> atom.create_from_string
+    |> bindings.try_whereis
+  bindings.try_lookup(ref, "Hello")
+  |> should.equal([#("Hello", "World")])
+  let task = {
+    use <- task.async
+    let assert Ok(ref) =
+      "uset30"
+      |> atom.create_from_string
+      |> bindings.try_whereis
+    bindings.try_lookup(ref, "Hello")
+    |> should.equal([])
+  }
+  task.await_forever(task)
+  let assert Ok(actor) = {
+    use _, state <- actor.start(uset.new("uset30a", 1, bravo.Public))
+    let assert Ok(table) = state
+    uset.insert(table, [#("Goodbye", "World")])
+    actor.Continue(state, option.None)
+  }
+  actor.send(actor, Nil)
+  process.sleep(100)
+  let assert Ok(ref) =
+    "uset30a"
+    |> atom.create_from_string
+    |> bindings.try_whereis
+  bindings.try_lookup(ref, "Goodbye")
+  |> should.equal([#("Goodbye", "World")])
 }

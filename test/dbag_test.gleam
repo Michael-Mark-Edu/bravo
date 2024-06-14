@@ -1,9 +1,15 @@
 import bravo
 import bravo/dbag
+import bravo/internal/bindings
 import gleam/dict
 import gleam/dynamic
+import gleam/erlang/atom
+import gleam/erlang/process
 import gleam/io
 import gleam/list
+import gleam/option
+import gleam/otp/actor
+import gleam/otp/task
 import gleeunit/should
 import simplifile
 
@@ -559,4 +565,41 @@ pub fn dbag_lp_test() {
   })
   table |> dbag.prev(l) |> should.equal(Error(Nil))
   Error(Nil)
+}
+
+// TODO: Replace the internal binding calls here with actual functions
+pub fn dbag_async_test() {
+  let assert Ok(table) = dbag.new("dbag30", 1, bravo.Private)
+  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  dbag.insert(table, [#("Hello", "World")])
+  let assert Ok(ref) =
+    "dbag30"
+    |> atom.create_from_string
+    |> bindings.try_whereis
+  bindings.try_lookup(ref, "Hello")
+  |> should.equal([#("Hello", "World")])
+  let task = {
+    use <- task.async
+    let assert Ok(ref) =
+      "dbag30"
+      |> atom.create_from_string
+      |> bindings.try_whereis
+    bindings.try_lookup(ref, "Hello")
+    |> should.equal([])
+  }
+  task.await_forever(task)
+  let assert Ok(actor) = {
+    use _, state <- actor.start(dbag.new("dbag30a", 1, bravo.Public))
+    let assert Ok(table) = state
+    dbag.insert(table, [#("Goodbye", "World")])
+    actor.Continue(state, option.None)
+  }
+  actor.send(actor, Nil)
+  process.sleep(100)
+  let assert Ok(ref) =
+    "dbag30a"
+    |> atom.create_from_string
+    |> bindings.try_whereis
+  bindings.try_lookup(ref, "Goodbye")
+  |> should.equal([#("Goodbye", "World")])
 }

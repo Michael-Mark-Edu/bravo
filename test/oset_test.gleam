@@ -1,9 +1,15 @@
 import bravo
+import bravo/internal/bindings
 import bravo/oset
 import gleam/dict
 import gleam/dynamic
+import gleam/erlang/atom
+import gleam/erlang/process
 import gleam/io
 import gleam/list
+import gleam/option
+import gleam/otp/actor
+import gleam/otp/task
 import gleeunit/should
 import simplifile
 
@@ -551,4 +557,41 @@ pub fn oset_lp_test() {
   oset.lookup(table, l) |> should.equal(Ok(#("A")))
   table |> oset.prev(l) |> should.equal(Error(Nil))
   Error(Nil)
+}
+
+// TODO: Replace the internal binding calls here with actual functions
+pub fn oset_async_test() {
+  let assert Ok(table) = oset.new("oset30", 1, bravo.Private)
+  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  oset.insert(table, [#("Hello", "World")])
+  let assert Ok(ref) =
+    "oset30"
+    |> atom.create_from_string
+    |> bindings.try_whereis
+  bindings.try_lookup(ref, "Hello")
+  |> should.equal([#("Hello", "World")])
+  let task = {
+    use <- task.async
+    let assert Ok(ref) =
+      "oset30"
+      |> atom.create_from_string
+      |> bindings.try_whereis
+    bindings.try_lookup(ref, "Hello")
+    |> should.equal([])
+  }
+  task.await_forever(task)
+  let assert Ok(actor) = {
+    use _, state <- actor.start(oset.new("oset30a", 1, bravo.Public))
+    let assert Ok(table) = state
+    oset.insert(table, [#("Goodbye", "World")])
+    actor.Continue(state, option.None)
+  }
+  actor.send(actor, Nil)
+  process.sleep(100)
+  let assert Ok(ref) =
+    "oset30a"
+    |> atom.create_from_string
+    |> bindings.try_whereis
+  bindings.try_lookup(ref, "Goodbye")
+  |> should.equal([#("Goodbye", "World")])
 }
