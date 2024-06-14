@@ -560,7 +560,7 @@ pub fn oset_lp_test() {
 }
 
 // TODO: Replace the internal binding calls here with actual functions
-pub fn oset_async_test() {
+pub fn oset_async_access_test() {
   let assert Ok(table) = oset.new("oset30", 1, bravo.Private)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("Hello", "World")])
@@ -580,11 +580,14 @@ pub fn oset_async_test() {
     |> should.equal([])
   }
   task.await_forever(task)
+}
+
+pub fn oset_async_protected_test() {
   let assert Ok(actor) = {
-    use _, state <- actor.start(oset.new("oset30a", 1, bravo.Public))
-    let assert Ok(table) = state
+    use _, _ <- actor.start(option.None)
+    let assert Ok(table) = oset.new("oset30a", 1, bravo.Protected)
     oset.insert(table, [#("Goodbye", "World")])
-    actor.Continue(state, option.None)
+    actor.Continue(option.Some(table), option.None)
   }
   actor.send(actor, Nil)
   process.sleep(100)
@@ -594,4 +597,6 @@ pub fn oset_async_test() {
     |> bindings.try_whereis
   bindings.try_lookup(ref, "Goodbye")
   |> should.equal([#("Goodbye", "World")])
+  bindings.try_insert(ref, 1, [#("Hello", "Again")])
+  |> should.equal(False)
 }

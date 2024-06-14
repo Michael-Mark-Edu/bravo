@@ -19,7 +19,7 @@ try_insert(Name, Keypos, Objects) ->
       false ->
         false
     end,
-  case Condition of
+  case catch(case Condition of
     true ->
       ets:insert('$BRAVOMETA', {Name, tuple}),
       case lists:all(fun(Elem) -> tuple_size(Elem) >= Keypos end, Objects) of
@@ -36,6 +36,9 @@ try_insert(Name, Keypos, Objects) ->
         false ->
           false
       end
+  end) of
+    {'EXIT', _} -> false;
+    Other -> Other
   end.
 
 try_new(Name, Options) ->
@@ -104,7 +107,7 @@ try_insert_new(Name, Keypos, Objects) ->
       false ->
         false
     end,
-  case Condition of
+  case catch(case Condition of
     true ->
       ets:insert('$BRAVOMETA', {Name, tuple}),
       case lists:all(fun(Elem) -> tuple_size(Elem) >= Keypos end, Objects) of
@@ -121,6 +124,9 @@ try_insert_new(Name, Keypos, Objects) ->
         false ->
           false
       end
+  end) of
+    {'EXIT', _} -> false;
+    Other -> Other
   end.
 
 try_lookup(Name, Key) ->

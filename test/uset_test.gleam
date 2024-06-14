@@ -546,7 +546,7 @@ pub fn uset_lp_test() {
 }
 
 // TODO: Replace the internal binding calls here with actual functions
-pub fn uset_async_test() {
+pub fn uset_async_access_test() {
   let assert Ok(table) = uset.new("uset30", 1, bravo.Private)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#("Hello", "World")])
@@ -566,11 +566,14 @@ pub fn uset_async_test() {
     |> should.equal([])
   }
   task.await_forever(task)
+}
+
+pub fn uset_async_protected_test() {
   let assert Ok(actor) = {
-    use _, state <- actor.start(uset.new("uset30a", 1, bravo.Public))
-    let assert Ok(table) = state
+    use _, _ <- actor.start(option.None)
+    let assert Ok(table) = uset.new("uset30a", 1, bravo.Protected)
     uset.insert(table, [#("Goodbye", "World")])
-    actor.Continue(state, option.None)
+    actor.Continue(option.Some(table), option.None)
   }
   actor.send(actor, Nil)
   process.sleep(100)
@@ -580,4 +583,6 @@ pub fn uset_async_test() {
     |> bindings.try_whereis
   bindings.try_lookup(ref, "Goodbye")
   |> should.equal([#("Goodbye", "World")])
+  bindings.try_insert(ref, 1, [#("Hello", "Again")])
+  |> should.equal(False)
 }

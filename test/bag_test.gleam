@@ -542,7 +542,7 @@ pub fn bag_lp_test() {
 }
 
 // TODO: Replace the internal binding calls here with actual functions
-pub fn bag_async_test() {
+pub fn bag_async_access_test() {
   let assert Ok(table) = bag.new("bag30", 1, bravo.Private)
   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
   bag.insert(table, [#("Hello", "World")])
@@ -562,11 +562,14 @@ pub fn bag_async_test() {
     |> should.equal([])
   }
   task.await_forever(task)
+}
+
+pub fn bag_async_protected_test() {
   let assert Ok(actor) = {
-    use _, state <- actor.start(bag.new("bag30a", 1, bravo.Public))
-    let assert Ok(table) = state
+    use _, _ <- actor.start(option.None)
+    let assert Ok(table) = bag.new("bag30a", 1, bravo.Protected)
     bag.insert(table, [#("Goodbye", "World")])
-    actor.Continue(state, option.None)
+    actor.Continue(option.Some(table), option.None)
   }
   actor.send(actor, Nil)
   process.sleep(100)
@@ -576,4 +579,6 @@ pub fn bag_async_test() {
     |> bindings.try_whereis
   bindings.try_lookup(ref, "Goodbye")
   |> should.equal([#("Goodbye", "World")])
+  bindings.try_insert(ref, 1, [#("Hello", "Again")])
+  |> should.equal(False)
 }
