@@ -600,3 +600,13 @@ pub fn oset_async_protected_test() {
   bindings.try_insert(ref, 1, [#("Hello", "Again")])
   |> should.equal(False)
 }
+
+pub fn oset_recreation_test() {
+  let assert Ok(table) = oset.new("oset31", 1, bravo.Private)
+  oset.insert(table, [#("Hello", "World")])
+  |> should.equal(True)
+  oset.delete(table)
+  let assert Ok(_table2) = oset.new("oset31", 1, bravo.Private)
+  oset.insert(table, [#("Hello", "World")])
+  |> should.equal(False)
+}

@@ -88,6 +88,8 @@ pub fn lookup(with oset: OSet(t), at key: a) -> Result(t, Nil) {
 ///
 /// Table lifetime is static, and memory is only freed when the owner process is killed! Don't forget to call this function!
 ///
+/// The input `OSet` is completely useless after it is deleted. Even if another table is created with the same name, the old handle will not work.
+///
 pub fn delete(with oset: OSet(t)) -> Bool {
   bindings.try_delete(oset.table)
 }

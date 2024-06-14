@@ -586,3 +586,13 @@ pub fn uset_async_protected_test() {
   bindings.try_insert(ref, 1, [#("Hello", "Again")])
   |> should.equal(False)
 }
+
+pub fn uset_recreation_test() {
+  let assert Ok(table) = uset.new("uset31", 1, bravo.Private)
+  uset.insert(table, [#("Hello", "World")])
+  |> should.equal(True)
+  uset.delete(table)
+  let assert Ok(_table2) = uset.new("uset31", 1, bravo.Private)
+  uset.insert(table, [#("Hello", "World")])
+  |> should.equal(False)
+}

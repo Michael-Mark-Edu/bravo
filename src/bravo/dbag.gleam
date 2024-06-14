@@ -81,6 +81,8 @@ pub fn lookup(with dbag: DBag(t), at key: a) -> List(t) {
 ///
 /// Table lifetime is static, and memory is only freed when the owner process is killed! Don't forget to call this function!
 ///
+/// The input `DBag` is completely useless after it is deleted. Even if another table is created with the same name, the old handle will not work.
+///
 pub fn delete(with dbag: DBag(t)) -> Bool {
   bindings.try_delete(dbag.table)
 }
