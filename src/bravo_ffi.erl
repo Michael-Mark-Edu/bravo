@@ -147,13 +147,22 @@ try_lookup(Name, Key) ->
 
 
 try_delete_key(Name, Key) ->
-  ets:delete(Name, Key).
+  case catch ets:delete(Name, Key) of
+    {'EXIT', _} -> false;
+    Other -> Other
+  end.
 
 try_delete_all_objects(Name) ->
-  ets:delete_all_objects(Name).
+  case catch ets:delete_all_objects(Name) of
+    {'EXIT', _} -> false;
+    Other -> Other
+  end.
 
 try_delete_object(Name, Object) ->
-  ets:delete_object(Name, Object).
+  case catch ets:delete_object(Name, Object) of
+    {'EXIT', _} -> false;
+    Other -> Other
+  end.
 
 try_tab2list(Name) ->
   case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
@@ -188,7 +197,10 @@ try_take(Name, Key) ->
   end.
 
 try_member(Name, Key) ->
-  ets:member(Name, Key).
+  case catch ets:member(Name, Key) of
+    {'EXIT', _} -> false;
+    Other -> Other
+  end.
 
 try_first(Name) ->
   case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
