@@ -1,6 +1,9 @@
-# v4.0.1 (unreleased)
+# v4.0.1
 - Changed the table types internally to store tids instead of atoms
     - This should result in better performance without changing the API.
+    - A consequence of this is that when a table is `delete`d, the remaining
+      variable will no longer autoconnect to a new table if that table has the
+      same name.
 - Improved behavior of tables in asynchronous, especially around `Access` types.
     - Now, instead of crashing the process upon access violation, relevant
       functions now act like the table is completely empty. However, this isn't
