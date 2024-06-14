@@ -1,5 +1,5 @@
 name = "bravo"
-version = "0.0.0"
+version = "4.0.1"
 target = "erlang"
 internal_modules = [
   "bravo/internal",
