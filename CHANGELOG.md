@@ -1,3 +1,8 @@
+# v5.0.0 (unreleased)
+This is a breaking update!
+- Gave ~~many functions~~ (currently just `insert`) more descriptive error types
+  to better indicate what exactly went wrong.
+
 # v4.0.1
 - Changed the table types internally to store tids instead of atoms.
     - This should result in better performance without changing the API.
