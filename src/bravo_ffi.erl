@@ -11,6 +11,21 @@ inform(Name, Key) ->
   {_, Target} = lists:keyfind(Key, 1, Info),
   Target.
 
+try_new(Name, Options) ->
+  case ets:whereis('$BRAVOMETA') of
+    undefined ->
+      Meta = ets:new('$BRAVOMETA', [set, public, named_table, {keypos, 1}, {heir, none}]),
+      ets:insert(Meta, {Name, unknown});
+    Table ->
+      ets:insert(Table, {Name, unknown})
+  end,
+  case catch ets:new(Name, Options) of
+    {'EXIT', {Reason, _}} ->
+      {error, {erlang_error, atom_to_binary(Reason, utf8)}};
+    Other ->
+      {ok, Other}
+  end.
+
 try_insert(Name, Keypos, Objects) ->
   Condition =
     case is_tuple(lists:nth(1, Objects)) of
@@ -48,64 +63,6 @@ try_insert(Name, Keypos, Objects) ->
       _ -> {error, {erlang_error, atom_to_binary(Reason)}}
     end;
     Other -> Other
-  end.
-
-try_new(Name, Options) ->
-  case ets:whereis('$BRAVOMETA') of
-    undefined ->
-      Meta = ets:new('$BRAVOMETA', [set, public, named_table, {keypos, 1}, {heir, none}]),
-      ets:insert(Meta, {Name, unknown});
-    Table ->
-      ets:insert(Table, {Name, unknown})
-  end,
-  case catch ets:new(Name, Options) of
-    {'EXIT', {Reason, _}} ->
-      {error, {erlang_error, atom_to_binary(Reason, utf8)}};
-    Other ->
-      {ok, Other}
-  end.
-
-try_delete(Name) ->
-  case catch ets:delete(Name) of
-    {'EXIT', _} ->
-      false;
-    _ ->
-      ets:insert('$BRAVOMETA', {Name, deleted}),
-      true
-  end.
-
-try_tab2file(Name, Filename, ObjectCount, Md5sum, Sync) ->
-  A = if ObjectCount ->
-           [object_count];
-         true ->
-           []
-      end,
-  B = if Md5sum ->
-           [md5sum];
-         true ->
-           []
-      end,
-  C = [{extended_info, lists:append(A, B)}],
-  D = [{sync, Sync}],
-  Options = lists:append(C, D),
-  case catch ets:tab2file(Name, Filename, Options) of
-    ok ->
-      {ok, nil};
-    {'EXIT', {Reason, _}} ->
-      {error, {erlang_error, atom_to_binary(Reason, utf8)}}
-  end.
-
-try_file2tab(Filename, Verify) ->
-  case catch ets:file2tab(Filename, [{verify, Verify}]) of
-    {'EXIT', {Reason, _}} ->
-      {error, {erlang_error, atom_to_binary(Reason, utf8)}};
-    Other ->
-      Name = element(2, Other),
-      ets:insert('$BRAVOMETA', {Name, case is_tuple(ets:lookup(Name, ets:first(Name))) of
-                                        true -> non_tuple;
-                                        false -> tuple
-                                      end}),
-      Other
   end.
 
 try_insert_new(Name, Keypos, Objects) ->
@@ -154,41 +111,6 @@ try_lookup(Name, Key) ->
     Other -> Other
   end.
 
-
-try_delete_key(Name, Key) ->
-  case catch ets:delete(Name, Key) of
-    {'EXIT', _} -> false;
-    Other -> Other
-  end.
-
-try_delete_all_objects(Name) ->
-  case catch ets:delete_all_objects(Name) of
-    {'EXIT', _} -> false;
-    Other -> Other
-  end.
-
-try_delete_object(Name, Object) ->
-  case catch ets:delete_object(Name, Object) of
-    {'EXIT', _} -> false;
-    Other -> Other
-  end.
-
-try_tab2list(Name) ->
-  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
-    {_, unknown} ->
-      [];
-    {_, deleted} ->
-      [];
-    {_, tuple} ->
-      ets:tab2list(Name);
-    {_, non_tuple} ->
-      Res = ets:tab2list(Name),
-      lists:map(fun(Elem) -> element(1, Elem) end, Res)
-  end) of
-    {'EXIT', _} -> [];
-    Other -> Other
-  end.
-
 try_take(Name, Key) ->
   case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
     {_, unknown} ->
@@ -208,6 +130,83 @@ try_take(Name, Key) ->
 try_member(Name, Key) ->
   case catch ets:member(Name, Key) of
     {'EXIT', _} -> false;
+    Other -> Other
+  end.
+
+try_delete(Name) ->
+  case catch ets:delete(Name) of
+    {'EXIT', _} ->
+      false;
+    _ ->
+      ets:insert('$BRAVOMETA', {Name, deleted}),
+      true
+  end.
+
+try_delete_key(Name, Key) ->
+  case catch ets:delete(Name, Key) of
+    {'EXIT', _} -> false;
+    Other -> Other
+  end.
+
+try_delete_object(Name, Object) ->
+  case catch ets:delete_object(Name, Object) of
+    {'EXIT', _} -> false;
+    Other -> Other
+  end.
+
+try_delete_all_objects(Name) ->
+  case catch ets:delete_all_objects(Name) of
+    {'EXIT', _} -> false;
+    Other -> Other
+  end.
+
+try_tab2file(Name, Filename, ObjectCount, Md5sum, Sync) ->
+  A = if ObjectCount ->
+           [object_count];
+         true ->
+           []
+      end,
+  B = if Md5sum ->
+           [md5sum];
+         true ->
+           []
+      end,
+  C = [{extended_info, lists:append(A, B)}],
+  D = [{sync, Sync}],
+  Options = lists:append(C, D),
+  case catch ets:tab2file(Name, Filename, Options) of
+    ok ->
+      {ok, nil};
+    {'EXIT', {Reason, _}} ->
+      {error, {erlang_error, atom_to_binary(Reason, utf8)}}
+  end.
+
+try_file2tab(Filename, Verify) ->
+  case catch ets:file2tab(Filename, [{verify, Verify}]) of
+    {'EXIT', {Reason, _}} ->
+      {error, {erlang_error, atom_to_binary(Reason, utf8)}};
+    Other ->
+      Name = element(2, Other),
+      ets:insert('$BRAVOMETA', {Name, case is_tuple(ets:lookup(Name, ets:first(Name))) of
+                                        true -> non_tuple;
+                                        false -> tuple
+                                      end}),
+      Other
+  end.
+
+try_tab2list(Name) ->
+  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
+    {_, unknown} ->
+      [];
+    {_, deleted} ->
+      [];
+    {_, tuple} ->
+      ets:tab2list(Name);
+    {_, non_tuple} ->
+      Res = ets:tab2list(Name),
+      lists:map(fun(Elem) -> element(1, Elem) end, Res)
+  end) of
+    {'EXIT', _} -> [];
     Other -> Other
   end.
 
