@@ -5,9 +5,19 @@
 pub type BravoError {
   /// Thrown if `new` is passed a `keypos` <= 0
   NonPositiveKeypos
+  /// Thrown if you try to `insert` an object with less elements than `keypos`.
+  InvalidKeypos
   /// Thrown if `file2tab` isn't able to successfully decode all elements in a table file.
   DecodeFailure
-  /// Runtime error caught in FFI. A non-exhaustive list of possible causes:
+  /// Thrown when trying to operate on a non-existent table, whether it be a table not yet created or one that has been `delete`d.
+  TableDoesNotExist
+  /// Thrown when `insert` and similar functions are passed an empty list.
+  NothingToInsert
+  /// Thrown when trying to perform an action on a table the current process has no access doing
+  ///
+  /// (examples: `insert` on a `Protected` table, `lookup` on a `Private` table)
+  AccessDenied
+  /// Runtime error caught in FFI. This is generally a fallthrough error type. A non-exhaustive list of possible causes:
   /// - `new` tried to create a table with the same name as another.
   /// - `tab2file` couldn't create a file successfully.
   /// - `file2tab` tries to read non-ETS or corrupted data.

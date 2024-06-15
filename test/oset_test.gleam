@@ -23,7 +23,7 @@ pub fn oset_insert_lookup_delete_test() {
   let assert Ok(table) = oset.new("oset1", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#(100, 200), #(300, 500)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, 100)
   |> should.equal(Ok(#(100, 200)))
   oset.lookup(table, 300)
@@ -36,7 +36,7 @@ pub fn oset_multitype_test() {
   let assert Ok(table) = oset.new("oset2", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("a", 1), #("b", 2)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, "a")
   |> should.equal(Ok(#("a", 1)))
   oset.lookup(table, "b")
@@ -71,7 +71,7 @@ pub fn oset_large_test() {
       -900,
     ),
   ])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, 900)
   |> should.equal(
     Ok(#(
@@ -102,7 +102,7 @@ pub fn oset_keypos_test() {
   let assert Ok(table) = oset.new("oset4", 2, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#(100, 200), #(300, 500)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, 200)
   |> should.equal(Ok(#(100, 200)))
   oset.lookup(table, 500)
@@ -122,18 +122,18 @@ pub fn oset_bad_insert_test() {
   let assert Ok(table) = oset.new("oset6", 3, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("a", 1)])
-  |> should.equal(False)
+  |> should.equal(Error(bravo.InvalidKeypos))
 }
 
 pub fn oset_multi_insert_test() {
   let assert Ok(table) = oset.new("oset7", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#(100, 200)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, 100)
   |> should.equal(Ok(#(100, 200)))
   oset.insert(table, [#(100, 300), #(100, 400)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, 100)
   |> should.equal(Ok(#(100, 400)))
 }
@@ -153,7 +153,7 @@ pub fn oset_large_multitype_test() {
       Ok(50),
     ),
   ])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, "String")
   |> should.equal(
     Ok(#(
@@ -184,7 +184,7 @@ pub fn oset_singleton_test() {
   let assert Ok(table) = oset.new("oset10", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#(1), #(2)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, 1)
   |> should.equal(Ok(#(1)))
   oset.lookup(table, 2)
@@ -195,7 +195,7 @@ pub fn oset_nontuple_test() {
   let assert Ok(table) = oset.new("oset11", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [5])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, 5)
   |> should.equal(Ok(5))
 }
@@ -204,7 +204,7 @@ pub fn oset_nontuple_record_test() {
   let assert Ok(table) = oset.new("oset12", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [Ok(5)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, Ok(5))
   |> should.equal(Ok(Ok(5)))
 }
@@ -219,7 +219,7 @@ pub fn oset_nontuple_multirecord_test() {
   let assert Ok(table) = oset.new("oset13", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [A(1), B(2, 3), C])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, A(1))
   |> should.equal(Ok(A(1)))
   oset.lookup(table, B(2, 3))
@@ -232,7 +232,7 @@ pub fn oset_delete_key_test() {
   let assert Ok(table) = oset.new("oset14", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("Hello", "World"), #("Bye", "World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, "Bye")
   |> should.equal(Ok(#("Bye", "World")))
   oset.delete_key(table, "Bye")
@@ -246,7 +246,7 @@ pub fn oset_delete_all_objects_test() {
   let assert Ok(table) = oset.new("oset15", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("Hello", "World"), #("Bye", "World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.delete_all_objects(table)
   oset.lookup(table, "Hello")
   |> should.equal(Error(Nil))
@@ -258,7 +258,7 @@ pub fn oset_delete_object_test() {
   let assert Ok(table) = oset.new("oset16", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("Hello", "World"), #("Bye", "World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.delete_object(table, #("Bye", "World"))
   oset.lookup(table, "Hello")
   |> should.equal(Ok(#("Hello", "World")))
@@ -269,7 +269,7 @@ pub fn oset_delete_object_test() {
 pub fn oset_tab2file_test() {
   let assert Ok(table) = oset.new("oset17", 2, bravo.Public)
   oset.insert(table, [#("Hello", "World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.tab2file(table, "oset17", True, True, True)
   |> should.equal(Ok(Nil))
   oset.delete(table)
@@ -292,7 +292,7 @@ pub fn oset_tab2list_test() {
   let assert Ok(table) = oset.new("oset18", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("Hello", "World"), #("Bye", "World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   let objects = oset.tab2list(table)
   list.contains(objects, #("Hello", "World"))
   |> should.equal(True)
@@ -319,7 +319,7 @@ pub fn oset_tab2list_orderedness_test() {
     #("Db"),
     #("a"),
   ])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.tab2list(table)
   |> should.equal([
     #("A"),
@@ -341,7 +341,7 @@ pub fn oset_empty_insert_test() {
   let assert Ok(table) = oset.new("oset20", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [])
-  |> should.equal(False)
+  |> should.equal(Error(bravo.NothingToInsert))
 }
 
 pub fn oset_dynamic_test() {
@@ -351,7 +351,7 @@ pub fn oset_dynamic_test() {
     dynamic.from(#("Hello", "World")),
     dynamic.from(#(1, 2, 3)),
   ])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, "Hello")
   |> should.equal(Ok(dynamic.from(#("Hello", "World"))))
   oset.lookup(table, 1)
@@ -375,7 +375,7 @@ pub fn oset_take_test() {
   let assert Ok(table) = oset.new("oset23", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#(1, 2), #(3, 4)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.lookup(table, 1)
   |> should.equal(Ok(#(1, 2)))
   oset.take(table, 1)
@@ -390,7 +390,7 @@ pub fn oset_member_test() {
   let assert Ok(table) = oset.new("oset24", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#(1, 2), #(3, 4)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.member(table, 1)
   |> should.equal(True)
   oset.member(table, 2)
@@ -404,7 +404,7 @@ pub fn oset_singleton_member_test() {
   let assert Ok(table) = oset.new("oset25", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [1, 3])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.member(table, 1)
   |> should.equal(True)
   oset.member(table, 2)
@@ -417,7 +417,7 @@ pub fn oset_singleton_member_test() {
 pub fn oset_tab2file_singleton_test() {
   let assert Ok(table) = oset.new("oset26", 1, bravo.Public)
   oset.insert(table, ["Hello"])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.tab2file(table, "oset26", True, True, True)
   |> should.equal(Ok(Nil))
   oset.delete(table)
@@ -430,7 +430,7 @@ pub fn oset_tab2file_singleton_test() {
 
   let assert Ok(newer_table) = oset.new("oset26", 1, bravo.Public)
   oset.insert(newer_table, [#("Hello")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.tab2file(newer_table, "oset26", True, True, True)
   |> should.equal(Ok(Nil))
   oset.delete(newer_table)
@@ -446,7 +446,7 @@ pub fn oset_tab2file_singleton_test() {
 pub fn oset_tab2file_singleton_record_test() {
   let assert Ok(table) = oset.new("oset27", 1, bravo.Public)
   oset.insert(table, [Ok("Hello"), Error("World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.tab2file(table, "oset27", True, True, True)
   |> should.equal(Ok(Nil))
   oset.delete(table)
@@ -484,7 +484,7 @@ pub fn oset_fn_test() {
     #("Db"),
     #("a"),
   ])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   let assert Ok(a) = table |> oset.first
   let assert Ok(b) = table |> oset.next(a)
   let assert Ok(c) = table |> oset.next(b)
@@ -530,7 +530,7 @@ pub fn oset_lp_test() {
     #("Db"),
     #("a"),
   ])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   let assert Ok(a) = table |> oset.last
   let assert Ok(b) = table |> oset.prev(a)
   let assert Ok(c) = table |> oset.prev(b)
@@ -564,6 +564,7 @@ pub fn oset_async_access_test() {
   let assert Ok(table) = oset.new("oset30", 1, bravo.Private)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.insert(table, [#("Hello", "World")])
+  |> should.equal(Ok(Nil))
   let assert Ok(ref) =
     "oset30"
     |> atom.create_from_string
@@ -587,6 +588,7 @@ pub fn oset_async_protected_test() {
     use _, _ <- actor.start(option.None)
     let assert Ok(table) = oset.new("oset30a", 1, bravo.Protected)
     oset.insert(table, [#("Goodbye", "World")])
+    |> should.equal(Ok(Nil))
     actor.Continue(option.Some(table), option.None)
   }
   actor.send(actor, Nil)
@@ -598,15 +600,15 @@ pub fn oset_async_protected_test() {
   bindings.try_lookup(ref, "Goodbye")
   |> should.equal([#("Goodbye", "World")])
   bindings.try_insert(ref, 1, [#("Hello", "Again")])
-  |> should.equal(False)
+  |> should.equal(Error(bravo.AccessDenied))
 }
 
 pub fn oset_recreation_test() {
   let assert Ok(table) = oset.new("oset31", 1, bravo.Private)
   oset.insert(table, [#("Hello", "World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   oset.delete(table)
   let assert Ok(_table2) = oset.new("oset31", 1, bravo.Private)
   oset.insert(table, [#("Hello", "World")])
-  |> should.equal(False)
+  |> should.equal(Error(bravo.TableDoesNotExist))
 }

@@ -23,7 +23,7 @@ pub fn uset_insert_lookup_delete_test() {
   let assert Ok(table) = uset.new("uset1", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(100, 200), #(300, 500)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, 100)
   |> should.equal(Ok(#(100, 200)))
   uset.lookup(table, 300)
@@ -36,7 +36,7 @@ pub fn uset_multitype_test() {
   let assert Ok(table) = uset.new("uset2", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#("a", 1), #("b", 2)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, "a")
   |> should.equal(Ok(#("a", 1)))
   uset.lookup(table, "b")
@@ -71,7 +71,7 @@ pub fn uset_large_test() {
       -900,
     ),
   ])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, 900)
   |> should.equal(
     Ok(#(
@@ -102,7 +102,7 @@ pub fn uset_keypos_test() {
   let assert Ok(table) = uset.new("uset4", 2, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(100, 200), #(300, 500)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, 200)
   |> should.equal(Ok(#(100, 200)))
   uset.lookup(table, 500)
@@ -122,18 +122,18 @@ pub fn uset_bad_insert_test() {
   let assert Ok(table) = uset.new("uset6", 3, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#("a", 1)])
-  |> should.equal(False)
+  |> should.equal(Error(bravo.InvalidKeypos))
 }
 
 pub fn uset_multi_insert_test() {
   let assert Ok(table) = uset.new("uset7", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(100, 200)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, 100)
   |> should.equal(Ok(#(100, 200)))
   uset.insert(table, [#(100, 300), #(100, 400)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, 100)
   |> should.equal(Ok(#(100, 400)))
 }
@@ -153,7 +153,7 @@ pub fn uset_large_multitype_test() {
       Ok(50),
     ),
   ])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, "String")
   |> should.equal(
     Ok(#(
@@ -184,7 +184,7 @@ pub fn uset_singleton_test() {
   let assert Ok(table) = uset.new("uset10", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(1), #(2)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, 1)
   |> should.equal(Ok(#(1)))
   uset.lookup(table, 2)
@@ -195,7 +195,7 @@ pub fn uset_nontuple_test() {
   let assert Ok(table) = uset.new("uset11", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [5])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, 5)
   |> should.equal(Ok(5))
 }
@@ -204,7 +204,7 @@ pub fn uset_nontuple_record_test() {
   let assert Ok(table) = uset.new("uset12", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [Ok(5)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, Ok(5))
   |> should.equal(Ok(Ok(5)))
 }
@@ -219,7 +219,7 @@ pub fn uset_nontuple_multirecord_test() {
   let assert Ok(table) = uset.new("uset13", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [A(1), B(2, 3), C])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, A(1))
   |> should.equal(Ok(A(1)))
   uset.lookup(table, B(2, 3))
@@ -232,7 +232,7 @@ pub fn uset_delete_key_test() {
   let assert Ok(table) = uset.new("uset14", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#("Hello", "World"), #("Bye", "World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, "Bye")
   |> should.equal(Ok(#("Bye", "World")))
   uset.delete_key(table, "Bye")
@@ -246,7 +246,7 @@ pub fn uset_delete_all_objects_test() {
   let assert Ok(table) = uset.new("uset15", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#("Hello", "World"), #("Bye", "World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.delete_all_objects(table)
   uset.lookup(table, "Hello")
   |> should.equal(Error(Nil))
@@ -258,7 +258,7 @@ pub fn uset_delete_object_test() {
   let assert Ok(table) = uset.new("uset16", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#("Hello", "World"), #("Bye", "World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.delete_object(table, #("Bye", "World"))
   uset.lookup(table, "Hello")
   |> should.equal(Ok(#("Hello", "World")))
@@ -269,7 +269,7 @@ pub fn uset_delete_object_test() {
 pub fn uset_tab2file_test() {
   let assert Ok(table) = uset.new("uset17", 2, bravo.Public)
   uset.insert(table, [#("Hello", "World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.tab2file(table, "uset17", True, True, True)
   |> should.equal(Ok(Nil))
   uset.delete(table)
@@ -292,7 +292,7 @@ pub fn uset_tab2list_test() {
   let assert Ok(table) = uset.new("uset18", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#("Hello", "World"), #("Bye", "World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   let objects = uset.tab2list(table)
   list.contains(objects, #("Hello", "World"))
   |> should.equal(True)
@@ -319,7 +319,7 @@ pub fn uset_tab2list_orderedness_test() {
     #("Db"),
     #("a"),
   ])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.tab2list(table)
   |> should.not_equal([
     #("A"),
@@ -341,7 +341,7 @@ pub fn uset_empty_insert_test() {
   let assert Ok(table) = uset.new("uset20", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [])
-  |> should.equal(False)
+  |> should.equal(Error(bravo.NothingToInsert))
 }
 
 pub fn uset_dynamic_test() {
@@ -351,7 +351,7 @@ pub fn uset_dynamic_test() {
     dynamic.from(#("Hello", "World")),
     dynamic.from(#(1, 2, 3)),
   ])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, "Hello")
   |> should.equal(Ok(dynamic.from(#("Hello", "World"))))
   uset.lookup(table, 1)
@@ -375,7 +375,7 @@ pub fn uset_take_test() {
   let assert Ok(table) = uset.new("uset23", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(1, 2), #(3, 4)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.lookup(table, 1)
   |> should.equal(Ok(#(1, 2)))
   uset.take(table, 1)
@@ -390,7 +390,7 @@ pub fn uset_member_test() {
   let assert Ok(table) = uset.new("uset24", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#(1, 2), #(3, 4)])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.member(table, 1)
   |> should.equal(True)
   uset.member(table, 2)
@@ -404,7 +404,7 @@ pub fn uset_singleton_member_test() {
   let assert Ok(table) = uset.new("uset25", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [1, 3])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.member(table, 1)
   |> should.equal(True)
   uset.member(table, 2)
@@ -417,7 +417,7 @@ pub fn uset_singleton_member_test() {
 pub fn uset_tab2file_singleton_test() {
   let assert Ok(table) = uset.new("uset26", 1, bravo.Public)
   uset.insert(table, ["Hello"])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.tab2file(table, "uset26", True, True, True)
   |> should.equal(Ok(Nil))
   uset.delete(table)
@@ -430,7 +430,7 @@ pub fn uset_tab2file_singleton_test() {
 
   let assert Ok(newer_table) = uset.new("uset26", 1, bravo.Public)
   uset.insert(newer_table, [#("Hello")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.tab2file(newer_table, "uset26", True, True, True)
   |> should.equal(Ok(Nil))
   uset.delete(newer_table)
@@ -446,7 +446,7 @@ pub fn uset_tab2file_singleton_test() {
 pub fn uset_tab2file_singleton_record_test() {
   let assert Ok(table) = uset.new("uset27", 1, bravo.Public)
   uset.insert(table, [Ok("Hello"), Error("World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.tab2file(table, "uset27", True, True, True)
   |> should.equal(Ok(Nil))
   uset.delete(table)
@@ -472,7 +472,7 @@ pub fn uset_fn_test() {
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
   uset.insert(table, dataset)
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   let assert Ok(a) = table |> uset.first
   let assert Ok(b) = table |> uset.next(a)
   let assert Ok(c) = table |> uset.next(b)
@@ -511,7 +511,7 @@ pub fn uset_lp_test() {
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
   uset.insert(table, dataset)
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   let assert Ok(a) = table |> uset.last
   let assert Ok(b) = table |> uset.prev(a)
   let assert Ok(c) = table |> uset.prev(b)
@@ -550,6 +550,7 @@ pub fn uset_async_access_test() {
   let assert Ok(table) = uset.new("uset30", 1, bravo.Private)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.insert(table, [#("Hello", "World")])
+  |> should.equal(Ok(Nil))
   let assert Ok(ref) =
     "uset30"
     |> atom.create_from_string
@@ -573,6 +574,7 @@ pub fn uset_async_protected_test() {
     use _, _ <- actor.start(option.None)
     let assert Ok(table) = uset.new("uset30a", 1, bravo.Protected)
     uset.insert(table, [#("Goodbye", "World")])
+    |> should.equal(Ok(Nil))
     actor.Continue(option.Some(table), option.None)
   }
   actor.send(actor, Nil)
@@ -584,15 +586,15 @@ pub fn uset_async_protected_test() {
   bindings.try_lookup(ref, "Goodbye")
   |> should.equal([#("Goodbye", "World")])
   bindings.try_insert(ref, 1, [#("Hello", "Again")])
-  |> should.equal(False)
+  |> should.equal(Error(bravo.AccessDenied))
 }
 
 pub fn uset_recreation_test() {
-  let assert Ok(table) = uset.new("uset31", 1, bravo.Private)
+  let assert Ok(table) = uset.new("uset31", 1, bravo.Public)
   uset.insert(table, [#("Hello", "World")])
-  |> should.equal(True)
+  |> should.equal(Ok(Nil))
   uset.delete(table)
-  let assert Ok(_table2) = uset.new("uset31", 1, bravo.Private)
+  let assert Ok(_table2) = uset.new("uset31", 1, bravo.Public)
   uset.insert(table, [#("Hello", "World")])
-  |> should.equal(False)
+  |> should.equal(Error(bravo.TableDoesNotExist))
 }

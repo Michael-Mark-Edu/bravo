@@ -66,8 +66,11 @@ pub fn new(
 ///
 /// If an object with the same key already exists, then the old object will be overwritten with the new one.
 ///
-pub fn insert(with uset: USet(t), insert objects: List(t)) -> Bool {
-  use <- bool.guard(list.is_empty(objects), False)
+pub fn insert(
+  with uset: USet(t),
+  insert objects: List(t),
+) -> Result(Nil, BravoError) {
+  use <- bool.guard(list.is_empty(objects), Error(bravo.NothingToInsert))
   bindings.try_insert(uset.table, uset.keypos, objects)
 }
 
