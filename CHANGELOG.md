@@ -1,5 +1,5 @@
 # v4.0.1
-- Changed the table types internally to store tids instead of atoms
+- Changed the table types internally to store tids instead of atoms.
     - This should result in better performance without changing the API.
     - A consequence of this is that when a table is `delete`d, the remaining
       variable will no longer autoconnect to a new table if that table has the
@@ -68,8 +68,8 @@ This is a breaking update!
 - Added `delete_key` to all tables.
 - Added `delete_all_objects` to all tables.
 - Added `delete_object` to all tables.
-- Relaxed `gleam_erlang` version requirement to >= 0.23.1
-- Relaxed `gleam_stdlib` version requirement to >= 0.33.0
+- Relaxed `gleam_erlang` version requirement to >= 0.23.1.
+- Relaxed `gleam_stdlib` version requirement to >= 0.33.0.
 
 # v2.0.0
 This is a breaking update!
