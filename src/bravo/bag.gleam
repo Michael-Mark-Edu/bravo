@@ -1,21 +1,15 @@
 //// This module provides functions to work with `Bag`s
 
 import bravo.{type Access, type BravoError}
-import bravo/internal/bindings
+import bravo/internal/master
 import bravo/internal/new_option
-import gleam/bool
 import gleam/dynamic.{type Dynamic}
-import gleam/erlang.{type Reference}
-import gleam/erlang/atom
-import gleam/io
-import gleam/list
 import gleam/result
-import gleam/string
 
 /// A bag table. Keys may occur multiple times per table, but objects cannot be
 /// copied verbatim.
 pub opaque type Bag(t) {
-  Bag(table: Reference, keypos: Int)
+  Bag(inner: master.InnerTable)
 }
 
 /// Creates a new ETS table configured as a bag: keys may only occur multiple
@@ -40,25 +34,8 @@ pub fn new(
   keypos keypos: Int,
   access access: Access,
 ) -> Result(Bag(t), BravoError) {
-  let atom = atom.create_from_string(name)
-  use <- bool.guard(keypos < 1, Error(bravo.NonPositiveKeypos))
-  use a <- result.try(
-    bindings.try_new(atom, [
-      new_option.Bag,
-      case access {
-        bravo.Public -> new_option.Public
-        bravo.Protected -> new_option.Protected
-        bravo.Private -> new_option.Private
-      },
-      new_option.NamedTable,
-      new_option.Keypos(keypos),
-      new_option.WriteConcurrency(new_option.Auto),
-      new_option.ReadConcurrency(True),
-      new_option.DecentralizedCounters(True),
-    ]),
-  )
-  let assert Ok(tid) = bindings.try_whereis(a)
-  Ok(Bag(tid, keypos))
+  use res <- result.try(master.new(name, keypos, access, new_option.Bag))
+  Ok(Bag(res))
 }
 
 /// Inserts a list of tuples into a `Bag`.
@@ -82,16 +59,14 @@ pub fn insert(
   with bag: Bag(t),
   insert objects: List(t),
 ) -> Result(Nil, BravoError) {
-  use <- bool.guard(list.is_empty(objects), Error(bravo.NothingToInsert))
-  bindings.try_insert(bag.table, bag.keypos, objects)
+  master.insert(bag.inner, objects)
 }
 
 /// Gets a list of objects from a `Bag`.
 ///
 /// Returns an list containing the objects, if any match.
-///
 pub fn lookup(with bag: Bag(t), at key: a) -> List(t) {
-  bindings.try_lookup(bag.table, key)
+  master.lookup_bag(bag.inner, key)
 }
 
 /// Deletes a `Bag`.
@@ -103,27 +78,24 @@ pub fn lookup(with bag: Bag(t), at key: a) -> List(t) {
 /// The input `Bag` is completely useless after it is deleted. Even if another
 /// table is created with the same name, the old handle will not work.
 pub fn delete(with bag: Bag(t)) -> Bool {
-  bindings.try_delete(bag.table)
+  master.delete(bag.inner)
 }
 
 /// Deletes all objects addressed by `key`, if any exist. If nothing does, this
 /// does nothing.
 pub fn delete_key(with bag: Bag(t), at key: a) -> Nil {
-  bindings.try_delete_key(bag.table, key)
-  Nil
+  master.delete_key(bag.inner, key)
 }
 
 /// Deletes all objects in the `Bag`. This is atomic and isolated.
 pub fn delete_all_objects(with bag: Bag(t)) -> Nil {
-  bindings.try_delete_all_objects(bag.table)
-  Nil
+  master.delete_all_objects(bag.inner)
 }
 
 /// Deletes a specific object in the `Bag`. Other objects with the same key are
 /// unaffected.
 pub fn delete_object(with bag: Bag(t), target object: t) -> Nil {
-  bindings.try_delete_object(bag.table, object)
-  Nil
+  master.delete_object(bag.inner, object)
 }
 
 /// Saves a `Bag` as file `filename` that can later be read back into memory
@@ -144,13 +116,7 @@ pub fn tab2file(
   md5sum md5sum: Bool,
   sync sync: Bool,
 ) -> Result(Nil, BravoError) {
-  bindings.try_tab2file(
-    bag.table,
-    string.to_utf_codepoints(filename),
-    object_count,
-    md5sum,
-    sync,
-  )
+  master.tab2file(bag.inner, filename, object_count, md5sum, sync)
 }
 
 /// Creates a `Bag` from `filename` that was previously created by `tab2file`.
@@ -170,37 +136,13 @@ pub fn file2tab(
   verify verify: Bool,
   using decoder: fn(Dynamic) -> Result(t, _),
 ) -> Result(Bag(t), BravoError) {
-  use name <- result.try(bindings.try_file2tab(
-    string.to_utf_codepoints(filename),
-    verify,
-  ))
-  let assert Ok(keypos) =
-    dynamic.int(bindings.inform(name, atom.create_from_string("keypos")))
-  let table = Bag(name, keypos)
-  list.map(tab2list(table), fn(obj: t) {
-    delete_object(table, obj)
-    case bindings.tuple_size(obj) {
-      1 -> insert(table, [bindings.element(1, obj)])
-      _ -> insert(table, [obj])
-    }
-  })
-  use <- bool.guard(
-    {
-      use obj <- list.all(tab2list(table))
-      obj
-      |> dynamic.from
-      |> decoder
-      |> result.is_ok
-    },
-    Ok(table),
-  )
-  delete(table)
-  Error(bravo.DecodeFailure)
+  use res <- result.try(master.file2tab(filename, verify, decoder))
+  Ok(Bag(res))
 }
 
 /// Returns a list containing all of the objects in the `Bag`.
 pub fn tab2list(with bag: Bag(t)) -> List(t) {
-  bindings.try_tab2list(bag.table)
+  master.tab2list(bag.inner)
 }
 
 /// Inserts a list of tuples into a `Bag`. Unlike `insert`, this cannot
@@ -212,32 +154,31 @@ pub fn tab2list(with bag: Bag(t)) -> List(t) {
 ///   occur if the `keypos` of the `Bag` is greater than the object tuple size
 ///   or if the input list is empty.
 pub fn insert_new(with bag: Bag(t), insert objects: List(t)) -> Bool {
-  use <- bool.guard(list.is_empty(objects), False)
-  bindings.try_insert_new(bag.table, bag.keypos, objects)
+  master.insert_new(bag.inner, objects)
 }
 
 /// Returns and removes all objects with `key` in the `Bag`, if any exist.
 pub fn take(with bag: Bag(t), at key: a) -> List(t) {
-  bindings.try_take(bag.table, key)
+  master.take_bag(bag.inner, key)
 }
 
 /// Returns whether a `Bag` contains an object at `key`.
 pub fn member(with bag: Bag(t), at key: a) -> Bool {
-  bindings.try_member(bag.table, key)
+  master.member(bag.inner, key)
 }
 
 /// Returns the first key (not the object!) in the table, if it exists.
 ///
 /// `Bag`s are unordered, so the order of keys is unknown.
 pub fn first(with bag: Bag(t)) -> Result(a, Nil) {
-  bindings.try_first(bag.table)
+  master.first(bag.inner)
 }
 
 /// Returns the last key (not the object!) in the table, if it exists.
 ///
 /// `Bag`s are unordered, so the order of keys is unknown.
 pub fn last(with bag: Bag(t)) -> Result(a, Nil) {
-  bindings.try_last(bag.table)
+  master.last(bag.inner)
 }
 
 /// Given a key, returns the next key (not the object!) after it in the table,
@@ -245,7 +186,7 @@ pub fn last(with bag: Bag(t)) -> Result(a, Nil) {
 ///
 /// `Bag`s are unordered, so the order of keys is unknown.
 pub fn next(with bag: Bag(t), from key: a) -> Result(a, Nil) {
-  bindings.try_next(bag.table, key)
+  master.next(bag.inner, key)
 }
 
 /// Given a key, returns the previous key (not the object!) before it in the
@@ -253,5 +194,5 @@ pub fn next(with bag: Bag(t), from key: a) -> Result(a, Nil) {
 ///
 /// `Bag`s are unordered, so the order of keys is unknown.
 pub fn prev(with bag: Bag(t), from key: a) -> Result(a, Nil) {
-  bindings.try_prev(bag.table, key)
+  master.prev(bag.inner, key)
 }

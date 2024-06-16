@@ -1,23 +1,17 @@
 //// This module provides functions to work with `USet`s
 
 import bravo.{type Access, type BravoError}
-import bravo/internal/bindings
+import bravo/internal/master
 import bravo/internal/new_option
-import gleam/bool
 import gleam/dynamic.{type Dynamic}
-import gleam/erlang.{type Reference}
-import gleam/erlang/atom
-import gleam/io
-import gleam/list
 import gleam/result
-import gleam/string
 
 /// An unordered set. Keys may only occur once per table,
 /// and keys are unordered.
 ///
 /// In order for a match to occur, entries must have the same value _and type_.
 pub opaque type USet(t) {
-  USet(table: Reference, keypos: Int)
+  USet(inner: master.InnerTable)
 }
 
 /// Creates a new ETS table configured as a set: keys may only occur once per
@@ -42,25 +36,8 @@ pub fn new(
   keypos keypos: Int,
   access access: Access,
 ) -> Result(USet(t), BravoError) {
-  let atom = atom.create_from_string(name)
-  use <- bool.guard(keypos < 1, Error(bravo.NonPositiveKeypos))
-  use a <- result.try(
-    bindings.try_new(atom, [
-      new_option.Set,
-      case access {
-        bravo.Public -> new_option.Public
-        bravo.Protected -> new_option.Protected
-        bravo.Private -> new_option.Private
-      },
-      new_option.NamedTable,
-      new_option.Keypos(keypos),
-      new_option.WriteConcurrency(new_option.Auto),
-      new_option.ReadConcurrency(True),
-      new_option.DecentralizedCounters(True),
-    ]),
-  )
-  let assert Ok(tid) = bindings.try_whereis(a)
-  Ok(USet(tid, keypos))
+  use res <- result.try(master.new(name, keypos, access, new_option.Set))
+  Ok(USet(res))
 }
 
 /// Inserts a list of tuples into a `USet`.
@@ -81,18 +58,14 @@ pub fn insert(
   with uset: USet(t),
   insert objects: List(t),
 ) -> Result(Nil, BravoError) {
-  use <- bool.guard(list.is_empty(objects), Error(bravo.NothingToInsert))
-  bindings.try_insert(uset.table, uset.keypos, objects)
+  master.insert(uset.inner, objects)
 }
 
 /// Gets an object from a `USet`.
 ///
 /// Returns an `Result` containing the object, if it exists.
 pub fn lookup(with uset: USet(t), at key: a) -> Result(t, Nil) {
-  case bindings.try_lookup(uset.table, key) {
-    [res] -> Ok(res)
-    _ -> Error(Nil)
-  }
+  master.lookup_set(uset.inner, key)
 }
 
 /// Deletes a `USet`.
@@ -104,27 +77,24 @@ pub fn lookup(with uset: USet(t), at key: a) -> Result(t, Nil) {
 /// The input `USet` is completely useless after it is deleted. Even if another
 /// table is created with the same name, the old handle will not work.
 pub fn delete(with uset: USet(t)) -> Bool {
-  bindings.try_delete(uset.table)
+  master.delete(uset.inner)
 }
 
 /// Deletes the object addressed by `key`, if it exists. If it doesn't, this
 /// does nothing.
 pub fn delete_key(with uset: USet(t), at key: a) -> Nil {
-  bindings.try_delete_key(uset.table, key)
-  Nil
+  master.delete_key(uset.inner, key)
 }
 
 /// Deletes all objects in the `USet`. This is atomic and isolated.
 pub fn delete_all_objects(with uset: USet(t)) -> Nil {
-  bindings.try_delete_all_objects(uset.table)
-  Nil
+  master.delete_all_objects(uset.inner)
 }
 
 /// Deletes a specific object in the `USet`. This is more useful with
 /// `Bag`s and `DBag`s.
 pub fn delete_object(with uset: USet(t), target object: t) -> Nil {
-  bindings.try_delete_object(uset.table, object)
-  Nil
+  master.delete_object(uset.inner, object)
 }
 
 /// Saves a `USet` as file `filename` that can later be read back into memory
@@ -145,13 +115,7 @@ pub fn tab2file(
   md5sum md5sum: Bool,
   sync sync: Bool,
 ) -> Result(Nil, BravoError) {
-  bindings.try_tab2file(
-    uset.table,
-    string.to_utf_codepoints(filename),
-    object_count,
-    md5sum,
-    sync,
-  )
+  master.tab2file(uset.inner, filename, object_count, md5sum, sync)
 }
 
 /// Creates a `USet` from `filename` that was previously created by `tab2file`.
@@ -171,37 +135,13 @@ pub fn file2tab(
   verify verify: Bool,
   using decoder: fn(Dynamic) -> Result(t, _),
 ) -> Result(USet(t), BravoError) {
-  use name <- result.try(bindings.try_file2tab(
-    string.to_utf_codepoints(filename),
-    verify,
-  ))
-  let assert Ok(keypos) =
-    dynamic.int(bindings.inform(name, atom.create_from_string("keypos")))
-  let table = USet(name, keypos)
-  list.map(tab2list(table), fn(obj: t) {
-    delete_object(table, obj)
-    case bindings.tuple_size(obj) {
-      1 -> insert(table, [bindings.element(1, obj)])
-      _ -> insert(table, [obj])
-    }
-  })
-  use <- bool.guard(
-    {
-      use obj <- list.all(tab2list(table))
-      obj
-      |> dynamic.from
-      |> decoder
-      |> result.is_ok
-    },
-    Ok(table),
-  )
-  delete(table)
-  Error(bravo.DecodeFailure)
+  use res <- result.try(master.file2tab(filename, verify, decoder))
+  Ok(USet(res))
 }
 
 /// Returns a list containing all of the objects in the `USet`.
 pub fn tab2list(with uset: USet(t)) -> List(t) {
-  bindings.try_tab2list(uset.table)
+  master.tab2list(uset.inner)
 }
 
 /// Inserts a list of tuples into a `USet`. Unlike `insert`, this cannot
@@ -213,35 +153,31 @@ pub fn tab2list(with uset: USet(t)) -> List(t) {
 ///   occur if the `keypos` of the `USet` is greater than the object tuple size
 ///   or if the input list is empty.
 pub fn insert_new(with uset: USet(t), insert objects: List(t)) -> Bool {
-  use <- bool.guard(list.is_empty(objects), False)
-  bindings.try_insert_new(uset.table, uset.keypos, objects)
+  master.insert_new(uset.inner, objects)
 }
 
 /// Returns and removes an object at `key` in the `USet`, if such object exists.
 pub fn take(with uset: USet(t), at key: a) -> Result(t, Nil) {
-  case bindings.try_take(uset.table, key) {
-    [res] -> Ok(res)
-    _ -> Error(Nil)
-  }
+  master.take_set(uset.inner, key)
 }
 
 /// Returns whether a `USet` contains an object at `key`.
 pub fn member(with uset: USet(t), at key: a) -> Bool {
-  bindings.try_member(uset.table, key)
+  master.member(uset.inner, key)
 }
 
 /// Returns the first key (not the object!) in the table, if it exists.
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
 pub fn first(with uset: USet(t)) -> Result(a, Nil) {
-  bindings.try_first(uset.table)
+  master.first(uset.inner)
 }
 
 /// Returns the last key (not the object!) in the table, if it exists.
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
 pub fn last(with uset: USet(t)) -> Result(a, Nil) {
-  bindings.try_last(uset.table)
+  master.last(uset.inner)
 }
 
 /// Given a key, returns the next key (not the object!) after it in the table,
@@ -249,7 +185,7 @@ pub fn last(with uset: USet(t)) -> Result(a, Nil) {
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
 pub fn next(with uset: USet(t), from key: a) -> Result(a, Nil) {
-  bindings.try_next(uset.table, key)
+  master.next(uset.inner, key)
 }
 
 /// Given a key, returns the previous key (not the object!) before it in the
@@ -257,5 +193,5 @@ pub fn next(with uset: USet(t), from key: a) -> Result(a, Nil) {
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
 pub fn prev(with uset: USet(t), from key: a) -> Result(a, Nil) {
-  bindings.try_prev(uset.table, key)
+  master.prev(uset.inner, key)
 }

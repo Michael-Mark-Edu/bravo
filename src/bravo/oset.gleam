@@ -1,16 +1,10 @@
 //// This module provides functions to work with `OSet`s
 
 import bravo.{type Access, type BravoError}
-import bravo/internal/bindings
+import bravo/internal/master
 import bravo/internal/new_option
-import gleam/bool
 import gleam/dynamic.{type Dynamic}
-import gleam/erlang.{type Reference}
-import gleam/erlang/atom
-import gleam/io
-import gleam/list
 import gleam/result
-import gleam/string
 
 /// An ordered set. Keys may only occur once per table, and keys are ordered
 /// (this comes at a performance cost).
@@ -20,7 +14,7 @@ import gleam/string
 /// In order for a lookup match to occur, entries must _coerce into the
 /// same value_. Two values may match even if they have different types.
 pub opaque type OSet(t) {
-  OSet(table: Reference, keypos: Int)
+  OSet(inner: master.InnerTable)
 }
 
 /// Creates a new ETS table configured as an ordered set: keys may only occur
@@ -45,25 +39,8 @@ pub fn new(
   keypos keypos: Int,
   access access: Access,
 ) -> Result(OSet(t), BravoError) {
-  let atom = atom.create_from_string(name)
-  use <- bool.guard(keypos < 1, Error(bravo.NonPositiveKeypos))
-  use a <- result.try(
-    bindings.try_new(atom, [
-      new_option.OrderedSet,
-      case access {
-        bravo.Public -> new_option.Public
-        bravo.Protected -> new_option.Protected
-        bravo.Private -> new_option.Private
-      },
-      new_option.NamedTable,
-      new_option.Keypos(keypos),
-      new_option.WriteConcurrency(new_option.Auto),
-      new_option.ReadConcurrency(True),
-      new_option.DecentralizedCounters(True),
-    ]),
-  )
-  let assert Ok(tid) = bindings.try_whereis(a)
-  Ok(OSet(tid, keypos))
+  use res <- result.try(master.new(name, keypos, access, new_option.OrderedSet))
+  Ok(OSet(res))
 }
 
 /// Inserts a list of tuples into a `OSet`.
@@ -84,18 +61,14 @@ pub fn insert(
   with oset: OSet(t),
   insert objects: List(t),
 ) -> Result(Nil, BravoError) {
-  use <- bool.guard(list.is_empty(objects), Error(bravo.NothingToInsert))
-  bindings.try_insert(oset.table, oset.keypos, objects)
+  master.insert(oset.inner, objects)
 }
 
 /// Gets an object from a `OSet`.
 ///
 /// Returns an `Result` containing the object, if it exists.
 pub fn lookup(with oset: OSet(t), at key: a) -> Result(t, Nil) {
-  case bindings.try_lookup(oset.table, key) {
-    [res] -> Ok(res)
-    _ -> Error(Nil)
-  }
+  master.lookup_set(oset.inner, key)
 }
 
 /// Deletes a `OSet`.
@@ -107,27 +80,24 @@ pub fn lookup(with oset: OSet(t), at key: a) -> Result(t, Nil) {
 /// The input `OSet` is completely useless after it is deleted. Even if another
 /// table is created with the same name, the old handle will not work.
 pub fn delete(with oset: OSet(t)) -> Bool {
-  bindings.try_delete(oset.table)
+  master.delete(oset.inner)
 }
 
 /// Deletes the object addressed by `key`, if it exists. If it doesn't, this
 /// does nothing.
 pub fn delete_key(with oset: OSet(t), at key: a) -> Nil {
-  bindings.try_delete_key(oset.table, key)
-  Nil
+  master.delete_key(oset.inner, key)
 }
 
 /// Deletes all objects in the `OSet`. This is atomic and isolated.
 pub fn delete_all_objects(with oset: OSet(t)) -> Nil {
-  bindings.try_delete_all_objects(oset.table)
-  Nil
+  master.delete_all_objects(oset.inner)
 }
 
 /// Deletes a specific object in the `OSet`. This is more useful with
-/// `Bag`s and `DBag`s.
+/// `oset`s and `Doset`s.
 pub fn delete_object(with oset: OSet(t), target object: t) -> Nil {
-  bindings.try_delete_object(oset.table, object)
-  Nil
+  master.delete_object(oset.inner, object)
 }
 
 /// Saves a `OSet` as file `filename` that can later be read back into memory
@@ -148,13 +118,7 @@ pub fn tab2file(
   md5sum md5sum: Bool,
   sync sync: Bool,
 ) -> Result(Nil, BravoError) {
-  bindings.try_tab2file(
-    oset.table,
-    string.to_utf_codepoints(filename),
-    object_count,
-    md5sum,
-    sync,
-  )
+  master.tab2file(oset.inner, filename, object_count, md5sum, sync)
 }
 
 /// Creates a `OSet` from `filename` that was previously created by `tab2file`.
@@ -174,39 +138,15 @@ pub fn file2tab(
   verify verify: Bool,
   using decoder: fn(Dynamic) -> Result(t, _),
 ) -> Result(OSet(t), BravoError) {
-  use name <- result.try(bindings.try_file2tab(
-    string.to_utf_codepoints(filename),
-    verify,
-  ))
-  let assert Ok(keypos) =
-    dynamic.int(bindings.inform(name, atom.create_from_string("keypos")))
-  let table = OSet(name, keypos)
-  list.map(tab2list(table), fn(obj: t) {
-    delete_object(table, obj)
-    case bindings.tuple_size(obj) {
-      1 -> insert(table, [bindings.element(1, obj)])
-      _ -> insert(table, [obj])
-    }
-  })
-  use <- bool.guard(
-    {
-      use obj <- list.all(tab2list(table))
-      obj
-      |> dynamic.from
-      |> decoder
-      |> result.is_ok
-    },
-    Ok(table),
-  )
-  delete(table)
-  Error(bravo.DecodeFailure)
+  use res <- result.try(master.file2tab(filename, verify, decoder))
+  Ok(OSet(res))
 }
 
 /// Returns a list containing all of the objects in the `OSet`.
 ///
 /// The list returned is ordered.
 pub fn tab2list(with oset: OSet(t)) -> List(t) {
-  bindings.try_tab2list(oset.table)
+  master.tab2list(oset.inner)
 }
 
 /// Inserts a list of tuples into a `OSet`. Unlike `insert`, this cannot
@@ -218,35 +158,31 @@ pub fn tab2list(with oset: OSet(t)) -> List(t) {
 ///   occur if the `keypos` of the `OSet` is greater than the object tuple size
 ///   or if the input list is empty.
 pub fn insert_new(with oset: OSet(t), insert objects: List(t)) -> Bool {
-  use <- bool.guard(list.is_empty(objects), False)
-  bindings.try_insert_new(oset.table, oset.keypos, objects)
+  master.insert_new(oset.inner, objects)
 }
 
 /// Returns and removes an object at `key` in the `OSet`, if such object exists.
 pub fn take(with oset: OSet(t), at key: a) -> Result(t, Nil) {
-  case bindings.try_take(oset.table, key) {
-    [res] -> Ok(res)
-    _ -> Error(Nil)
-  }
+  master.take_set(oset.inner, key)
 }
 
 /// Returns whether a `OSet` contains an object at `key`.
 pub fn member(with oset: OSet(t), at key: a) -> Bool {
-  bindings.try_member(oset.table, key)
+  master.member(oset.inner, key)
 }
 
 /// Returns the first key (not the object!) in the table, if it exists.
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
 pub fn first(with oset: OSet(t)) -> Result(a, Nil) {
-  bindings.try_first(oset.table)
+  master.first(oset.inner)
 }
 
 /// Returns the last key (not the object!) in the table, if it exists.
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
 pub fn last(with oset: OSet(t)) -> Result(a, Nil) {
-  bindings.try_last(oset.table)
+  master.last(oset.inner)
 }
 
 /// Given a key, returns the next key (not the object!) after it in the table,
@@ -254,7 +190,7 @@ pub fn last(with oset: OSet(t)) -> Result(a, Nil) {
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
 pub fn next(with oset: OSet(t), from key: a) -> Result(a, Nil) {
-  bindings.try_next(oset.table, key)
+  master.next(oset.inner, key)
 }
 
 /// Given a key, returns the previous key (not the object!) before it in the
@@ -262,5 +198,5 @@ pub fn next(with oset: OSet(t), from key: a) -> Result(a, Nil) {
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
 pub fn prev(with oset: OSet(t), from key: a) -> Result(a, Nil) {
-  bindings.try_prev(oset.table, key)
+  master.prev(oset.inner, key)
 }
