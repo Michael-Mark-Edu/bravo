@@ -21,7 +21,11 @@ pub fn try_insert(
 ) -> Result(Nil, BravoError)
 
 @external(erlang, "bravo_ffi", "try_insert_new")
-pub fn try_insert_new(table: Reference, keypos: Int, list: List(a)) -> Bool
+pub fn try_insert_new(
+  table: Reference,
+  keypos: Int,
+  list: List(a),
+) -> Result(Bool, BravoError)
 
 @external(erlang, "bravo_ffi", "try_lookup")
 pub fn try_lookup(table: Reference, key: a) -> List(b)

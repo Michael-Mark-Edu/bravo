@@ -64,6 +64,30 @@ pub fn insert(
   master.insert(oset.inner, objects)
 }
 
+/// Inserts a list of tuples into a `OSet`. Unlike `insert`, this cannot
+/// overwrite objects and will return false if it tries to do so.
+///
+/// If the insertion was successful, returns `Ok(Nil)`. Othwerise:
+/// - `Error(InvalidKeypos)`: The size of the inserted tuple is less than the
+///   `keypos` of the table (or in the case of a non-tuple, `keypos` is greater
+///   than 1).
+/// - `Error(TableDoesNotExist)`: The table was either deleted or never created.
+/// - `Error(AccessDenied)`: The table has an access level of `Protected` or
+///   `Private` and is owned by a different process.
+/// - `Error(NothingToInsert)`: Parameter `insert` is an empty list.
+/// - `Error(KeyAlreadyPresent)`: At least one inserted object's key matches
+///   with the key of an already present object.
+/// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
+///
+/// If an object with the same key already exists, then the old object will be
+/// overwritten with the new one. To instead overwrite, use `insert`.
+pub fn insert_new(
+  with oset: OSet(t),
+  insert objects: List(t),
+) -> Result(Nil, BravoError) {
+  master.insert_new(oset.inner, objects)
+}
+
 /// Gets an object from a `OSet`.
 ///
 /// Returns an `Result` containing the object, if it exists.
@@ -147,18 +171,6 @@ pub fn file2tab(
 /// The list returned is ordered.
 pub fn tab2list(with oset: OSet(t)) -> List(t) {
   master.tab2list(oset.inner)
-}
-
-/// Inserts a list of tuples into a `OSet`. Unlike `insert`, this cannot
-/// overwrite objects and will return false if it tries to do so.
-///
-/// Returns a `Bool` representing if the inserting succeeded.
-/// - If `True`, all objects in the list were inserted.
-/// - If `False`, _none_ of the objects in the list were inserted. This may
-///   occur if the `keypos` of the `OSet` is greater than the object tuple size
-///   or if the input list is empty.
-pub fn insert_new(with oset: OSet(t), insert objects: List(t)) -> Bool {
-  master.insert_new(oset.inner, objects)
 }
 
 /// Returns and removes an object at `key` in the `OSet`, if such object exists.

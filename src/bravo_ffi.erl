@@ -78,20 +78,27 @@ try_insert_new(Name, Keypos, Objects) ->
       ets:insert('$BRAVOMETA', {Name, tuple}),
       case lists:all(fun(Elem) -> tuple_size(Elem) >= Keypos end, Objects) of
         true ->
-          ets:insert_new(Name, Objects);
+          {ok, ets:insert_new(Name, Objects)};
         false ->
-          false
+          {error, invalid_keypos}
       end;
     false ->
       ets:insert('$BRAVOMETA', {Name, non_tuple}),
       case Keypos == 1 of
         true ->
-          ets:insert_new(Name, lists:map(fun(Elem) -> {Elem} end, Objects));
+          {ok, ets:insert_new(Name, Objects)};
         false ->
-          false
+          {error, invalid_keypos}
       end
   end) of
-    {'EXIT', _} -> false;
+    {'EXIT', {Reason, _}} -> case Reason of
+      badarg ->
+       case ets:info(Name) == undefined of
+         true -> {error, table_does_not_exist};
+         false -> {error, access_denied}
+       end;
+      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
+    end;
     Other -> Other
   end.
 

@@ -14,6 +14,9 @@ pub type BravoError {
   TableDoesNotExist
   /// Thrown when `insert` and similar functions are passed an empty list.
   NothingToInsert
+  /// Thrown when `insert_new` tries to insert with a key that the table already
+  /// has.
+  KeyAlreadyPresent
   /// Thrown when trying to perform an action on a table the current process
   /// does not have sufficient access to.
   ///

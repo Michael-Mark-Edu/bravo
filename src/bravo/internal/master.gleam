@@ -49,6 +49,18 @@ pub fn insert(
   bindings.try_insert(table.table, table.keypos, objects)
 }
 
+pub fn insert_new(
+  with table: InnerTable,
+  insert objects: List(t),
+) -> Result(Nil, BravoError) {
+  use <- bool.guard(list.is_empty(objects), Error(bravo.NothingToInsert))
+  case bindings.try_insert_new(table.table, table.keypos, objects) {
+    Ok(True) -> Ok(Nil)
+    Ok(False) -> Error(bravo.KeyAlreadyPresent)
+    Error(e) -> Error(e)
+  }
+}
+
 pub fn lookup_set(with table: InnerTable, at key: a) -> Result(t, Nil) {
   case bindings.try_lookup(table.table, key) {
     [a] -> Ok(a)
@@ -130,11 +142,6 @@ pub fn file2tab(
 
 pub fn tab2list(with table: InnerTable) -> List(t) {
   bindings.try_tab2list(table.table)
-}
-
-pub fn insert_new(with table: InnerTable, insert objects: List(t)) -> Bool {
-  use <- bool.guard(list.is_empty(objects), False)
-  bindings.try_insert_new(table.table, table.keypos, objects)
 }
 
 pub fn take_set(with table: InnerTable, at key: a) -> Result(t, Nil) {
