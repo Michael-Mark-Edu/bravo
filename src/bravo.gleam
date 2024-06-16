@@ -34,6 +34,6 @@ pub type Access {
   Public
   /// Any process can read the table. Only the owner process can write to it.
   Protected
-  /// Only the parent process can read or write to the table.
+  /// Only the owner process can read or write to the table.
   Private
 }
