@@ -29,7 +29,7 @@ pub fn uset_insert_lookup_delete_test() {
   uset.lookup(table, 300)
   |> should.equal(Ok(#(300, 500)))
   uset.lookup(table, 600)
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn uset_multitype_test() {
@@ -42,7 +42,7 @@ pub fn uset_multitype_test() {
   uset.lookup(table, "b")
   |> should.equal(Ok(#("b", 2)))
   uset.lookup(table, "c")
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn uset_large_test() {
@@ -108,7 +108,7 @@ pub fn uset_keypos_test() {
   uset.lookup(table, 500)
   |> should.equal(Ok(#(300, 500)))
   uset.lookup(table, 100)
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn uset_bad_new_test() {
@@ -237,7 +237,7 @@ pub fn uset_delete_key_test() {
   |> should.equal(Ok(#("Bye", "World")))
   uset.delete_key(table, "Bye")
   uset.lookup(table, "Bye")
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
   uset.lookup(table, "Hello")
   |> should.equal(Ok(#("Hello", "World")))
 }
@@ -249,9 +249,9 @@ pub fn uset_delete_all_objects_test() {
   |> should.equal(Ok(Nil))
   uset.delete_all_objects(table)
   uset.lookup(table, "Hello")
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
   uset.lookup(table, "Bye")
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn uset_delete_object_test() {
@@ -263,7 +263,7 @@ pub fn uset_delete_object_test() {
   uset.lookup(table, "Hello")
   |> should.equal(Ok(#("Hello", "World")))
   uset.lookup(table, "Bye")
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn uset_tab2file_test() {
@@ -368,7 +368,7 @@ pub fn uset_insert_new_test() {
   uset.lookup(table, 1)
   |> should.equal(Ok(#(1, 2)))
   uset.lookup(table, 2)
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn uset_take_test() {
@@ -383,7 +383,7 @@ pub fn uset_take_test() {
   uset.take(table, 1)
   |> should.equal(Error(Nil))
   uset.lookup(table, 1)
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn uset_member_test() {
@@ -473,33 +473,45 @@ pub fn uset_fn_test() {
   let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
   uset.insert(table, dataset)
   |> should.equal(Ok(Nil))
-  let assert Ok(a) = table |> uset.first
-  let assert Ok(b) = table |> uset.next(a)
-  let assert Ok(c) = table |> uset.next(b)
-  let assert Ok(d) = table |> uset.next(c)
-  let assert Ok(e) = table |> uset.next(d)
-  let assert Ok(f) = table |> uset.next(e)
-  let assert Ok(g) = table |> uset.next(f)
-  let assert Ok(h) = table |> uset.next(g)
-  let assert Ok(i) = table |> uset.next(h)
-  let assert Ok(j) = table |> uset.next(i)
-  let assert Ok(k) = table |> uset.next(j)
-  let assert Ok(l) = table |> uset.next(k)
+  let assert Ok(key) = table |> uset.first
+  let assert Ok(a) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(b) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(c) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(d) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(e) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(f) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(g) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(h) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(i) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(j) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(k) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(l) = uset.lookup(table, key)
   let list = []
-  let list = [uset.lookup(table, a), ..list]
-  let list = [uset.lookup(table, b), ..list]
-  let list = [uset.lookup(table, c), ..list]
-  let list = [uset.lookup(table, d), ..list]
-  let list = [uset.lookup(table, e), ..list]
-  let list = [uset.lookup(table, f), ..list]
-  let list = [uset.lookup(table, g), ..list]
-  let list = [uset.lookup(table, h), ..list]
-  let list = [uset.lookup(table, i), ..list]
-  let list = [uset.lookup(table, j), ..list]
-  let list = [uset.lookup(table, k), ..list]
-  let list = [uset.lookup(table, l), ..list]
+  let list = list.append([a], list)
+  let list = list.append([b], list)
+  let list = list.append([c], list)
+  let list = list.append([d], list)
+  let list = list.append([e], list)
+  let list = list.append([f], list)
+  let list = list.append([g], list)
+  let list = list.append([h], list)
+  let list = list.append([i], list)
+  let list = list.append([j], list)
+  let list = list.append([k], list)
+  let list = list.append([l], list)
   list.map(dataset, fn(elem) {
-    list.contains(list, Ok(elem))
+    list.contains(list, elem)
     |> should.equal(True)
   })
   table |> uset.next(l) |> should.equal(Error(Nil))
@@ -512,33 +524,45 @@ pub fn uset_lp_test() {
   let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
   uset.insert(table, dataset)
   |> should.equal(Ok(Nil))
-  let assert Ok(a) = table |> uset.last
-  let assert Ok(b) = table |> uset.prev(a)
-  let assert Ok(c) = table |> uset.prev(b)
-  let assert Ok(d) = table |> uset.prev(c)
-  let assert Ok(e) = table |> uset.prev(d)
-  let assert Ok(f) = table |> uset.prev(e)
-  let assert Ok(g) = table |> uset.prev(f)
-  let assert Ok(h) = table |> uset.prev(g)
-  let assert Ok(i) = table |> uset.prev(h)
-  let assert Ok(j) = table |> uset.prev(i)
-  let assert Ok(k) = table |> uset.prev(j)
-  let assert Ok(l) = table |> uset.prev(k)
+  let assert Ok(key) = table |> uset.last
+  let assert Ok(a) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(b) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(c) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(d) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(e) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(f) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(g) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(h) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(i) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(j) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(k) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(l) = uset.lookup(table, key)
   let list = []
-  let list = [uset.lookup(table, a), ..list]
-  let list = [uset.lookup(table, b), ..list]
-  let list = [uset.lookup(table, c), ..list]
-  let list = [uset.lookup(table, d), ..list]
-  let list = [uset.lookup(table, e), ..list]
-  let list = [uset.lookup(table, f), ..list]
-  let list = [uset.lookup(table, g), ..list]
-  let list = [uset.lookup(table, h), ..list]
-  let list = [uset.lookup(table, i), ..list]
-  let list = [uset.lookup(table, j), ..list]
-  let list = [uset.lookup(table, k), ..list]
-  let list = [uset.lookup(table, l), ..list]
+  let list = list.append([a], list)
+  let list = list.append([b], list)
+  let list = list.append([c], list)
+  let list = list.append([d], list)
+  let list = list.append([e], list)
+  let list = list.append([f], list)
+  let list = list.append([g], list)
+  let list = list.append([h], list)
+  let list = list.append([i], list)
+  let list = list.append([j], list)
+  let list = list.append([k], list)
+  let list = list.append([l], list)
   list.map(dataset, fn(elem) {
-    list.contains(list, Ok(elem))
+    list.contains(list, elem)
     |> should.equal(True)
   })
   table |> uset.prev(l) |> should.equal(Error(Nil))
@@ -556,7 +580,7 @@ pub fn uset_async_access_test() {
     |> atom.create_from_string
     |> bindings.try_whereis
   bindings.try_lookup(ref, "Hello")
-  |> should.equal([#("Hello", "World")])
+  |> should.equal(Ok([#("Hello", "World")]))
   let task = {
     use <- task.async
     let assert Ok(ref) =
@@ -564,7 +588,7 @@ pub fn uset_async_access_test() {
       |> atom.create_from_string
       |> bindings.try_whereis
     bindings.try_lookup(ref, "Hello")
-    |> should.equal([])
+    |> should.equal(Error(bravo.AccessDenied))
   }
   task.await_forever(task)
 }
@@ -584,7 +608,7 @@ pub fn uset_async_protected_test() {
     |> atom.create_from_string
     |> bindings.try_whereis
   bindings.try_lookup(ref, "Goodbye")
-  |> should.equal([#("Goodbye", "World")])
+  |> should.equal(Ok([#("Goodbye", "World")]))
   bindings.try_insert(ref, 1, [#("Hello", "Again")])
   |> should.equal(Error(bravo.AccessDenied))
 }

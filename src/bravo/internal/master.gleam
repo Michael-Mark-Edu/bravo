@@ -61,14 +61,18 @@ pub fn insert_new(
   }
 }
 
-pub fn lookup_set(with table: InnerTable, at key: a) -> Result(t, Nil) {
-  case bindings.try_lookup(table.table, key) {
+pub fn lookup_set(with table: InnerTable, at key: a) -> Result(t, BravoError) {
+  use res <- result.try(bindings.try_lookup(table.table, key))
+  case res {
     [a] -> Ok(a)
-    _ -> Error(Nil)
+    _ -> Error(bravo.Empty)
   }
 }
 
-pub fn lookup_bag(with table: InnerTable, at key: a) -> List(t) {
+pub fn lookup_bag(
+  with table: InnerTable,
+  at key: a,
+) -> Result(List(t), BravoError) {
   bindings.try_lookup(table.table, key)
 }
 

@@ -2,6 +2,8 @@
 
 /// The error type all Bravo functions use.
 pub type BravoError {
+  /// Used in cases where a function may return nothing or an error.
+  Empty
   /// Thrown if `new` is passed a `keypos` <= 0
   NonPositiveKeypos
   /// Thrown if you try to `insert` an object with less elements than `keypos`.
@@ -22,6 +24,12 @@ pub type BravoError {
   ///
   /// (examples: `insert` on a `Protected` table, `lookup` on a `Private` table)
   AccessDenied
+  /// Thrown when trying to perform an action on a table that has never been
+  /// `insert`ed into. This library relies on a `insert`, `insert_new`, or
+  /// `file2tab` call to initialize information about a table due to them
+  /// requiring specifying the table's type. Not initializing a table will cause
+  /// issues in the code, and as such is its own error type.
+  UninitializedTable
   /// Runtime error caught in FFI. This is generally a fallthrough error type.
   /// A non-exhaustive list of possible causes:
   /// - `new` tried to create a table with the same name as another.

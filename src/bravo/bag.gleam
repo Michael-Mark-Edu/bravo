@@ -88,9 +88,20 @@ pub fn insert_new(
 
 /// Gets a list of objects from a `Bag`.
 ///
-/// Returns an list containing the objects, if any match.
-pub fn lookup(with bag: Bag(t), at key: a) -> List(t) {
-  master.lookup_bag(bag.inner, key)
+/// Returns an list containing the objects, if any match. Otherwise:
+/// - `Error(Empty)`: No objects have the given key. This is returned instead of
+///   an `Ok([])`.
+/// - `Error(UninitializedTable)`: The table has never been `insert`ed into and
+///   was not created using `file2tab`.
+/// - `Error(TableDoesNotExist)`: The table was either deleted or never created.
+/// - `Error(AccessDenied)`: The table has an access level of `Private` and is
+///   owned by a different process.
+/// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
+pub fn lookup(with bag: Bag(t), at key: a) -> Result(List(t), BravoError) {
+  case master.lookup_bag(bag.inner, key) {
+    Ok([]) -> Error(bravo.Empty)
+    other -> other
+  }
 }
 
 /// Deletes a `Bag`.

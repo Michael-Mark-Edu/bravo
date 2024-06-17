@@ -25,11 +25,11 @@ pub fn bag_insert_lookup_delete_test() {
   bag.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(Ok(Nil))
   bag.lookup(table, 100)
-  |> should.equal([#(100, 200)])
+  |> should.equal(Ok([#(100, 200)]))
   bag.lookup(table, 300)
-  |> should.equal([#(300, 500)])
+  |> should.equal(Ok([#(300, 500)]))
   bag.lookup(table, 600)
-  |> should.equal([])
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn bag_multitype_test() {
@@ -38,11 +38,11 @@ pub fn bag_multitype_test() {
   bag.insert(table, [#("a", 1), #("b", 2)])
   |> should.equal(Ok(Nil))
   bag.lookup(table, "a")
-  |> should.equal([#("a", 1)])
+  |> should.equal(Ok([#("a", 1)]))
   bag.lookup(table, "b")
-  |> should.equal([#("b", 2)])
+  |> should.equal(Ok([#("b", 2)]))
   bag.lookup(table, "c")
-  |> should.equal([])
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn bag_large_test() {
@@ -73,29 +73,31 @@ pub fn bag_large_test() {
   ])
   |> should.equal(Ok(Nil))
   bag.lookup(table, 900)
-  |> should.equal([
-    #(
-      900,
-      800,
-      700,
-      600,
-      500,
-      400,
-      300,
-      200,
-      100,
-      0,
-      -100,
-      -200,
-      -300,
-      -400,
-      -500,
-      -600,
-      -700,
-      -800,
-      -900,
-    ),
-  ])
+  |> should.equal(
+    Ok([
+      #(
+        900,
+        800,
+        700,
+        600,
+        500,
+        400,
+        300,
+        200,
+        100,
+        0,
+        -100,
+        -200,
+        -300,
+        -400,
+        -500,
+        -600,
+        -700,
+        -800,
+        -900,
+      ),
+    ]),
+  )
 }
 
 pub fn bag_keypos_test() {
@@ -104,11 +106,11 @@ pub fn bag_keypos_test() {
   bag.insert(table, [#(100, 200), #(300, 500)])
   |> should.equal(Ok(Nil))
   bag.lookup(table, 200)
-  |> should.equal([#(100, 200)])
+  |> should.equal(Ok([#(100, 200)]))
   bag.lookup(table, 500)
-  |> should.equal([#(300, 500)])
+  |> should.equal(Ok([#(300, 500)]))
   bag.lookup(table, 100)
-  |> should.equal([])
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn bag_bad_new_test() {
@@ -131,11 +133,11 @@ pub fn bag_multi_insert_test() {
   bag.insert(table, [#(100, 200)])
   |> should.equal(Ok(Nil))
   bag.lookup(table, 100)
-  |> should.equal([#(100, 200)])
+  |> should.equal(Ok([#(100, 200)]))
   bag.insert(table, [#(100, 300), #(100, 400), #(100, 400)])
   |> should.equal(Ok(Nil))
   bag.lookup(table, 100)
-  |> should.equal([#(100, 200), #(100, 300), #(100, 400)])
+  |> should.equal(Ok([#(100, 200), #(100, 300), #(100, 400)]))
 }
 
 pub fn bag_large_multitype_test() {
@@ -155,18 +157,20 @@ pub fn bag_large_multitype_test() {
   ])
   |> should.equal(Ok(Nil))
   bag.lookup(table, "String")
-  |> should.equal([
-    #(
-      "String",
-      5,
-      10.0,
-      [15, 20],
-      #(25, 30),
-      dict.from_list([#(35, 40)]),
-      Ok(45),
-      Ok(50),
-    ),
-  ])
+  |> should.equal(
+    Ok([
+      #(
+        "String",
+        5,
+        10.0,
+        [15, 20],
+        #(25, 30),
+        dict.from_list([#(35, 40)]),
+        Ok(45),
+        Ok(50),
+      ),
+    ]),
+  )
 }
 
 pub fn bag_delete_test() {
@@ -186,9 +190,9 @@ pub fn bag_singleton_test() {
   bag.insert(table, [#(1), #(2)])
   |> should.equal(Ok(Nil))
   bag.lookup(table, 1)
-  |> should.equal([#(1)])
+  |> should.equal(Ok([#(1)]))
   bag.lookup(table, 2)
-  |> should.equal([#(2)])
+  |> should.equal(Ok([#(2)]))
 }
 
 pub fn bag_nontuple_test() {
@@ -197,7 +201,7 @@ pub fn bag_nontuple_test() {
   bag.insert(table, [5])
   |> should.equal(Ok(Nil))
   bag.lookup(table, 5)
-  |> should.equal([5])
+  |> should.equal(Ok([5]))
 }
 
 pub fn bag_nontuple_record_test() {
@@ -206,7 +210,7 @@ pub fn bag_nontuple_record_test() {
   bag.insert(table, [Ok(5)])
   |> should.equal(Ok(Nil))
   bag.lookup(table, Ok(5))
-  |> should.equal([Ok(5)])
+  |> should.equal(Ok([Ok(5)]))
 }
 
 type Multirecord {
@@ -221,11 +225,11 @@ pub fn bag_nontuple_multirecord_test() {
   bag.insert(table, [A(1), B(2, 3), C])
   |> should.equal(Ok(Nil))
   bag.lookup(table, A(1))
-  |> should.equal([A(1)])
+  |> should.equal(Ok([A(1)]))
   bag.lookup(table, B(2, 3))
-  |> should.equal([B(2, 3)])
+  |> should.equal(Ok([B(2, 3)]))
   bag.lookup(table, C)
-  |> should.equal([C])
+  |> should.equal(Ok([C]))
 }
 
 pub fn bag_delete_key_test() {
@@ -234,12 +238,12 @@ pub fn bag_delete_key_test() {
   bag.insert(table, [#("Hello", "World"), #("Bye", "World"), #("Bye", "Bye")])
   |> should.equal(Ok(Nil))
   bag.lookup(table, "Bye")
-  |> should.equal([#("Bye", "World"), #("Bye", "Bye")])
+  |> should.equal(Ok([#("Bye", "World"), #("Bye", "Bye")]))
   bag.delete_key(table, "Bye")
   bag.lookup(table, "Bye")
-  |> should.equal([])
+  |> should.equal(Error(bravo.Empty))
   bag.lookup(table, "Hello")
-  |> should.equal([#("Hello", "World")])
+  |> should.equal(Ok([#("Hello", "World")]))
 }
 
 pub fn bag_delete_all_objects_test() {
@@ -249,9 +253,9 @@ pub fn bag_delete_all_objects_test() {
   |> should.equal(Ok(Nil))
   bag.delete_all_objects(table)
   bag.lookup(table, "Hello")
-  |> should.equal([])
+  |> should.equal(Error(bravo.Empty))
   bag.lookup(table, "Bye")
-  |> should.equal([])
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn bag_delete_object_test() {
@@ -261,9 +265,9 @@ pub fn bag_delete_object_test() {
   |> should.equal(Ok(Nil))
   bag.delete_object(table, #("Bye", "Bye"))
   bag.lookup(table, "Hello")
-  |> should.equal([#("Hello", "World")])
+  |> should.equal(Ok([#("Hello", "World")]))
   bag.lookup(table, "Bye")
-  |> should.equal([#("Bye", "World")])
+  |> should.equal(Ok([#("Bye", "World")]))
 }
 
 pub fn bag_tab2file_test() {
@@ -276,7 +280,7 @@ pub fn bag_tab2file_test() {
   let assert Ok(new_table) =
     bag.file2tab("bag17", True, dynamic.tuple2(dynamic.string, dynamic.string))
   bag.lookup(new_table, "World")
-  |> should.equal([#("Hello", "World")])
+  |> should.equal(Ok([#("Hello", "World")]))
   bag.delete(new_table)
   bag.file2tab("bag17", True, dynamic.tuple2(dynamic.int, dynamic.int))
   |> should.equal(Error(bravo.DecodeFailure))
@@ -349,13 +353,13 @@ pub fn bag_dynamic_test() {
     dynamic.from(#(1, 2, 3)),
   ])
   |> should.equal(Ok(Nil))
-  let list = bag.lookup(table, "Hello")
+  let assert Ok(list) = bag.lookup(table, "Hello")
   list.contains(list, dynamic.from(#("Hello", "World")))
   |> should.equal(True)
   list.contains(list, dynamic.from(#("Hello", "my", "friend!")))
   |> should.equal(True)
   bag.lookup(table, 1)
-  |> should.equal([dynamic.from(#(1, 2, 3))])
+  |> should.equal(Ok([dynamic.from(#(1, 2, 3))]))
 }
 
 pub fn bag_insert_new_test() {
@@ -366,9 +370,9 @@ pub fn bag_insert_new_test() {
   bag.insert_new(table, [#(1, 3), #(2, 4)])
   |> should.equal(Error(bravo.KeyAlreadyPresent))
   bag.lookup(table, 1)
-  |> should.equal([#(1, 2)])
+  |> should.equal(Ok([#(1, 2)]))
   bag.lookup(table, 2)
-  |> should.equal([])
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn bag_take_test() {
@@ -377,13 +381,13 @@ pub fn bag_take_test() {
   bag.insert(table, [#(1, 2), #(3, 4)])
   |> should.equal(Ok(Nil))
   bag.lookup(table, 1)
-  |> should.equal([#(1, 2)])
+  |> should.equal(Ok([#(1, 2)]))
   bag.take(table, 1)
   |> should.equal([#(1, 2)])
   bag.take(table, 1)
   |> should.equal([])
   bag.lookup(table, 1)
-  |> should.equal([])
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn bag_member_test() {
@@ -423,7 +427,7 @@ pub fn bag_tab2file_singleton_test() {
   bag.delete(table)
   let assert Ok(new_table) = bag.file2tab("bag26", True, dynamic.string)
   bag.lookup(new_table, "Hello")
-  |> should.equal(["Hello"])
+  |> should.equal(Ok(["Hello"]))
   bag.delete(new_table)
   bag.file2tab("bag26", True, dynamic.tuple2(dynamic.int, dynamic.int))
   |> should.equal(Error(bravo.DecodeFailure))
@@ -436,7 +440,7 @@ pub fn bag_tab2file_singleton_test() {
   bag.delete(newer_table)
   let assert Ok(newest_table) = bag.file2tab("bag26", True, dynamic.string)
   bag.lookup(newest_table, "Hello")
-  |> should.equal(["Hello"])
+  |> should.equal(Ok(["Hello"]))
   bag.delete(newest_table)
 
   simplifile.delete("bag26")
@@ -453,9 +457,9 @@ pub fn bag_tab2file_singleton_record_test() {
   let assert Ok(new_table) =
     bag.file2tab("bag27", True, dynamic.result(dynamic.string, dynamic.string))
   bag.lookup(new_table, Ok("Hello"))
-  |> should.equal([Ok("Hello")])
+  |> should.equal(Ok([Ok("Hello")]))
   bag.lookup(new_table, Error("World"))
-  |> should.equal([Error("World")])
+  |> should.equal(Ok([Error("World")]))
   bag.delete(new_table)
   bag.file2tab("bag27", True, dynamic.tuple2(dynamic.int, dynamic.int))
   |> should.equal(Error(bravo.DecodeFailure))
@@ -469,31 +473,43 @@ pub fn bag_fn_test() {
   let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
   bag.insert(table, dataset)
   |> should.equal(Ok(Nil))
-  let assert Ok(a) = table |> bag.first
-  let assert Ok(b) = table |> bag.next(a)
-  let assert Ok(c) = table |> bag.next(b)
-  let assert Ok(d) = table |> bag.next(c)
-  let assert Ok(e) = table |> bag.next(d)
-  let assert Ok(f) = table |> bag.next(e)
-  let assert Ok(g) = table |> bag.next(f)
-  let assert Ok(h) = table |> bag.next(g)
-  let assert Ok(i) = table |> bag.next(h)
-  let assert Ok(j) = table |> bag.next(i)
-  let assert Ok(k) = table |> bag.next(j)
-  let assert Ok(l) = table |> bag.next(k)
+  let assert Ok(key) = table |> bag.first
+  let assert Ok(a) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(b) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(c) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(d) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(e) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(f) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(g) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(h) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(i) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(j) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(k) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(l) = bag.lookup(table, key)
   let list = []
-  let list = list.append(bag.lookup(table, a), list)
-  let list = list.append(bag.lookup(table, b), list)
-  let list = list.append(bag.lookup(table, c), list)
-  let list = list.append(bag.lookup(table, d), list)
-  let list = list.append(bag.lookup(table, e), list)
-  let list = list.append(bag.lookup(table, f), list)
-  let list = list.append(bag.lookup(table, g), list)
-  let list = list.append(bag.lookup(table, h), list)
-  let list = list.append(bag.lookup(table, i), list)
-  let list = list.append(bag.lookup(table, j), list)
-  let list = list.append(bag.lookup(table, k), list)
-  let list = list.append(bag.lookup(table, l), list)
+  let list = list.append(a, list)
+  let list = list.append(b, list)
+  let list = list.append(c, list)
+  let list = list.append(d, list)
+  let list = list.append(e, list)
+  let list = list.append(f, list)
+  let list = list.append(g, list)
+  let list = list.append(h, list)
+  let list = list.append(i, list)
+  let list = list.append(j, list)
+  let list = list.append(k, list)
+  let list = list.append(l, list)
   list.map(dataset, fn(elem) {
     list.contains(list, elem)
     |> should.equal(True)
@@ -508,31 +524,43 @@ pub fn bag_lp_test() {
   let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
   bag.insert(table, dataset)
   |> should.equal(Ok(Nil))
-  let assert Ok(a) = table |> bag.last
-  let assert Ok(b) = table |> bag.prev(a)
-  let assert Ok(c) = table |> bag.prev(b)
-  let assert Ok(d) = table |> bag.prev(c)
-  let assert Ok(e) = table |> bag.prev(d)
-  let assert Ok(f) = table |> bag.prev(e)
-  let assert Ok(g) = table |> bag.prev(f)
-  let assert Ok(h) = table |> bag.prev(g)
-  let assert Ok(i) = table |> bag.prev(h)
-  let assert Ok(j) = table |> bag.prev(i)
-  let assert Ok(k) = table |> bag.prev(j)
-  let assert Ok(l) = table |> bag.prev(k)
+  let assert Ok(key) = table |> bag.last
+  let assert Ok(a) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(b) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(c) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(d) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(e) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(f) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(g) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(h) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(i) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(j) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(k) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(l) = bag.lookup(table, key)
   let list = []
-  let list = list.append(bag.lookup(table, a), list)
-  let list = list.append(bag.lookup(table, b), list)
-  let list = list.append(bag.lookup(table, c), list)
-  let list = list.append(bag.lookup(table, d), list)
-  let list = list.append(bag.lookup(table, e), list)
-  let list = list.append(bag.lookup(table, f), list)
-  let list = list.append(bag.lookup(table, g), list)
-  let list = list.append(bag.lookup(table, h), list)
-  let list = list.append(bag.lookup(table, i), list)
-  let list = list.append(bag.lookup(table, j), list)
-  let list = list.append(bag.lookup(table, k), list)
-  let list = list.append(bag.lookup(table, l), list)
+  let list = list.append(a, list)
+  let list = list.append(b, list)
+  let list = list.append(c, list)
+  let list = list.append(d, list)
+  let list = list.append(e, list)
+  let list = list.append(f, list)
+  let list = list.append(g, list)
+  let list = list.append(h, list)
+  let list = list.append(i, list)
+  let list = list.append(j, list)
+  let list = list.append(k, list)
+  let list = list.append(l, list)
   list.map(dataset, fn(elem) {
     list.contains(list, elem)
     |> should.equal(True)
@@ -552,7 +580,7 @@ pub fn bag_async_access_test() {
     |> atom.create_from_string
     |> bindings.try_whereis
   bindings.try_lookup(ref, "Hello")
-  |> should.equal([#("Hello", "World")])
+  |> should.equal(Ok([#("Hello", "World")]))
   let task = {
     use <- task.async
     let assert Ok(ref) =
@@ -560,7 +588,7 @@ pub fn bag_async_access_test() {
       |> atom.create_from_string
       |> bindings.try_whereis
     bindings.try_lookup(ref, "Hello")
-    |> should.equal([])
+    |> should.equal(Error(bravo.AccessDenied))
   }
   task.await_forever(task)
 }
@@ -580,7 +608,7 @@ pub fn bag_async_protected_test() {
     |> atom.create_from_string
     |> bindings.try_whereis
   bindings.try_lookup(ref, "Goodbye")
-  |> should.equal([#("Goodbye", "World")])
+  |> should.equal(Ok([#("Goodbye", "World")]))
   bindings.try_insert(ref, 1, [#("Hello", "Again")])
   |> should.equal(Error(bravo.AccessDenied))
 }

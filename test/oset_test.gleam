@@ -29,7 +29,7 @@ pub fn oset_insert_lookup_delete_test() {
   oset.lookup(table, 300)
   |> should.equal(Ok(#(300, 500)))
   oset.lookup(table, 600)
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn oset_multitype_test() {
@@ -42,7 +42,7 @@ pub fn oset_multitype_test() {
   oset.lookup(table, "b")
   |> should.equal(Ok(#("b", 2)))
   oset.lookup(table, "c")
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn oset_large_test() {
@@ -108,7 +108,7 @@ pub fn oset_keypos_test() {
   oset.lookup(table, 500)
   |> should.equal(Ok(#(300, 500)))
   oset.lookup(table, 100)
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn oset_bad_new_test() {
@@ -237,7 +237,7 @@ pub fn oset_delete_key_test() {
   |> should.equal(Ok(#("Bye", "World")))
   oset.delete_key(table, "Bye")
   oset.lookup(table, "Bye")
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
   oset.lookup(table, "Hello")
   |> should.equal(Ok(#("Hello", "World")))
 }
@@ -249,9 +249,9 @@ pub fn oset_delete_all_objects_test() {
   |> should.equal(Ok(Nil))
   oset.delete_all_objects(table)
   oset.lookup(table, "Hello")
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
   oset.lookup(table, "Bye")
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn oset_delete_object_test() {
@@ -263,7 +263,7 @@ pub fn oset_delete_object_test() {
   oset.lookup(table, "Hello")
   |> should.equal(Ok(#("Hello", "World")))
   oset.lookup(table, "Bye")
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn oset_tab2file_test() {
@@ -368,7 +368,7 @@ pub fn oset_insert_new_test() {
   oset.lookup(table, 1)
   |> should.equal(Ok(#(1, 2)))
   oset.lookup(table, 2)
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn oset_take_test() {
@@ -383,7 +383,7 @@ pub fn oset_take_test() {
   oset.take(table, 1)
   |> should.equal(Error(Nil))
   oset.lookup(table, 1)
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
 }
 
 pub fn oset_member_test() {
@@ -570,7 +570,7 @@ pub fn oset_async_access_test() {
     |> atom.create_from_string
     |> bindings.try_whereis
   bindings.try_lookup(ref, "Hello")
-  |> should.equal([#("Hello", "World")])
+  |> should.equal(Ok([#("Hello", "World")]))
   let task = {
     use <- task.async
     let assert Ok(ref) =
@@ -578,7 +578,7 @@ pub fn oset_async_access_test() {
       |> atom.create_from_string
       |> bindings.try_whereis
     bindings.try_lookup(ref, "Hello")
-    |> should.equal([])
+    |> should.equal(Error(bravo.AccessDenied))
   }
   task.await_forever(task)
 }
@@ -598,7 +598,7 @@ pub fn oset_async_protected_test() {
     |> atom.create_from_string
     |> bindings.try_whereis
   bindings.try_lookup(ref, "Goodbye")
-  |> should.equal([#("Goodbye", "World")])
+  |> should.equal(Ok([#("Goodbye", "World")]))
   bindings.try_insert(ref, 1, [#("Hello", "Again")])
   |> should.equal(Error(bravo.AccessDenied))
 }

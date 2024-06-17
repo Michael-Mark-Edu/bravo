@@ -90,8 +90,15 @@ pub fn insert_new(
 
 /// Gets an object from a `OSet`.
 ///
-/// Returns an `Result` containing the object, if it exists.
-pub fn lookup(with oset: OSet(t), at key: a) -> Result(t, Nil) {
+/// Returns an `Result` containing the object, if it exists. Otherwise:
+/// - `Error(Empty)`: There is no object with the given key.
+/// - `Error(UninitializedTable)`: The table has never been `insert`ed into and
+///   was not created using `file2tab`.
+/// - `Error(TableDoesNotExist)`: The table was either deleted or never created.
+/// - `Error(AccessDenied)`: The table has an access level of `Private` and is
+///   owned by a different process.
+/// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
+pub fn lookup(with oset: OSet(t), at key: a) -> Result(t, BravoError) {
   master.lookup_set(oset.inner, key)
 }
 
