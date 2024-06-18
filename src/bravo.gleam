@@ -16,6 +16,9 @@ pub type BravoError {
   /// Thrown when trying to operate on a non-existent table, whether it is
   /// because the table has not yet created or that it has been `delete`d.
   TableDoesNotExist
+  /// Thrown when trying to create a table with the same name as an existing
+  /// table.
+  TableAlreadyExists
   /// Thrown when `insert` and similar functions are passed an empty list.
   NothingToInsert
   /// Thrown when `insert_new` tries to insert with a key that the table already
@@ -34,7 +37,6 @@ pub type BravoError {
   UninitializedTable
   /// Runtime error caught in FFI. This is generally a fallthrough error type.
   /// A non-exhaustive list of possible causes:
-  /// - `new` tried to create a table with the same name as another.
   /// - `tab2file` couldn't create a file successfully.
   /// - `file2tab` tries to read non-ETS or corrupted data.
   ErlangError(String)

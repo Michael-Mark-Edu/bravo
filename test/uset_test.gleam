@@ -115,7 +115,7 @@ pub fn uset_bad_new_test() {
   let assert Ok(table) = uset.new("uset5", 1, bravo.Public)
   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
   uset.new("uset5", 1, bravo.Public)
-  |> should.equal(Error(bravo.ErlangError("badarg")))
+  |> should.equal(Error(bravo.TableAlreadyExists))
 }
 
 pub fn uset_bad_insert_test() {

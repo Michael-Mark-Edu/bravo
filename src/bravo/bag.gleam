@@ -28,7 +28,11 @@ pub opaque type Bag(t) {
 /// Returns a result of the created `Bag`, which can be used by other functions
 /// in this module.
 ///
-/// Can have error types `ErlangError` and `NonPositiveKeypos`.
+/// Can have error types:
+/// - `Error(TableAlreadyExists)`: A table with the same name already exists.
+///   Deleting this other table will free up the spot.
+/// - `Error(NonPositiveKeypos)`: The input `keypos` is 0 or less.
+/// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
 pub fn new(
   name name: String,
   keypos keypos: Int,

@@ -20,6 +20,11 @@ try_new(Name, Options) ->
       ets:insert(Table, {Name, unknown})
   end,
   case catch ets:new(Name, Options) of
+    {'EXIT', {badarg, _}} ->
+      case ets:whereis(Name) of
+        undefined -> {error, {erlang_error, atom_to_binary(badarg, utf8)}};
+        _ -> {error, table_already_exists}
+      end;
     {'EXIT', {Reason, _}} ->
       {error, {erlang_error, atom_to_binary(Reason, utf8)}};
     Other ->

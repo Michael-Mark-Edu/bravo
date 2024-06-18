@@ -115,7 +115,7 @@ pub fn oset_bad_new_test() {
   let assert Ok(table) = oset.new("oset5", 1, bravo.Public)
   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
   oset.new("oset5", 1, bravo.Public)
-  |> should.equal(Error(bravo.ErlangError("badarg")))
+  |> should.equal(Error(bravo.TableAlreadyExists))
 }
 
 pub fn oset_bad_insert_test() {

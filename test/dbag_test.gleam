@@ -117,7 +117,7 @@ pub fn dbag_bad_new_test() {
   let assert Ok(table) = dbag.new("dbag5", 1, bravo.Public)
   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
   dbag.new("dbag5", 1, bravo.Public)
-  |> should.equal(Error(bravo.ErlangError("badarg")))
+  |> should.equal(Error(bravo.TableAlreadyExists))
 }
 
 pub fn dbag_bad_insert_test() {
