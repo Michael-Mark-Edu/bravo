@@ -1,7 +1,7 @@
 # v5.0.0 (unreleased)
 This is a breaking update!
-- Gave `insert`, `insert_new`, and `take` more descriptive error types to better
-  indicate what exactly went wrong.
+- Gave `new`, `insert`, `insert_new`, and `take` more descriptive error types to
+  better indicate what exactly went wrong.
 - Consolidated all function code into a single internal module.
     - This has no effect on the API, but it is a massive change internally. It
       should be easier for me to work on the codebase and it greatly reduces the
