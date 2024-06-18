@@ -95,7 +95,7 @@ pub fn insert_new(
 
 /// Gets a list of objects from a `DBag`.
 ///
-/// Returns an list containing the objects, if any match. Otherwise:
+/// Returns a list containing the objects, if any match. Otherwise:
 /// - `Error(Empty)`: No objects have the given key. This is returned instead of
 ///   an `Ok([])`.
 /// - `Error(UninitializedTable)`: The table has never been `insert`ed into and
@@ -109,6 +109,16 @@ pub fn lookup(with dbag: DBag(t), at key: a) -> Result(List(t), BravoError) {
 }
 
 /// Returns and removes all objects with `key` in the `DBag`, if any exist.
+///
+/// Returns a list containing the objects, if any match. Otherwise:
+/// - `Error(Empty)`: No objects have the given key. This is returned instead of
+///   an `Ok([])`.
+/// - `Error(UninitializedTable)`: The table has never been `insert`ed into and
+///   was not created using `file2tab`.
+/// - `Error(TableDoesNotExist)`: The table was either deleted or never created.
+/// - `Error(AccessDenied)`: The table has an access level of `Private` and is
+///   owned by a different process.
+/// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
 pub fn take(with dbag: DBag(t), at key: a) -> Result(List(t), BravoError) {
   master.take_bag(dbag.inner, key)
 }

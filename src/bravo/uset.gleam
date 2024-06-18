@@ -87,7 +87,7 @@ pub fn insert_new(
 
 /// Gets an object from a `USet`.
 ///
-/// Returns an `Result` containing the object, if it exists. Otherwise:
+/// Returns a `Result` containing the object, if it exists. Otherwise:
 /// - `Error(Empty)`: There is no object with the given key.
 /// - `Error(UninitializedTable)`: The table has never been `insert`ed into and
 ///   was not created using `file2tab`.
@@ -99,7 +99,16 @@ pub fn lookup(with uset: USet(t), at key: a) -> Result(t, BravoError) {
   master.lookup_set(uset.inner, key)
 }
 
-/// Returns and removes an object at `key` in the `USet`, if such object exists.
+/// Returns and removes an object at `key` in the `USet`.
+///
+/// Returns a `Result` containing the object, if it exists. Otherwise:
+/// - `Error(Empty)`: There is no object with the given key.
+/// - `Error(UninitializedTable)`: The table has never been `insert`ed into and
+///   was not created using `file2tab`.
+/// - `Error(TableDoesNotExist)`: The table was either deleted or never created.
+/// - `Error(AccessDenied)`: The table has an access level of `Private` and is
+///   owned by a different process.
+/// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
 pub fn take(with uset: USet(t), at key: a) -> Result(t, BravoError) {
   master.take_set(uset.inner, key)
 }
