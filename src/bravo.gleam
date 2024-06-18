@@ -2,7 +2,9 @@
 
 /// The error type all Bravo functions use.
 pub type BravoError {
-  /// Used in cases where a function may return nothing or an error.
+  /// Used in cases where a function that can return an error `BravoError` is
+  /// also able to return a non-value (aka `Nil`). In this scenario, `Nil` is
+  /// replaced with `Empty`.
   Empty
   /// Thrown if `new` is passed a `keypos` <= 0
   NonPositiveKeypos
