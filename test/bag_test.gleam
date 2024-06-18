@@ -383,9 +383,9 @@ pub fn bag_take_test() {
   bag.lookup(table, 1)
   |> should.equal(Ok([#(1, 2)]))
   bag.take(table, 1)
-  |> should.equal([#(1, 2)])
+  |> should.equal(Ok([#(1, 2)]))
   bag.take(table, 1)
-  |> should.equal([])
+  |> should.equal(Error(bravo.Empty))
   bag.lookup(table, 1)
   |> should.equal(Error(bravo.Empty))
 }

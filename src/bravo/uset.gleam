@@ -99,6 +99,11 @@ pub fn lookup(with uset: USet(t), at key: a) -> Result(t, BravoError) {
   master.lookup_set(uset.inner, key)
 }
 
+/// Returns and removes an object at `key` in the `USet`, if such object exists.
+pub fn take(with uset: USet(t), at key: a) -> Result(t, BravoError) {
+  master.take_set(uset.inner, key)
+}
+
 /// Deletes a `USet`.
 ///
 /// Table lifetime is static, and memory is only freed when the owner process is
@@ -173,11 +178,6 @@ pub fn file2tab(
 /// Returns a list containing all of the objects in the `USet`.
 pub fn tab2list(with uset: USet(t)) -> List(t) {
   master.tab2list(uset.inner)
-}
-
-/// Returns and removes an object at `key` in the `USet`, if such object exists.
-pub fn take(with uset: USet(t), at key: a) -> Result(t, Nil) {
-  master.take_set(uset.inner, key)
 }
 
 /// Returns whether a `USet` contains an object at `key`.

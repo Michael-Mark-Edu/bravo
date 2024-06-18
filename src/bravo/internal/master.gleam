@@ -73,7 +73,28 @@ pub fn lookup_bag(
   with table: InnerTable,
   at key: a,
 ) -> Result(List(t), BravoError) {
-  bindings.try_lookup(table.table, key)
+  case bindings.try_lookup(table.table, key) {
+    Ok([]) -> Error(bravo.Empty)
+    other -> other
+  }
+}
+
+pub fn take_set(with table: InnerTable, at key: a) -> Result(t, BravoError) {
+  use res <- result.try(bindings.try_take(table.table, key))
+  case res {
+    [res] -> Ok(res)
+    _ -> Error(bravo.Empty)
+  }
+}
+
+pub fn take_bag(
+  with table: InnerTable,
+  at key: a,
+) -> Result(List(t), BravoError) {
+  case bindings.try_take(table.table, key) {
+    Ok([]) -> Error(bravo.Empty)
+    other -> other
+  }
 }
 
 pub fn delete(with table: InnerTable) -> Bool {
@@ -146,17 +167,6 @@ pub fn file2tab(
 
 pub fn tab2list(with table: InnerTable) -> List(t) {
   bindings.try_tab2list(table.table)
-}
-
-pub fn take_set(with table: InnerTable, at key: a) -> Result(t, Nil) {
-  case bindings.try_take(table.table, key) {
-    [res] -> Ok(res)
-    _ -> Error(Nil)
-  }
-}
-
-pub fn take_bag(with table: InnerTable, at key: a) -> List(t) {
-  bindings.try_take(table.table, key)
 }
 
 pub fn member(with table: InnerTable, at key: a) -> Bool {

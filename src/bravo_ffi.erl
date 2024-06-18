@@ -128,16 +128,23 @@ try_lookup(Name, Key) ->
 try_take(Name, Key) ->
   case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
     {_, unknown} ->
-      [];
+      {error, uninitialized_table};
     {_, deleted} ->
-      [];
+      {error, table_does_not_exist};
     {_, tuple} ->
-      ets:take(Name, Key);
+      {ok, ets:take(Name, Key)};
     {_, non_tuple} ->
-      {Res} = ets:take(Name, {Key}),
-      Res
+      Res = ets:take(Name, Key),
+      {ok, lists:map(fun(Elem) -> element(1, Elem) end, Res)}
   end) of
-    {'EXIT', _} -> [];
+    {'EXIT', {Reason, _}} -> case Reason of
+      badarg ->
+       case ets:info(Name) == undefined of
+         true -> {error, table_does_not_exist};
+         false -> {error, access_denied}
+       end;
+      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
+    end;
     Other -> Other
   end.
 

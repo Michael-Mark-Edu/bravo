@@ -381,7 +381,7 @@ pub fn uset_take_test() {
   uset.take(table, 1)
   |> should.equal(Ok(#(1, 2)))
   uset.take(table, 1)
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
   uset.lookup(table, 1)
   |> should.equal(Error(bravo.Empty))
 }

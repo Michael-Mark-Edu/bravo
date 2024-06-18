@@ -31,7 +31,7 @@ pub fn try_insert_new(
 pub fn try_lookup(table: Reference, key: a) -> Result(List(b), BravoError)
 
 @external(erlang, "bravo_ffi", "try_take")
-pub fn try_take(table: Reference, key: a) -> List(b)
+pub fn try_take(table: Reference, key: a) -> Result(List(b), BravoError)
 
 @external(erlang, "bravo_ffi", "try_member")
 pub fn try_member(table: Reference, key: a) -> Bool

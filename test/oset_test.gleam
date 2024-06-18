@@ -381,7 +381,7 @@ pub fn oset_take_test() {
   oset.take(table, 1)
   |> should.equal(Ok(#(1, 2)))
   oset.take(table, 1)
-  |> should.equal(Error(Nil))
+  |> should.equal(Error(bravo.Empty))
   oset.lookup(table, 1)
   |> should.equal(Error(bravo.Empty))
 }

@@ -401,9 +401,9 @@ pub fn dbag_take_test() {
   dbag.lookup(table, 1)
   |> should.equal(Ok([#(1, 2)]))
   dbag.take(table, 1)
-  |> should.equal([#(1, 2)])
+  |> should.equal(Ok([#(1, 2)]))
   dbag.take(table, 1)
-  |> should.equal([])
+  |> should.equal(Error(bravo.Empty))
   dbag.lookup(table, 1)
   |> should.equal(Error(bravo.Empty))
 }

@@ -105,10 +105,12 @@ pub fn insert_new(
 ///   owned by a different process.
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
 pub fn lookup(with dbag: DBag(t), at key: a) -> Result(List(t), BravoError) {
-  case master.lookup_bag(dbag.inner, key) {
-    Ok([]) -> Error(bravo.Empty)
-    other -> other
-  }
+  master.lookup_bag(dbag.inner, key)
+}
+
+/// Returns and removes all objects with `key` in the `DBag`, if any exist.
+pub fn take(with dbag: DBag(t), at key: a) -> Result(List(t), BravoError) {
+  master.take_bag(dbag.inner, key)
 }
 
 /// Deletes a `DBag`.
@@ -188,11 +190,6 @@ pub fn file2tab(
 /// Returns a list containing all of the objects in the `Dbag`.
 pub fn tab2list(with dbag: DBag(t)) -> List(t) {
   master.tab2list(dbag.inner)
-}
-
-/// Returns and removes all objects with `key` in the `DBag`, if any exist.
-pub fn take(with dbag: DBag(t), at key: a) -> List(t) {
-  master.take_bag(dbag.inner, key)
 }
 
 /// Returns whether a `DBag` contains an object at `key`.

@@ -102,6 +102,11 @@ pub fn lookup(with oset: OSet(t), at key: a) -> Result(t, BravoError) {
   master.lookup_set(oset.inner, key)
 }
 
+/// Returns and removes an object at `key` in the `OSet`, if such object exists.
+pub fn take(with oset: OSet(t), at key: a) -> Result(t, BravoError) {
+  master.take_set(oset.inner, key)
+}
+
 /// Deletes a `OSet`.
 ///
 /// Table lifetime is static, and memory is only freed when the owner process is
@@ -178,11 +183,6 @@ pub fn file2tab(
 /// The list returned is ordered.
 pub fn tab2list(with oset: OSet(t)) -> List(t) {
   master.tab2list(oset.inner)
-}
-
-/// Returns and removes an object at `key` in the `OSet`, if such object exists.
-pub fn take(with oset: OSet(t), at key: a) -> Result(t, Nil) {
-  master.take_set(oset.inner, key)
 }
 
 /// Returns whether a `OSet` contains an object at `key`.
