@@ -1,9 +1,9 @@
 # v5.0.0 (unreleased)
 This is a breaking update!
-- Gave ~~many functions~~ (currently just `insert` and `insert_new`) more
-  descriptive error types to better indicate what exactly went wrong.
+- Gave `insert`, `insert_new`, and `take` more descriptive error types to better
+  indicate what exactly went wrong.
 - Consolidated all function code into a single internal module.
-    - This has no effect on the API, but is a massive change internally. It
+    - This has no effect on the API, but it is a massive change internally. It
       should be easier for me to work on the codebase and it greatly reduces the
       chances of a typo in one table type causing it to behave differently.
 
