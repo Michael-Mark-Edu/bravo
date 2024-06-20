@@ -15,7 +15,9 @@ try_new(Name, Options) ->
   case ets:whereis('$BRAVOMETA') of
     undefined ->
       Meta = ets:new('$BRAVOMETA', [set, public, named_table, {keypos, 1}, {heir, none}]),
-      ets:insert(Meta, {Name, unknown});
+      ets:insert(Meta, {Name, unknown}),
+      Pid = spawn(fun() -> timer:sleep(infinity) end),
+      ets:give_away(Meta, Pid, nil);
     Table ->
       ets:insert(Table, {Name, unknown})
   end,
