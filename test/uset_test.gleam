@@ -1,235 +1,96 @@
-// import bravo
-// import bravo/internal/bindings
-// import bravo/uset
-// import gleam/dict
-// import gleam/dynamic
-// import gleam/erlang/atom
-// import gleam/erlang/process
-// import gleam/io
-// import gleam/list
-// import gleam/option
-// import gleam/otp/actor
-// import gleam/otp/task
-// import gleeunit/should
-// import simplifile
-//
-// fn defer(defer: fn() -> a, block: fn() -> b) -> b {
-//   let b = block()
-//   defer()
-//   b
-// }
-//
-// pub fn uset_insert_lookup_delete_test() {
-//   let assert Ok(table) = uset.new("uset1", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [#(100, 200), #(300, 500)])
-//   |> should.equal(Ok(Nil))
-//   uset.lookup(table, 100)
-//   |> should.equal(Ok(#(100, 200)))
-//   uset.lookup(table, 300)
-//   |> should.equal(Ok(#(300, 500)))
-//   uset.lookup(table, 600)
-//   |> should.equal(Error(bravo.Empty))
-// }
-//
-// pub fn uset_multitype_test() {
-//   let assert Ok(table) = uset.new("uset2", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [#("a", 1), #("b", 2)])
-//   |> should.equal(Ok(Nil))
-//   uset.lookup(table, "a")
-//   |> should.equal(Ok(#("a", 1)))
-//   uset.lookup(table, "b")
-//   |> should.equal(Ok(#("b", 2)))
-//   uset.lookup(table, "c")
-//   |> should.equal(Error(bravo.Empty))
-// }
-//
-// pub fn uset_large_test() {
-//   let assert Ok(table) = uset.new("uset3", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [
-//     #(
-//       900,
-//       800,
-//       700,
-//       600,
-//       500,
-//       400,
-//       300,
-//       200,
-//       100,
-//       0,
-//       -100,
-//       -200,
-//       -300,
-//       -400,
-//       -500,
-//       -600,
-//       -700,
-//       -800,
-//       -900,
-//     ),
-//   ])
-//   |> should.equal(Ok(Nil))
-//   uset.lookup(table, 900)
-//   |> should.equal(
-//     Ok(#(
-//       900,
-//       800,
-//       700,
-//       600,
-//       500,
-//       400,
-//       300,
-//       200,
-//       100,
-//       0,
-//       -100,
-//       -200,
-//       -300,
-//       -400,
-//       -500,
-//       -600,
-//       -700,
-//       -800,
-//       -900,
-//     )),
-//   )
-// }
-//
-// pub fn uset_keypos_test() {
-//   let assert Ok(table) = uset.new("uset4", 2, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [#(100, 200), #(300, 500)])
-//   |> should.equal(Ok(Nil))
-//   uset.lookup(table, 200)
-//   |> should.equal(Ok(#(100, 200)))
-//   uset.lookup(table, 500)
-//   |> should.equal(Ok(#(300, 500)))
-//   uset.lookup(table, 100)
-//   |> should.equal(Error(bravo.Empty))
-// }
-//
-// pub fn uset_bad_new_test() {
-//   let assert Ok(table) = uset.new("uset5", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.new("uset5", 1, bravo.Public)
-//   |> should.equal(Error(bravo.TableAlreadyExists))
-// }
-//
-// pub fn uset_bad_insert_test() {
-//   let assert Ok(table) = uset.new("uset6", 3, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [#("a", 1)])
-//   |> should.equal(Error(bravo.InvalidKeypos))
-// }
-//
-// pub fn uset_multi_insert_test() {
-//   let assert Ok(table) = uset.new("uset7", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [#(100, 200)])
-//   |> should.equal(Ok(Nil))
-//   uset.lookup(table, 100)
-//   |> should.equal(Ok(#(100, 200)))
-//   uset.insert(table, [#(100, 300), #(100, 400)])
-//   |> should.equal(Ok(Nil))
-//   uset.lookup(table, 100)
-//   |> should.equal(Ok(#(100, 400)))
-// }
-//
-// pub fn uset_large_multitype_test() {
-//   let assert Ok(table) = uset.new("uset8", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [
-//     #(
-//       "String",
-//       5,
-//       10.0,
-//       [15, 20],
-//       #(25, 30),
-//       dict.from_list([#(35, 40)]),
-//       Ok(45),
-//       Ok(50),
-//     ),
-//   ])
-//   |> should.equal(Ok(Nil))
-//   uset.lookup(table, "String")
-//   |> should.equal(
-//     Ok(#(
-//       "String",
-//       5,
-//       10.0,
-//       [15, 20],
-//       #(25, 30),
-//       dict.from_list([#(35, 40)]),
-//       Ok(45),
-//       Ok(50),
-//     )),
-//   )
-// }
-//
-// pub fn uset_delete_test() {
-//   let assert Ok(table) = uset.new("uset9", 1, bravo.Public)
-//   uset.delete(table)
-//   |> should.equal(True)
-//   let assert Ok(table) = uset.new("uset9", 1, bravo.Public)
-//   uset.delete(table)
-//   |> should.equal(True)
-//   uset.delete(table)
-//   |> should.equal(False)
-// }
-//
-// pub fn uset_singleton_test() {
-//   let assert Ok(table) = uset.new("uset10", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [#(1), #(2)])
-//   |> should.equal(Ok(Nil))
-//   uset.lookup(table, 1)
-//   |> should.equal(Ok(#(1)))
-//   uset.lookup(table, 2)
-//   |> should.equal(Ok(#(2)))
-// }
-//
-// pub fn uset_nontuple_test() {
-//   let assert Ok(table) = uset.new("uset11", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [5])
-//   |> should.equal(Ok(Nil))
-//   uset.lookup(table, 5)
-//   |> should.equal(Ok(5))
-// }
-//
-// pub fn uset_nontuple_record_test() {
-//   let assert Ok(table) = uset.new("uset12", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [Ok(5)])
-//   |> should.equal(Ok(Nil))
-//   uset.lookup(table, Ok(5))
-//   |> should.equal(Ok(Ok(5)))
-// }
-//
-// type Multirecord {
-//   A(Int)
-//   B(Int, Int)
-//   C
-// }
-//
-// pub fn uset_nontuple_multirecord_test() {
-//   let assert Ok(table) = uset.new("uset13", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [A(1), B(2, 3), C])
-//   |> should.equal(Ok(Nil))
-//   uset.lookup(table, A(1))
-//   |> should.equal(Ok(A(1)))
-//   uset.lookup(table, B(2, 3))
-//   |> should.equal(Ok(B(2, 3)))
-//   uset.lookup(table, C)
-//   |> should.equal(Ok(C))
-// }
-//
+import bravo
+import bravo/internal/bindings
+import bravo/uset
+import gleam/dict
+import gleam/dynamic
+import gleam/erlang/atom
+import gleam/erlang/process
+import gleam/io
+import gleam/list
+import gleam/option
+import gleam/otp/actor
+import gleam/otp/task
+import gleeunit/should
+import simplifile
+
+fn defer(defer: fn() -> a, block: fn() -> b) -> b {
+  let b = block()
+  defer()
+  b
+}
+
+pub fn uset_insert_lookup_delete_test() {
+  let assert Ok(table) = uset.new("uset1", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, "a", 1)
+  |> should.be_ok
+  uset.lookup(table, "a")
+  |> should.equal(Ok(1))
+  uset.lookup(table, 1)
+  |> should.equal(Error(bravo.Empty))
+}
+
+pub fn uset_large_test() {
+  let assert Ok(table) = uset.new("uset2", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, #(1, 2, 3, 4, 5), [6, 7, 8, 9, 0])
+  |> should.be_ok
+  uset.lookup(table, #(1, 2, 3, 4, 5))
+  |> should.equal(Ok([6, 7, 8, 9, 0]))
+}
+
+pub fn uset_dupe_test() {
+  let assert Ok(table) = uset.new("uset3", bravo.Public)
+  uset.new("uset3", bravo.Public)
+  |> should.equal(Error(bravo.TableAlreadyExists))
+  uset.delete(table)
+  let assert Ok(table) = uset.new("uset3", bravo.Public)
+  uset.delete(table)
+}
+
+pub fn uset_multi_insert_test() {
+  let assert Ok(table) = uset.new("uset4", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, 100, 200)
+  |> should.be_ok
+  uset.lookup(table, 100)
+  |> should.equal(Ok(200))
+  uset.insert(table, 100, 300)
+  |> should.be_ok
+  uset.lookup(table, 100)
+  |> should.equal(Ok(300))
+}
+
+pub fn uset_large_multitype_test() {
+  let assert Ok(table) = uset.new("uset5", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert(table, 0, #(
+    "String",
+    5,
+    10.0,
+    [15, 20],
+    #(25, 30),
+    dict.from_list([#(35, 40)]),
+    Ok(45),
+    Ok(50),
+  ))
+  |> should.be_ok
+  uset.lookup(table, 0)
+  |> should.equal(
+    Ok(#(
+      "String",
+      5,
+      10.0,
+      [15, 20],
+      #(25, 30),
+      dict.from_list([#(35, 40)]),
+      Ok(45),
+      Ok(50),
+    )),
+  )
+}
 // pub fn uset_delete_key_test() {
-//   let assert Ok(table) = uset.new("uset14", 1, bravo.Public)
+//   let assert Ok(table) = uset.new("uset14", bravo.Public)
 //   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
 //   uset.insert(table, [#("Hello", "World"), #("Bye", "World")])
 //   |> should.equal(Ok(Nil))
