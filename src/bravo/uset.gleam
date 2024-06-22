@@ -65,6 +65,13 @@ pub fn insert(
   master.insert(uset.inner, key, value)
 }
 
+pub fn insert_list(
+  uset: USet(k, v),
+  objects: List(#(k, v)),
+) -> Result(Nil, BravoError) {
+  master.insert_list(uset.inner, objects)
+}
+
 /// Inserts a list of tuples into a `USet`. Unlike `insert`, this cannot
 /// overwrite objects and will error if it tries to do so.
 ///
@@ -100,7 +107,7 @@ pub fn insert_new(
 /// - `Error(AccessDenied)`: The table has an access level of `Private` and is
 ///   owned by a different process.
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
-pub fn lookup(with uset: USet(k, v), at key: a) -> Result(t, BravoError) {
+pub fn lookup(with uset: USet(k, v), at key: k) -> Result(t, BravoError) {
   master.lookup_set(uset.inner, key)
 }
 
@@ -114,7 +121,7 @@ pub fn lookup(with uset: USet(k, v), at key: a) -> Result(t, BravoError) {
 /// - `Error(AccessDenied)`: The table has an access level of `Private` and is
 ///   owned by a different process.
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
-pub fn take(with uset: USet(k, v), at key: a) -> Result(t, BravoError) {
+pub fn take(with uset: USet(k, v), at key: k) -> Result(t, BravoError) {
   master.take_set(uset.inner, key)
 }
 

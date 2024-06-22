@@ -1,17 +1,7 @@
 import bravo
-import bravo/internal/bindings
 import bravo/uset
 import gleam/dict
-import gleam/dynamic
-import gleam/erlang/atom
-import gleam/erlang/process
-import gleam/io
-import gleam/list
-import gleam/option
-import gleam/otp/actor
-import gleam/otp/task
 import gleeunit/should
-import simplifile
 
 fn defer(defer: fn() -> a, block: fn() -> b) -> b {
   let b = block()
@@ -26,8 +16,14 @@ pub fn uset_insert_lookup_delete_test() {
   |> should.be_ok
   uset.lookup(table, "a")
   |> should.equal(Ok(1))
-  uset.lookup(table, 1)
+  uset.lookup(table, "b")
   |> should.equal(Error(bravo.Empty))
+  uset.insert_list(table, [#("b", 2), #("c", 3)])
+  |> should.be_ok
+  uset.lookup(table, "b")
+  |> should.equal(Ok(2))
+  uset.lookup(table, "c")
+  |> should.equal(Ok(3))
 }
 
 pub fn uset_large_test() {
@@ -89,43 +85,44 @@ pub fn uset_large_multitype_test() {
     )),
   )
 }
-// pub fn uset_delete_key_test() {
-//   let assert Ok(table) = uset.new("uset14", bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [#("Hello", "World"), #("Bye", "World")])
-//   |> should.equal(Ok(Nil))
-//   uset.lookup(table, "Bye")
-//   |> should.equal(Ok(#("Bye", "World")))
-//   uset.delete_key(table, "Bye")
-//   uset.lookup(table, "Bye")
-//   |> should.equal(Error(bravo.Empty))
-//   uset.lookup(table, "Hello")
-//   |> should.equal(Ok(#("Hello", "World")))
-// }
-//
-// pub fn uset_delete_all_objects_test() {
-//   let assert Ok(table) = uset.new("uset15", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [#("Hello", "World"), #("Bye", "World")])
-//   |> should.equal(Ok(Nil))
-//   uset.delete_all_objects(table)
-//   uset.lookup(table, "Hello")
-//   |> should.equal(Error(bravo.Empty))
-//   uset.lookup(table, "Bye")
-//   |> should.equal(Error(bravo.Empty))
-// }
-//
-// pub fn uset_delete_object_test() {
-//   let assert Ok(table) = uset.new("uset16", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [#("Hello", "World"), #("Bye", "World")])
-//   |> should.equal(Ok(Nil))
-//   uset.delete_object(table, #("Bye", "World"))
-//   uset.lookup(table, "Hello")
-//   |> should.equal(Ok(#("Hello", "World")))
-//   uset.lookup(table, "Bye")
-//   |> should.equal(Error(bravo.Empty))
-// }
+
+pub fn uset_delete_key_test() {
+  let assert Ok(table) = uset.new("uset6", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
+  |> should.be_ok
+  uset.lookup(table, "Bye")
+  |> should.equal(Ok("World"))
+  uset.delete_key(table, "Bye")
+  uset.lookup(table, "Bye")
+  |> should.equal(Error(bravo.Empty))
+  uset.lookup(table, "Hello")
+  |> should.equal(Ok("World"))
+}
+
+pub fn uset_delete_all_objects_test() {
+  let assert Ok(table) = uset.new("uset7", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
+  |> should.be_ok
+  uset.delete_all_objects(table)
+  uset.lookup(table, "Hello")
+  |> should.equal(Error(bravo.Empty))
+  uset.lookup(table, "Bye")
+  |> should.equal(Error(bravo.Empty))
+}
+
+pub fn uset_delete_object_test() {
+  let assert Ok(table) = uset.new("uset8", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.equal(True) })
+  uset.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
+  |> should.be_ok
+  uset.delete_object(table, #("Bye", "World"))
+  uset.lookup(table, "Hello")
+  |> should.equal(Ok("World"))
+  uset.lookup(table, "Bye")
+  |> should.equal(Error(bravo.Empty))
+}
 //
 // pub fn uset_tab2file_test() {
 //   let assert Ok(table) = uset.new("uset17", 2, bravo.Public)

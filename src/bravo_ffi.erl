@@ -2,9 +2,9 @@
 
 -export([inform/2, try_delete/1, try_delete_all_objects/1, try_delete_key/2,
          try_delete_object/2, try_file2tab/2, try_first/1, try_insert/3,
-         try_insert_new/3, try_last/1, try_lookup/2, try_member/2, try_new/2,
-         try_next/2, try_prev/2, try_tab2file/5, try_tab2list/1, try_take/2,
-         try_whereis/1]).
+         try_insert_list/2, try_insert_new/3, try_insert_new_list/2, try_last/1,
+         try_lookup/2, try_member/2, try_new/2, try_next/2, try_prev/2,
+         try_tab2file/5, try_tab2list/1, try_take/2, try_whereis/1]).
 
 inform(Name, Key) ->
   Info = catch ets:info(Name),
@@ -37,6 +37,19 @@ try_insert(Name, Key, Value) ->
     _ -> {ok, nil}
   end.
 
+try_insert_list(Name, Objects) ->
+  case catch ets:insert(Name, Objects) of
+    {'EXIT', {Reason, _}} -> case Reason of
+      badarg ->
+       case ets:info(Name) == undefined of
+         true -> {error, table_does_not_exist};
+         false -> {error, access_denied}
+       end;
+      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
+    end;
+    _ -> {ok, nil}
+  end.
+
 try_insert_new(Name, Key, Value) ->
   case catch ets:insert_new(Name, {Key, Value}) of
     {'EXIT', {Reason, _}} -> case Reason of
@@ -49,6 +62,9 @@ try_insert_new(Name, Key, Value) ->
     end;
     _ -> {ok, nil}
   end.
+
+try_insert_new_list(Name, Object) ->
+  todo.
 
 try_lookup(Name, Key) ->
   case catch ets:lookup(Name, Key) of

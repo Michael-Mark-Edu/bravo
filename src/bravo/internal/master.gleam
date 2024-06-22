@@ -43,6 +43,13 @@ pub fn insert(table: InnerTable, key: k, value: v) -> Result(Nil, BravoError) {
   bindings.try_insert(table.table, key, value)
 }
 
+pub fn insert_list(
+  table: InnerTable,
+  list: List(#(k, v)),
+) -> Result(Nil, BravoError) {
+  bindings.try_insert_list(table.table, list)
+}
+
 pub fn insert_new(
   table: InnerTable,
   key: k,

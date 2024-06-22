@@ -16,11 +16,23 @@ pub fn try_new(
 @external(erlang, "bravo_ffi", "try_insert")
 pub fn try_insert(table: Reference, key: k, value: v) -> Result(Nil, BravoError)
 
+@external(erlang, "bravo_ffi", "try_insert_list")
+pub fn try_insert_list(
+  table: Reference,
+  list: List(#(k, v)),
+) -> Result(Nil, BravoError)
+
 @external(erlang, "bravo_ffi", "try_insert_new")
 pub fn try_insert_new(
   table: Reference,
   key: k,
   value: v,
+) -> Result(Nil, BravoError)
+
+@external(erlang, "bravo_ffi", "try_insert_new_list")
+pub fn try_insert_new_list(
+  table: Reference,
+  list: List(#(k, v)),
 ) -> Result(Nil, BravoError)
 
 @external(erlang, "bravo_ffi", "try_lookup")
