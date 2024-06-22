@@ -13,7 +13,7 @@ import gleam/result
 ///
 /// In order for a lookup match to occur, entries must _coerce into the
 /// same value_. Two values may match even if they have different types.
-pub opaque type OSet(t) {
+pub opaque type OSet(k, v) {
   OSet(inner: master.InnerTable)
 }
 
@@ -40,10 +40,9 @@ pub opaque type OSet(t) {
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
 pub fn new(
   name name: String,
-  keypos keypos: Int,
   access access: Access,
-) -> Result(OSet(t), BravoError) {
-  use res <- result.try(master.new(name, keypos, access, new_option.OrderedSet))
+) -> Result(OSet(k, v), BravoError) {
+  use res <- result.try(master.new(name, access, new_option.OrderedSet))
   Ok(OSet(res))
 }
 
@@ -62,10 +61,11 @@ pub fn new(
 /// If an object with the same key already exists, then the old object will be
 /// overwritten with the new one. To instead get an error, use `insert_new`.
 pub fn insert(
-  with oset: OSet(t),
-  insert objects: List(t),
+  with oset: OSet(k, v),
+  key key: k,
+  value value: v,
 ) -> Result(Nil, BravoError) {
-  master.insert(oset.inner, objects)
+  master.insert(oset.inner, key, value)
 }
 
 /// Inserts a list of tuples into a `OSet`. Unlike `insert`, this cannot
@@ -86,10 +86,11 @@ pub fn insert(
 /// If an object with the same key already exists, then the old object will be
 /// overwritten with the new one. To instead overwrite, use `insert`.
 pub fn insert_new(
-  with oset: OSet(t),
-  insert objects: List(t),
+  with oset: OSet(k, v),
+  key key: k,
+  value value: v,
 ) -> Result(Nil, BravoError) {
-  master.insert_new(oset.inner, objects)
+  master.insert(oset.inner, key, value)
 }
 
 /// Gets an object from a `OSet`.
@@ -102,7 +103,7 @@ pub fn insert_new(
 /// - `Error(AccessDenied)`: The table has an access level of `Private` and is
 ///   owned by a different process.
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
-pub fn lookup(with oset: OSet(t), at key: a) -> Result(t, BravoError) {
+pub fn lookup(with oset: OSet(k, v), at key: a) -> Result(t, BravoError) {
   master.lookup_set(oset.inner, key)
 }
 
@@ -116,7 +117,7 @@ pub fn lookup(with oset: OSet(t), at key: a) -> Result(t, BravoError) {
 /// - `Error(AccessDenied)`: The table has an access level of `Private` and is
 ///   owned by a different process.
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
-pub fn take(with oset: OSet(t), at key: a) -> Result(t, BravoError) {
+pub fn take(with oset: OSet(k, v), at key: a) -> Result(t, BravoError) {
   master.take_set(oset.inner, key)
 }
 
@@ -128,24 +129,24 @@ pub fn take(with oset: OSet(t), at key: a) -> Result(t, BravoError) {
 ///
 /// The input `OSet` is completely useless after it is deleted. Even if another
 /// table is created with the same name, the old handle will not work.
-pub fn delete(with oset: OSet(t)) -> Bool {
+pub fn delete(with oset: OSet(k, v)) -> Bool {
   master.delete(oset.inner)
 }
 
 /// Deletes the object addressed by `key`, if it exists. If it doesn't, this
 /// does nothing.
-pub fn delete_key(with oset: OSet(t), at key: a) -> Nil {
+pub fn delete_key(with oset: OSet(k, v), at key: a) -> Nil {
   master.delete_key(oset.inner, key)
 }
 
 /// Deletes all objects in the `OSet`. This is atomic and isolated.
-pub fn delete_all_objects(with oset: OSet(t)) -> Nil {
+pub fn delete_all_objects(with oset: OSet(k, v)) -> Nil {
   master.delete_all_objects(oset.inner)
 }
 
 /// Deletes a specific object in the `OSet`. This is more useful with
 /// `oset`s and `Doset`s.
-pub fn delete_object(with oset: OSet(t), target object: t) -> Nil {
+pub fn delete_object(with oset: OSet(k, v), target object: #(k, v)) -> Nil {
   master.delete_object(oset.inner, object)
 }
 
@@ -161,7 +162,7 @@ pub fn delete_object(with oset: OSet(t), target object: t) -> Nil {
 ///
 /// Can have error type `ErlangError`.
 pub fn tab2file(
-  with oset: OSet(t),
+  with oset: OSet(k, v),
   to filename: String,
   object_count object_count: Bool,
   md5sum md5sum: Bool,
@@ -185,35 +186,41 @@ pub fn tab2file(
 pub fn file2tab(
   from filename: String,
   verify verify: Bool,
-  using decoder: fn(Dynamic) -> Result(t, _),
-) -> Result(OSet(t), BravoError) {
-  use res <- result.try(master.file2tab(filename, verify, decoder))
+  key_decoder key_decoder: fn(Dynamic) -> Result(k, _),
+  value_decoder value_decoder: fn(Dynamic) -> Result(v, _),
+) -> Result(OSet(k, v), BravoError) {
+  use res <- result.try(master.file2tab(
+    filename,
+    verify,
+    key_decoder,
+    value_decoder,
+  ))
   Ok(OSet(res))
 }
 
 /// Returns a list containing all of the objects in the `OSet`.
 ///
 /// The list returned is ordered.
-pub fn tab2list(with oset: OSet(t)) -> List(t) {
+pub fn tab2list(with oset: OSet(k, v)) -> List(#(k, v)) {
   master.tab2list(oset.inner)
 }
 
 /// Returns whether a `OSet` contains an object at `key`.
-pub fn member(with oset: OSet(t), at key: a) -> Bool {
+pub fn member(with oset: OSet(k, v), at key: a) -> Bool {
   master.member(oset.inner, key)
 }
 
 /// Returns the first key (not the object!) in the table, if it exists.
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
-pub fn first(with oset: OSet(t)) -> Result(a, Nil) {
+pub fn first(with oset: OSet(k, v)) -> Result(a, Nil) {
   master.first(oset.inner)
 }
 
 /// Returns the last key (not the object!) in the table, if it exists.
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
-pub fn last(with oset: OSet(t)) -> Result(a, Nil) {
+pub fn last(with oset: OSet(k, v)) -> Result(a, Nil) {
   master.last(oset.inner)
 }
 
@@ -221,7 +228,7 @@ pub fn last(with oset: OSet(t)) -> Result(a, Nil) {
 /// if it exists.
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
-pub fn next(with oset: OSet(t), from key: a) -> Result(a, Nil) {
+pub fn next(with oset: OSet(k, v), from key: a) -> Result(a, Nil) {
   master.next(oset.inner, key)
 }
 
@@ -229,6 +236,6 @@ pub fn next(with oset: OSet(t), from key: a) -> Result(a, Nil) {
 /// table, if it exists.
 ///
 /// `OSet`s _are_ ordered as per the Erlang documentation.
-pub fn prev(with oset: OSet(t), from key: a) -> Result(a, Nil) {
+pub fn prev(with oset: OSet(k, v), from key: a) -> Result(a, Nil) {
   master.prev(oset.inner, key)
 }

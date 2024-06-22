@@ -8,7 +8,7 @@ import gleam/result
 
 /// A duplicate bag bravo. Keys may occur multiple times per table, and verbatim
 /// copies of an object can be stored.
-pub opaque type DBag(t) {
+pub opaque type DBag(k, v) {
   DBag(inner: master.InnerTable)
 }
 
@@ -35,15 +35,9 @@ pub opaque type DBag(t) {
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
 pub fn new(
   name name: String,
-  keypos keypos: Int,
   access access: Access,
-) -> Result(DBag(t), BravoError) {
-  use res <- result.try(master.new(
-    name,
-    keypos,
-    access,
-    new_option.DuplicateBag,
-  ))
+) -> Result(DBag(k, v), BravoError) {
+  use res <- result.try(master.new(name, access, new_option.DuplicateBag))
   Ok(DBag(res))
 }
 
@@ -66,10 +60,11 @@ pub fn new(
 /// To instead get an error when inserting an object with the same key as an
 /// already existing object, use `insert_new`.
 pub fn insert(
-  with dbag: DBag(t),
-  insert objects: List(t),
+  into bag: DBag(k, v),
+  key key: k,
+  value value: v,
 ) -> Result(Nil, BravoError) {
-  master.insert(dbag.inner, objects)
+  master.insert(bag.inner, key, value)
 }
 
 /// Inserts a list of tuples into a `DBag`. Unlike `insert`, this cannot
@@ -90,10 +85,11 @@ pub fn insert(
 /// If an object with the same key already exists, then the old object will be
 /// overwritten with the new one. To instead overwrite, use `insert`.
 pub fn insert_new(
-  with dbag: DBag(t),
-  insert objects: List(t),
+  with dbag: DBag(k, v),
+  key key: k,
+  value value: v,
 ) -> Result(Nil, BravoError) {
-  master.insert_new(dbag.inner, objects)
+  master.insert_new(dbag.inner, key, value)
 }
 
 /// Gets a list of objects from a `DBag`.
@@ -107,7 +103,7 @@ pub fn insert_new(
 /// - `Error(AccessDenied)`: The table has an access level of `Private` and is
 ///   owned by a different process.
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
-pub fn lookup(with dbag: DBag(t), at key: a) -> Result(List(t), BravoError) {
+pub fn lookup(with dbag: DBag(k, v), at key: a) -> Result(List(t), BravoError) {
   master.lookup_bag(dbag.inner, key)
 }
 
@@ -122,7 +118,7 @@ pub fn lookup(with dbag: DBag(t), at key: a) -> Result(List(t), BravoError) {
 /// - `Error(AccessDenied)`: The table has an access level of `Private` and is
 ///   owned by a different process.
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
-pub fn take(with dbag: DBag(t), at key: a) -> Result(List(t), BravoError) {
+pub fn take(with dbag: DBag(k, v), at key: a) -> Result(List(t), BravoError) {
   master.take_bag(dbag.inner, key)
 }
 
@@ -134,19 +130,19 @@ pub fn take(with dbag: DBag(t), at key: a) -> Result(List(t), BravoError) {
 ///
 /// The input `DBag` is completely useless after it is deleted. Even if another
 /// table is created with the same name, the old handle will not work.
-pub fn delete(with dbag: DBag(t)) -> Bool {
+pub fn delete(with dbag: DBag(k, v)) -> Bool {
   master.delete(dbag.inner)
 }
 
 /// Deletes all objects addressed by `key`, if any exist. If nothing does, this
 /// does nothing.
-pub fn delete_key(with dbag: DBag(t), at key: a) -> Nil {
+pub fn delete_key(with dbag: DBag(k, v), at key: a) -> Nil {
   master.delete_key(dbag.inner, key)
 }
 
 /// Deletes all objects in the `DBag`. This is atomic and isolated.
 ///
-pub fn delete_all_objects(with dbag: DBag(t)) -> Nil {
+pub fn delete_all_objects(with dbag: DBag(k, v)) -> Nil {
   master.delete_all_objects(dbag.inner)
 }
 
@@ -154,7 +150,7 @@ pub fn delete_all_objects(with dbag: DBag(t)) -> Nil {
 /// unaffected.
 ///
 /// If there are multiple of the same object, then they will all be deleted.
-pub fn delete_object(with dbag: DBag(t), target object: t) -> Nil {
+pub fn delete_object(with dbag: DBag(k, v), target object: #(k, v)) -> Nil {
   master.delete_object(dbag.inner, object)
 }
 
@@ -170,7 +166,7 @@ pub fn delete_object(with dbag: DBag(t), target object: t) -> Nil {
 ///
 /// Can have error type `ErlangError`.
 pub fn tab2file(
-  with dbag: DBag(t),
+  with dbag: DBag(k, v),
   to filename: String,
   object_count object_count: Bool,
   md5sum md5sum: Bool,
@@ -194,33 +190,39 @@ pub fn tab2file(
 pub fn file2tab(
   from filename: String,
   verify verify: Bool,
-  using decoder: fn(Dynamic) -> Result(t, _),
-) -> Result(DBag(t), BravoError) {
-  use res <- result.try(master.file2tab(filename, verify, decoder))
+  key_decoder key_decoder: fn(Dynamic) -> Result(k, _),
+  value_decoder value_decoder: fn(Dynamic) -> Result(v, _),
+) -> Result(DBag(k, v), BravoError) {
+  use res <- result.try(master.file2tab(
+    filename,
+    verify,
+    key_decoder,
+    value_decoder,
+  ))
   Ok(DBag(res))
 }
 
 /// Returns a list containing all of the objects in the `Dbag`.
-pub fn tab2list(with dbag: DBag(t)) -> List(t) {
+pub fn tab2list(with dbag: DBag(k, v)) -> List(#(k, v)) {
   master.tab2list(dbag.inner)
 }
 
 /// Returns whether a `DBag` contains an object at `key`.
-pub fn member(with dbag: DBag(t), at key: a) -> Bool {
+pub fn member(with dbag: DBag(k, v), at key: a) -> Bool {
   master.member(dbag.inner, key)
 }
 
 /// Returns the first key (not the object!) in the table, if it exists.
 ///
 /// `DBag`s are unordered, so the order of keys is unknown.
-pub fn first(with dbag: DBag(t)) -> Result(a, Nil) {
+pub fn first(with dbag: DBag(k, v)) -> Result(a, Nil) {
   master.first(dbag.inner)
 }
 
 /// Returns the last key (not the object!) in the table, if it exists.
 ///
 /// `DBag`s are unordered, so the order of keys is unknown.
-pub fn last(with dbag: DBag(t)) -> Result(a, Nil) {
+pub fn last(with dbag: DBag(k, v)) -> Result(a, Nil) {
   master.last(dbag.inner)
 }
 
@@ -228,7 +230,7 @@ pub fn last(with dbag: DBag(t)) -> Result(a, Nil) {
 /// if it exists.
 ///
 /// `DBag`s are unordered, so the order of keys is unknown.
-pub fn next(with dbag: DBag(t), from key: a) -> Result(a, Nil) {
+pub fn next(with dbag: DBag(k, v), from key: a) -> Result(a, Nil) {
   master.next(dbag.inner, key)
 }
 
@@ -236,6 +238,6 @@ pub fn next(with dbag: DBag(t), from key: a) -> Result(a, Nil) {
 /// table, if it exists.
 ///
 /// `DBag`s are unordered, so the order of keys is unknown.
-pub fn prev(with dbag: DBag(t), from key: a) -> Result(a, Nil) {
+pub fn prev(with dbag: DBag(k, v), from key: a) -> Result(a, Nil) {
   master.prev(dbag.inner, key)
 }

@@ -11,17 +11,15 @@ import gleam/result
 import gleam/string
 
 pub type InnerTable {
-  InnerTable(table: Reference, keypos: Int)
+  InnerTable(table: Reference)
 }
 
 pub fn new(
-  name name: String,
-  keypos keypos: Int,
-  access access: Access,
-  ttype ttype: new_option.NewOption,
+  name: String,
+  access: Access,
+  ttype: new_option.NewOption,
 ) -> Result(InnerTable, BravoError) {
   let atom = atom.create_from_string(name)
-  use <- bool.guard(keypos < 1, Error(bravo.NonPositiveKeypos))
   use a <- result.try(
     bindings.try_new(atom, [
       ttype,
@@ -31,97 +29,73 @@ pub fn new(
         bravo.Private -> new_option.Private
       },
       new_option.NamedTable,
-      new_option.Keypos(keypos),
+      new_option.Keypos(1),
       new_option.WriteConcurrency(new_option.Auto),
       new_option.ReadConcurrency(True),
       new_option.DecentralizedCounters(True),
     ]),
   )
   let assert Ok(tid) = bindings.try_whereis(a)
-  Ok(InnerTable(tid, keypos))
+  Ok(InnerTable(tid))
 }
 
-pub fn insert(
-  with table: InnerTable,
-  insert objects: List(t),
-) -> Result(Nil, BravoError) {
-  use <- bool.guard(list.is_empty(objects), Error(bravo.NothingToInsert))
-  bindings.try_insert(table.table, table.keypos, objects)
+pub fn insert(table: InnerTable, key: k, value: v) -> Result(Nil, BravoError) {
+  bindings.try_insert(table.table, key, value)
 }
 
 pub fn insert_new(
-  with table: InnerTable,
-  insert objects: List(t),
+  table: InnerTable,
+  key: k,
+  value: v,
 ) -> Result(Nil, BravoError) {
-  use <- bool.guard(list.is_empty(objects), Error(bravo.NothingToInsert))
-  case bindings.try_insert_new(table.table, table.keypos, objects) {
-    Ok(True) -> Ok(Nil)
-    Ok(False) -> Error(bravo.KeyAlreadyPresent)
-    Error(e) -> Error(e)
-  }
+  bindings.try_insert_new(table.table, key, value)
 }
 
-pub fn lookup_set(with table: InnerTable, at key: a) -> Result(t, BravoError) {
+pub fn lookup_set(table: InnerTable, key: k) -> Result(v, BravoError) {
   use res <- result.try(bindings.try_lookup(table.table, key))
-  case res {
-    [a] -> Ok(a)
-    _ -> Error(bravo.Empty)
-  }
+  let assert [a] = res
+  Ok(a)
 }
 
-pub fn lookup_bag(
-  with table: InnerTable,
-  at key: a,
-) -> Result(List(t), BravoError) {
-  case bindings.try_lookup(table.table, key) {
-    Ok([]) -> Error(bravo.Empty)
-    other -> other
-  }
+pub fn lookup_bag(table: InnerTable, key: k) -> Result(List(v), BravoError) {
+  bindings.try_lookup(table.table, key)
 }
 
-pub fn take_set(with table: InnerTable, at key: a) -> Result(t, BravoError) {
+pub fn take_set(table: InnerTable, key: k) -> Result(v, BravoError) {
   use res <- result.try(bindings.try_take(table.table, key))
-  case res {
-    [res] -> Ok(res)
-    _ -> Error(bravo.Empty)
-  }
+  let assert [a] = res
+  Ok(a)
 }
 
-pub fn take_bag(
-  with table: InnerTable,
-  at key: a,
-) -> Result(List(t), BravoError) {
-  case bindings.try_take(table.table, key) {
-    Ok([]) -> Error(bravo.Empty)
-    other -> other
-  }
+pub fn take_bag(table: InnerTable, key: k) -> Result(List(v), BravoError) {
+  bindings.try_take(table.table, key)
 }
 
-pub fn delete(with table: InnerTable) -> Bool {
+pub fn delete(table: InnerTable) -> Bool {
   bindings.try_delete(table.table)
 }
 
-pub fn delete_key(with table: InnerTable, at key: a) -> Nil {
+pub fn delete_key(table: InnerTable, key: a) -> Nil {
   bindings.try_delete_key(table.table, key)
   Nil
 }
 
-pub fn delete_all_objects(with table: InnerTable) -> Nil {
+pub fn delete_all_objects(table: InnerTable) -> Nil {
   bindings.try_delete_all_objects(table.table)
   Nil
 }
 
-pub fn delete_object(with table: InnerTable, target object: t) -> Nil {
+pub fn delete_object(table: InnerTable, object: #(k, v)) -> Nil {
   bindings.try_delete_object(table.table, object)
   Nil
 }
 
 pub fn tab2file(
-  with table: InnerTable,
-  to filename: String,
-  object_count object_count: Bool,
-  md5sum md5sum: Bool,
-  sync sync: Bool,
+  table: InnerTable,
+  filename: String,
+  object_count: Bool,
+  md5sum: Bool,
+  sync: Bool,
 ) -> Result(Nil, BravoError) {
   bindings.try_tab2file(
     table.table,
@@ -133,58 +107,56 @@ pub fn tab2file(
 }
 
 pub fn file2tab(
-  from filename: String,
-  verify verify: Bool,
-  using decoder: fn(Dynamic) -> Result(t, _),
+  filename: String,
+  verify: Bool,
+  key_decode: fn(Dynamic) -> Result(k, _),
+  value_decode: fn(Dynamic) -> Result(v, _),
 ) -> Result(InnerTable, BravoError) {
-  use name <- result.try(bindings.try_file2tab(
+  use table <- result.try(bindings.try_file2tab(
     string.to_utf_codepoints(filename),
     verify,
   ))
-  let assert Ok(keypos) =
-    dynamic.int(bindings.inform(name, atom.create_from_string("keypos")))
-  let table = InnerTable(name, keypos)
-  list.map(tab2list(table), fn(obj: t) {
-    delete_object(table, obj)
-    case bindings.tuple_size(obj) {
-      1 -> insert(table, [bindings.element(1, obj)])
-      _ -> insert(table, [obj])
-    }
-  })
-  use <- bool.guard(
+  let assert Ok(objects) = bindings.try_tab2list(table)
+  case
     {
-      use obj <- list.all(tab2list(table))
-      obj
-      |> dynamic.from
-      |> decoder
-      |> result.is_ok
-    },
-    Ok(table),
-  )
-  delete(table)
-  Error(bravo.DecodeFailure)
+      use object <- list.all(objects)
+      let key =
+        object.0
+        |> key_decode
+        |> result.is_ok
+      let value =
+        object.1
+        |> key_decode
+        |> result.is_ok
+      bool.and(key, value)
+    }
+  {
+    True -> Ok(InnerTable(table))
+    False -> Error(bravo.DecodeFailure)
+  }
 }
 
-pub fn tab2list(with table: InnerTable) -> List(t) {
-  bindings.try_tab2list(table.table)
+pub fn tab2list(table: InnerTable) -> List(#(k, v)) {
+  let assert Ok(out) = bindings.try_tab2list(table.table)
+  out
 }
 
-pub fn member(with table: InnerTable, at key: a) -> Bool {
+pub fn member(table: InnerTable, key: k) -> Bool {
   bindings.try_member(table.table, key)
 }
 
-pub fn first(with table: InnerTable) -> Result(a, Nil) {
+pub fn first(table: InnerTable) -> Result(k, Nil) {
   bindings.try_first(table.table)
 }
 
-pub fn last(with table: InnerTable) -> Result(a, Nil) {
+pub fn last(table: InnerTable) -> Result(k, Nil) {
   bindings.try_last(table.table)
 }
 
-pub fn next(with table: InnerTable, from key: a) -> Result(a, Nil) {
+pub fn next(table: InnerTable, key: k) -> Result(k, Nil) {
   bindings.try_next(table.table, key)
 }
 
-pub fn prev(with table: InnerTable, from key: a) -> Result(a, Nil) {
+pub fn prev(table: InnerTable, key: k) -> Result(k, Nil) {
   bindings.try_prev(table.table, key)
 }

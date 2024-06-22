@@ -6,10 +6,6 @@ pub type BravoError {
   /// also able to return a non-value (aka `Nil`). In this scenario, `Nil` is
   /// replaced with `Empty`.
   Empty
-  /// Thrown if `new` is passed a `keypos` <= 0
-  NonPositiveKeypos
-  /// Thrown if you try to `insert` an object with less elements than `keypos`.
-  InvalidKeypos
   /// Thrown if `file2tab` isn't able to successfully decode all elements in a
   /// table file.
   DecodeFailure

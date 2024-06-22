@@ -14,18 +14,14 @@ pub fn try_new(
 ) -> Result(Atom, BravoError)
 
 @external(erlang, "bravo_ffi", "try_insert")
-pub fn try_insert(
-  table: Reference,
-  keypos: Int,
-  list: List(a),
-) -> Result(Nil, BravoError)
+pub fn try_insert(table: Reference, key: k, value: v) -> Result(Nil, BravoError)
 
 @external(erlang, "bravo_ffi", "try_insert_new")
 pub fn try_insert_new(
   table: Reference,
-  keypos: Int,
-  list: List(a),
-) -> Result(Bool, BravoError)
+  key: k,
+  value: v,
+) -> Result(Nil, BravoError)
 
 @external(erlang, "bravo_ffi", "try_lookup")
 pub fn try_lookup(table: Reference, key: a) -> Result(List(b), BravoError)
@@ -64,7 +60,7 @@ pub fn try_file2tab(
 ) -> Result(Reference, BravoError)
 
 @external(erlang, "bravo_ffi", "try_tab2list")
-pub fn try_tab2list(table: Reference) -> a
+pub fn try_tab2list(table: Reference) -> Result(List(#(k, v)), BravoError)
 
 @external(erlang, "bravo_ffi", "try_first")
 pub fn try_first(table: Reference) -> Result(a, Nil)

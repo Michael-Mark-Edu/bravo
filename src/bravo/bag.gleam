@@ -8,7 +8,7 @@ import gleam/result
 
 /// A bag table. Keys may occur multiple times per table, but objects cannot be
 /// copied verbatim.
-pub opaque type Bag(t) {
+pub opaque type Bag(k, v) {
   Bag(inner: master.InnerTable)
 }
 
@@ -35,10 +35,9 @@ pub opaque type Bag(t) {
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
 pub fn new(
   name name: String,
-  keypos keypos: Int,
   access access: Access,
-) -> Result(Bag(t), BravoError) {
-  use res <- result.try(master.new(name, keypos, access, new_option.Bag))
+) -> Result(Bag(k, v), BravoError) {
+  use res <- result.try(master.new(name, access, new_option.Bag))
   Ok(Bag(res))
 }
 
@@ -60,10 +59,11 @@ pub fn new(
 /// To instead get an error when inserting an object with the same key as an
 /// already existing object, use `insert_new`.
 pub fn insert(
-  with bag: Bag(t),
-  insert objects: List(t),
+  into bag: Bag(k, v),
+  key key: k,
+  value value: v,
 ) -> Result(Nil, BravoError) {
-  master.insert(bag.inner, objects)
+  master.insert(bag.inner, key, value)
 }
 
 /// Inserts a list of tuples into a `Bag`. Unlike `insert`, this cannot
@@ -84,10 +84,11 @@ pub fn insert(
 /// If an object with the same key already exists, then the old object will be
 /// overwritten with the new one. To instead overwrite, use `insert`.
 pub fn insert_new(
-  with bag: Bag(t),
-  insert objects: List(t),
+  into bag: Bag(k, v),
+  key key: k,
+  value value: v,
 ) -> Result(Nil, BravoError) {
-  master.insert_new(bag.inner, objects)
+  master.insert_new(bag.inner, key, value)
 }
 
 /// Gets a list of objects from a `Bag`.
@@ -101,7 +102,7 @@ pub fn insert_new(
 /// - `Error(AccessDenied)`: The table has an access level of `Private` and is
 ///   owned by a different process.
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
-pub fn lookup(with bag: Bag(t), at key: a) -> Result(List(t), BravoError) {
+pub fn lookup(from bag: Bag(k, v), at key: k) -> Result(List(v), BravoError) {
   master.lookup_bag(bag.inner, key)
 }
 
@@ -116,7 +117,7 @@ pub fn lookup(with bag: Bag(t), at key: a) -> Result(List(t), BravoError) {
 /// - `Error(AccessDenied)`: The table has an access level of `Private` and is
 ///   owned by a different process.
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
-pub fn take(with bag: Bag(t), at key: a) -> Result(List(t), BravoError) {
+pub fn take(from bag: Bag(k, v), at key: k) -> Result(List(v), BravoError) {
   master.take_bag(bag.inner, key)
 }
 
@@ -128,24 +129,24 @@ pub fn take(with bag: Bag(t), at key: a) -> Result(List(t), BravoError) {
 ///
 /// The input `Bag` is completely useless after it is deleted. Even if another
 /// table is created with the same name, the old handle will not work.
-pub fn delete(with bag: Bag(t)) -> Bool {
+pub fn delete(bag: Bag(k, v)) -> Bool {
   master.delete(bag.inner)
 }
 
 /// Deletes all objects addressed by `key`, if any exist. If nothing does, this
 /// does nothing.
-pub fn delete_key(with bag: Bag(t), at key: a) -> Nil {
+pub fn delete_key(from bag: Bag(k, v), at key: k) -> Nil {
   master.delete_key(bag.inner, key)
 }
 
 /// Deletes all objects in the `Bag`. This is atomic and isolated.
-pub fn delete_all_objects(with bag: Bag(t)) -> Nil {
+pub fn delete_all_objects(bag: Bag(k, v)) -> Nil {
   master.delete_all_objects(bag.inner)
 }
 
 /// Deletes a specific object in the `Bag`. Other objects with the same key are
 /// unaffected.
-pub fn delete_object(with bag: Bag(t), target object: t) -> Nil {
+pub fn delete_object(from bag: Bag(k, v), object object: #(k, v)) -> Nil {
   master.delete_object(bag.inner, object)
 }
 
@@ -161,7 +162,7 @@ pub fn delete_object(with bag: Bag(t), target object: t) -> Nil {
 ///
 /// Can have error type `ErlangError`.
 pub fn tab2file(
-  with bag: Bag(t),
+  from bag: Bag(k, v),
   to filename: String,
   object_count object_count: Bool,
   md5sum md5sum: Bool,
@@ -185,33 +186,39 @@ pub fn tab2file(
 pub fn file2tab(
   from filename: String,
   verify verify: Bool,
-  using decoder: fn(Dynamic) -> Result(t, _),
-) -> Result(Bag(t), BravoError) {
-  use res <- result.try(master.file2tab(filename, verify, decoder))
+  key_decoder key_decoder: fn(Dynamic) -> Result(k, _),
+  value_decoder value_decoder: fn(Dynamic) -> Result(v, _),
+) -> Result(Bag(k, v), BravoError) {
+  use res <- result.try(master.file2tab(
+    filename,
+    verify,
+    key_decoder,
+    value_decoder,
+  ))
   Ok(Bag(res))
 }
 
 /// Returns a list containing all of the objects in the `Bag`.
-pub fn tab2list(with bag: Bag(t)) -> List(t) {
+pub fn tab2list(bag: Bag(k, v)) -> List(#(k, v)) {
   master.tab2list(bag.inner)
 }
 
 /// Returns whether a `Bag` contains an object at `key`.
-pub fn member(with bag: Bag(t), at key: a) -> Bool {
+pub fn member(of bag: Bag(k, v), at key: a) -> Bool {
   master.member(bag.inner, key)
 }
 
 /// Returns the first key (not the object!) in the table, if it exists.
 ///
 /// `Bag`s are unordered, so the order of keys is unknown.
-pub fn first(with bag: Bag(t)) -> Result(a, Nil) {
+pub fn first(bag: Bag(k, v)) -> Result(a, Nil) {
   master.first(bag.inner)
 }
 
 /// Returns the last key (not the object!) in the table, if it exists.
 ///
 /// `Bag`s are unordered, so the order of keys is unknown.
-pub fn last(with bag: Bag(t)) -> Result(a, Nil) {
+pub fn last(bag: Bag(k, v)) -> Result(a, Nil) {
   master.last(bag.inner)
 }
 
@@ -219,7 +226,7 @@ pub fn last(with bag: Bag(t)) -> Result(a, Nil) {
 /// if it exists.
 ///
 /// `Bag`s are unordered, so the order of keys is unknown.
-pub fn next(with bag: Bag(t), from key: a) -> Result(a, Nil) {
+pub fn next(with bag: Bag(k, v), from key: a) -> Result(a, Nil) {
   master.next(bag.inner, key)
 }
 
@@ -227,6 +234,6 @@ pub fn next(with bag: Bag(t), from key: a) -> Result(a, Nil) {
 /// table, if it exists.
 ///
 /// `Bag`s are unordered, so the order of keys is unknown.
-pub fn prev(with bag: Bag(t), from key: a) -> Result(a, Nil) {
+pub fn prev(with bag: Bag(k, v), from key: a) -> Result(a, Nil) {
   master.prev(bag.inner, key)
 }

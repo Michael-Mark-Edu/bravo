@@ -12,15 +12,6 @@ inform(Name, Key) ->
   Target.
 
 try_new(Name, Options) ->
-  case ets:whereis('$BRAVOMETA') of
-    undefined ->
-      Meta = ets:new('$BRAVOMETA', [set, public, named_table, {keypos, 1}, {heir, none}]),
-      ets:insert(Meta, {Name, unknown}),
-      Pid = spawn(fun() -> timer:sleep(infinity) end),
-      ets:give_away(Meta, Pid, nil);
-    Table ->
-      ets:insert(Table, {Name, unknown})
-  end,
   case catch ets:new(Name, Options) of
     {'EXIT', {badarg, _}} ->
       case ets:whereis(Name) of
@@ -33,34 +24,8 @@ try_new(Name, Options) ->
       {ok, Other}
   end.
 
-try_insert(Name, Keypos, Objects) ->
-  Condition =
-    case is_tuple(lists:nth(1, Objects)) of
-      true ->
-        not is_atom(element(1, lists:nth(1, Objects)));
-      false ->
-        false
-    end,
-  case catch(case Condition of
-    true ->
-      ets:insert('$BRAVOMETA', {Name, tuple}),
-      case lists:all(fun(Elem) -> tuple_size(Elem) >= Keypos end, Objects) of
-        true ->
-          ets:insert(Name, Objects),
-          {ok, nil};
-        false ->
-          {error, invalid_keypos}
-      end;
-    false ->
-      ets:insert('$BRAVOMETA', {Name, non_tuple}),
-      case Keypos == 1 of
-        true ->
-          ets:insert(Name, lists:map(fun(Elem) -> {Elem} end, Objects)),
-          {ok, nil};
-        false ->
-          {error, invalid_keypos}
-      end
-  end) of
+try_insert(Name, Key, Value) ->
+  case catch ets:insert(Name, {Key, Value}) of
     {'EXIT', {Reason, _}} -> case Reason of
       badarg ->
        case ets:info(Name) == undefined of
@@ -69,35 +34,11 @@ try_insert(Name, Keypos, Objects) ->
        end;
       _ -> {error, {erlang_error, atom_to_binary(Reason)}}
     end;
-    Other -> Other
+    _ -> {ok, nil}
   end.
 
-try_insert_new(Name, Keypos, Objects) ->
-  Condition =
-    case is_tuple(lists:nth(1, Objects)) of
-      true ->
-        not is_atom(element(1, lists:nth(1, Objects)));
-      false ->
-        false
-    end,
-  case catch(case Condition of
-    true ->
-      ets:insert('$BRAVOMETA', {Name, tuple}),
-      case lists:all(fun(Elem) -> tuple_size(Elem) >= Keypos end, Objects) of
-        true ->
-          {ok, ets:insert_new(Name, Objects)};
-        false ->
-          {error, invalid_keypos}
-      end;
-    false ->
-      ets:insert('$BRAVOMETA', {Name, non_tuple}),
-      case Keypos == 1 of
-        true ->
-          {ok, ets:insert_new(Name, Objects)};
-        false ->
-          {error, invalid_keypos}
-      end
-  end) of
+try_insert_new(Name, Key, Value) ->
+  case catch ets:insert_new(Name, {Key, Value}) of
     {'EXIT', {Reason, _}} -> case Reason of
       badarg ->
        case ets:info(Name) == undefined of
@@ -106,21 +47,11 @@ try_insert_new(Name, Keypos, Objects) ->
        end;
       _ -> {error, {erlang_error, atom_to_binary(Reason)}}
     end;
-    Other -> Other
+    _ -> {ok, nil}
   end.
 
 try_lookup(Name, Key) ->
-  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
-    {_, unknown} ->
-      {error, uninitialized_table};
-    {_, deleted} ->
-      {error, table_does_not_exist};
-    {_, tuple} ->
-      {ok, ets:lookup(Name, Key)};
-    {_, non_tuple} ->
-      Res = ets:lookup(Name, Key),
-      {ok, lists:map(fun(Elem) -> element(1, Elem) end, Res)}
-  end) of
+  case catch ets:lookup(Name, Key) of
     {'EXIT', {Reason, _}} -> case Reason of
       badarg ->
        case ets:info(Name) == undefined of
@@ -129,21 +60,15 @@ try_lookup(Name, Key) ->
        end;
       _ -> {error, {erlang_error, atom_to_binary(Reason)}}
     end;
-    Other -> Other
+    Other ->
+      case lists:map(fun(Elem) -> element(2, Elem) end, Other) of
+        [] -> {error, empty};
+        Value -> {ok, Value}
+      end
   end.
 
 try_take(Name, Key) ->
-  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
-    {_, unknown} ->
-      {error, uninitialized_table};
-    {_, deleted} ->
-      {error, table_does_not_exist};
-    {_, tuple} ->
-      {ok, ets:take(Name, Key)};
-    {_, non_tuple} ->
-      Res = ets:take(Name, Key),
-      {ok, lists:map(fun(Elem) -> element(1, Elem) end, Res)}
-  end) of
+  case catch ets:take(Name, Key) of
     {'EXIT', {Reason, _}} -> case Reason of
       badarg ->
        case ets:info(Name) == undefined of
@@ -152,7 +77,11 @@ try_take(Name, Key) ->
        end;
       _ -> {error, {erlang_error, atom_to_binary(Reason)}}
     end;
-    Other -> Other
+    Other ->
+      case lists:map(fun(Elem) -> element(2, Elem) end, Other) of
+        [] -> {error, empty};
+        Value -> {ok, Value}
+      end
   end.
 
 try_member(Name, Key) ->
@@ -166,7 +95,6 @@ try_delete(Name) ->
     {'EXIT', _} ->
       false;
     _ ->
-      ets:insert('$BRAVOMETA', {Name, deleted}),
       true
   end.
 
@@ -213,113 +141,72 @@ try_file2tab(Filename, Verify) ->
   case catch ets:file2tab(Filename, [{verify, Verify}]) of
     {'EXIT', {Reason, _}} ->
       {error, {erlang_error, atom_to_binary(Reason, utf8)}};
-    Other ->
-      Name = element(2, Other),
-      ets:insert('$BRAVOMETA', {Name, case is_tuple(ets:lookup(Name, ets:first(Name))) of
-                                        true -> non_tuple;
-                                        false -> tuple
-                                      end}),
-      Other
+    Other -> Other
   end.
 
 try_tab2list(Name) ->
-  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
-    {_, unknown} ->
-      [];
-    {_, deleted} ->
-      [];
-    {_, tuple} ->
-      ets:tab2list(Name);
-    {_, non_tuple} ->
-      Res = ets:tab2list(Name),
-      lists:map(fun(Elem) -> element(1, Elem) end, Res)
-  end) of
-    {'EXIT', _} -> [];
+  case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:first(Name))) of
+    {'EXIT', {Reason, _}} -> case Reason of
+      badarg ->
+       case ets:info(Name) == undefined of
+         true -> {error, table_does_not_exist};
+         false -> {error, access_denied}
+       end;
+      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
+    end;
     Other -> Other
   end.
 
 try_first(Name) ->
-  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
-    {_, unknown} ->
-      [];
-    {_, deleted} ->
-      [];
-    {_, tuple} ->
-      case ets:first(Name) of
-        '$end_of_table' -> {error, nil};
-        Val -> {ok, Val}
-      end;
-    {_, non_tuple} ->
-      case ets:first(Name) of
-        '$end_of_table' -> {error, nil};
-        Val -> {ok, Val}
-      end
-  end) of
-    {'EXIT', _} -> {error, nil};
+  case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:first(Name))) of
+    {'EXIT', {Reason, _}} -> case Reason of
+      badarg ->
+       case ets:info(Name) == undefined of
+         true -> {error, table_does_not_exist};
+         false -> {error, access_denied}
+       end;
+      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
+    end;
     Other -> Other
   end.
 
 try_last(Name) ->
-  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
-    {_, unknown} ->
-      [];
-    {_, deleted} ->
-      [];
-    {_, tuple} ->
-      case ets:last(Name) of
-        '$end_of_table' -> {error, nil};
-        Val -> {ok, Val}
-      end;
-    {_, non_tuple} ->
-      case ets:last(Name) of
-        '$end_of_table' -> {error, nil};
-        Val -> {ok, Val}
-      end
-  end) of
-    {'EXIT', _} -> {error, nil};
+  case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:last(Name))) of
+    {'EXIT', {Reason, _}} -> case Reason of
+      badarg ->
+       case ets:info(Name) == undefined of
+         true -> {error, table_does_not_exist};
+         false -> {error, access_denied}
+       end;
+      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
+    end;
     Other -> Other
   end.
 
 
 try_next(Name, Key) ->
-  case catch(case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
-    {_, unknown} ->
-      [];
-    {_, deleted} ->
-      [];
-    {_, tuple} ->
-      case ets:next(Name, Key) of
-        '$end_of_table' -> {error, nil};
-        Val -> {ok, Val}
-      end;
-    {_, non_tuple} ->
-      case ets:next(Name, Key) of
-        '$end_of_table' -> {error, nil};
-        Val -> {ok, Val}
-      end
-  end) of
-    {'EXIT', _} -> {error, nil};
+  case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:next(Name, Key))) of
+    {'EXIT', {Reason, _}} -> case Reason of
+      badarg ->
+       case ets:info(Name) == undefined of
+         true -> {error, table_does_not_exist};
+         false -> {error, access_denied}
+       end;
+      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
+    end;
     Other -> Other
   end.
 
 try_prev(Name, Key) ->
-  case catch (case lists:nth(1, ets:lookup('$BRAVOMETA', Name)) of
-    {_, unknown} ->
-      [];
-    {_, deleted} ->
-      [];
-    {_, tuple} ->
-      case ets:prev(Name, Key) of
-        '$end_of_table' -> {error, nil};
-        Val -> {ok, Val}
-      end;
-    {_, non_tuple} ->
-      case ets:prev(Name, Key) of
-        '$end_of_table' -> {error, nil};
-        Val -> {ok, Val}
-      end
-  end) of
-    {'EXIT', _} -> {error, nil};
+  case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:next(Name, Key))) of
+    {'EXIT', {Reason, _}} -> case Reason of
+      badarg ->
+       case ets:info(Name) == undefined of
+         true -> {error, table_does_not_exist};
+         false -> {error, access_denied}
+       end;
+      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
+    end;
     Other -> Other
   end.
 

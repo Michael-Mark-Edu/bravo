@@ -10,7 +10,7 @@ import gleam/result
 /// and keys are unordered.
 ///
 /// In order for a match to occur, entries must have the same value _and type_.
-pub opaque type USet(t) {
+pub opaque type USet(k, v) {
   USet(inner: master.InnerTable)
 }
 
@@ -37,10 +37,9 @@ pub opaque type USet(t) {
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
 pub fn new(
   name name: String,
-  keypos keypos: Int,
   access access: Access,
-) -> Result(USet(t), BravoError) {
-  use res <- result.try(master.new(name, keypos, access, new_option.Set))
+) -> Result(USet(k, v), BravoError) {
+  use res <- result.try(master.new(name, access, new_option.Set))
   Ok(USet(res))
 }
 
@@ -59,10 +58,11 @@ pub fn new(
 /// If an object with the same key already exists, then the old object will be
 /// overwritten with the new one. To instead get an error, use `insert_new`.
 pub fn insert(
-  with uset: USet(t),
-  insert objects: List(t),
+  with uset: USet(k, v),
+  key key: k,
+  value value: v,
 ) -> Result(Nil, BravoError) {
-  master.insert(uset.inner, objects)
+  master.insert(uset.inner, key, value)
 }
 
 /// Inserts a list of tuples into a `USet`. Unlike `insert`, this cannot
@@ -83,10 +83,11 @@ pub fn insert(
 /// If an object with the same key already exists, then the old object will be
 /// overwritten with the new one. To instead overwrite, use `insert`.
 pub fn insert_new(
-  with uset: USet(t),
-  insert objects: List(t),
+  with uset: USet(k, v),
+  key key: k,
+  value value: v,
 ) -> Result(Nil, BravoError) {
-  master.insert_new(uset.inner, objects)
+  master.insert_new(uset.inner, key, value)
 }
 
 /// Gets an object from a `USet`.
@@ -99,7 +100,7 @@ pub fn insert_new(
 /// - `Error(AccessDenied)`: The table has an access level of `Private` and is
 ///   owned by a different process.
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
-pub fn lookup(with uset: USet(t), at key: a) -> Result(t, BravoError) {
+pub fn lookup(with uset: USet(k, v), at key: a) -> Result(t, BravoError) {
   master.lookup_set(uset.inner, key)
 }
 
@@ -113,7 +114,7 @@ pub fn lookup(with uset: USet(t), at key: a) -> Result(t, BravoError) {
 /// - `Error(AccessDenied)`: The table has an access level of `Private` and is
 ///   owned by a different process.
 /// - `Error(ErlangError)`: Likely a bug with the library itself. Please report.
-pub fn take(with uset: USet(t), at key: a) -> Result(t, BravoError) {
+pub fn take(with uset: USet(k, v), at key: a) -> Result(t, BravoError) {
   master.take_set(uset.inner, key)
 }
 
@@ -125,24 +126,24 @@ pub fn take(with uset: USet(t), at key: a) -> Result(t, BravoError) {
 ///
 /// The input `USet` is completely useless after it is deleted. Even if another
 /// table is created with the same name, the old handle will not work.
-pub fn delete(with uset: USet(t)) -> Bool {
+pub fn delete(with uset: USet(k, v)) -> Bool {
   master.delete(uset.inner)
 }
 
 /// Deletes the object addressed by `key`, if it exists. If it doesn't, this
 /// does nothing.
-pub fn delete_key(with uset: USet(t), at key: a) -> Nil {
+pub fn delete_key(with uset: USet(k, v), at key: a) -> Nil {
   master.delete_key(uset.inner, key)
 }
 
 /// Deletes all objects in the `USet`. This is atomic and isolated.
-pub fn delete_all_objects(with uset: USet(t)) -> Nil {
+pub fn delete_all_objects(with uset: USet(k, v)) -> Nil {
   master.delete_all_objects(uset.inner)
 }
 
 /// Deletes a specific object in the `USet`. This is more useful with
 /// `Bag`s and `DBag`s.
-pub fn delete_object(with uset: USet(t), target object: t) -> Nil {
+pub fn delete_object(with uset: USet(k, v), target object: #(k, v)) -> Nil {
   master.delete_object(uset.inner, object)
 }
 
@@ -158,7 +159,7 @@ pub fn delete_object(with uset: USet(t), target object: t) -> Nil {
 ///
 /// Can have error type `ErlangError`.
 pub fn tab2file(
-  with uset: USet(t),
+  with uset: USet(k, v),
   to filename: String,
   object_count object_count: Bool,
   md5sum md5sum: Bool,
@@ -182,33 +183,39 @@ pub fn tab2file(
 pub fn file2tab(
   from filename: String,
   verify verify: Bool,
-  using decoder: fn(Dynamic) -> Result(t, _),
-) -> Result(USet(t), BravoError) {
-  use res <- result.try(master.file2tab(filename, verify, decoder))
+  key_decoder key_decoder: fn(Dynamic) -> Result(k, _),
+  value_decoder value_decoder: fn(Dynamic) -> Result(v, _),
+) -> Result(USet(k, v), BravoError) {
+  use res <- result.try(master.file2tab(
+    filename,
+    verify,
+    key_decoder,
+    value_decoder,
+  ))
   Ok(USet(res))
 }
 
 /// Returns a list containing all of the objects in the `USet`.
-pub fn tab2list(with uset: USet(t)) -> List(t) {
+pub fn tab2list(with uset: USet(k, v)) -> List(#(k, v)) {
   master.tab2list(uset.inner)
 }
 
 /// Returns whether a `USet` contains an object at `key`.
-pub fn member(with uset: USet(t), at key: a) -> Bool {
+pub fn member(with uset: USet(k, v), at key: a) -> Bool {
   master.member(uset.inner, key)
 }
 
 /// Returns the first key (not the object!) in the table, if it exists.
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
-pub fn first(with uset: USet(t)) -> Result(a, Nil) {
+pub fn first(with uset: USet(k, v)) -> Result(a, Nil) {
   master.first(uset.inner)
 }
 
 /// Returns the last key (not the object!) in the table, if it exists.
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
-pub fn last(with uset: USet(t)) -> Result(a, Nil) {
+pub fn last(with uset: USet(k, v)) -> Result(a, Nil) {
   master.last(uset.inner)
 }
 
@@ -216,7 +223,7 @@ pub fn last(with uset: USet(t)) -> Result(a, Nil) {
 /// if it exists.
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
-pub fn next(with uset: USet(t), from key: a) -> Result(a, Nil) {
+pub fn next(with uset: USet(k, v), from key: a) -> Result(a, Nil) {
   master.next(uset.inner, key)
 }
 
@@ -224,6 +231,6 @@ pub fn next(with uset: USet(t), from key: a) -> Result(a, Nil) {
 /// table, if it exists.
 ///
 /// `USet`s are unordered, so the order of keys is unknown.
-pub fn prev(with uset: USet(t), from key: a) -> Result(a, Nil) {
+pub fn prev(with uset: USet(k, v), from key: a) -> Result(a, Nil) {
   master.prev(uset.inner, key)
 }
