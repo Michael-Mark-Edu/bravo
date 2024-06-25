@@ -108,7 +108,7 @@ pub fn file2tab(
   Ok(OSet(res))
 }
 
-pub fn tab2list(with oset: OSet(k, v)) -> List(#(k, v)) {
+pub fn tab2list(with oset: OSet(k, v)) -> Result(List(#(k, v)), BravoError) {
   master.tab2list(oset.inner)
 }
 

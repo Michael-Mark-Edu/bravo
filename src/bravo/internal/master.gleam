@@ -151,9 +151,8 @@ pub fn file2tab(
   }
 }
 
-pub fn tab2list(table: InnerTable) -> List(#(k, v)) {
-  let assert Ok(out) = bindings.try_tab2list(table.table)
-  out
+pub fn tab2list(table: InnerTable) -> Result(List(#(k, v)), BravoError) {
+  bindings.try_tab2list(table.table)
 }
 
 pub fn member(table: InnerTable, key: k) -> Result(Bool, BravoError) {

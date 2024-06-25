@@ -103,7 +103,7 @@ pub fn file2tab(
   Ok(DBag(res))
 }
 
-pub fn tab2list(with dbag: DBag(k, v)) -> List(#(k, v)) {
+pub fn tab2list(with dbag: DBag(k, v)) -> Result(List(#(k, v)), BravoError) {
   master.tab2list(dbag.inner)
 }
 

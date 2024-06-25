@@ -105,7 +105,7 @@ pub fn file2tab(
   Ok(USet(res))
 }
 
-pub fn tab2list(with uset: USet(k, v)) -> List(#(k, v)) {
+pub fn tab2list(with uset: USet(k, v)) -> Result(List(#(k, v)), BravoError) {
   master.tab2list(uset.inner)
 }
 
