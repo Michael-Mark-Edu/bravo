@@ -13,7 +13,7 @@ fn defer(defer: fn() -> a, block: fn() -> b) -> b {
 
 pub fn bag_insert_lookup_delete_test() {
   let assert Ok(table) = bag.new("bag1", bravo.Public)
-  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  use <- defer(fn() { bag.delete(table) |> should.be_ok })
   bag.insert(table, "a", 1)
   |> should.be_ok
   bag.lookup(table, "a")
@@ -33,13 +33,14 @@ pub fn bag_dupe_test() {
   bag.new("bag2", bravo.Public)
   |> should.equal(Error(bravo.TableAlreadyExists))
   bag.delete(table)
+  |> should.be_ok
   let assert Ok(table) = bag.new("bag2", bravo.Public)
   bag.delete(table)
 }
 
 pub fn bag_multi_insert_test() {
   let assert Ok(table) = bag.new("bag3", bravo.Public)
-  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  use <- defer(fn() { bag.delete(table) |> should.be_ok })
   bag.insert(table, 100, 200)
   |> should.be_ok
   bag.lookup(table, 100)
@@ -56,7 +57,7 @@ pub fn bag_multi_insert_test() {
 
 pub fn bag_large_multitype_test() {
   let assert Ok(table) = bag.new("bag4", bravo.Public)
-  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  use <- defer(fn() { bag.delete(table) |> should.be_ok })
   bag.insert(table, 0, #(
     "String",
     5,
@@ -87,7 +88,7 @@ pub fn bag_large_multitype_test() {
 
 pub fn bag_delete_key_test() {
   let assert Ok(table) = bag.new("bag5", bravo.Public)
-  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  use <- defer(fn() { bag.delete(table) |> should.be_ok })
   bag.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
   bag.lookup(table, "Bye")
@@ -101,7 +102,7 @@ pub fn bag_delete_key_test() {
 
 pub fn bag_delete_all_objects_test() {
   let assert Ok(table) = bag.new("bag6", bravo.Public)
-  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  use <- defer(fn() { bag.delete(table) |> should.be_ok })
   bag.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
   bag.delete_all_objects(table)
@@ -113,7 +114,7 @@ pub fn bag_delete_all_objects_test() {
 
 pub fn bag_delete_object_test() {
   let assert Ok(table) = bag.new("bag7", bravo.Public)
-  use <- defer(fn() { bag.delete(table) |> should.equal(True) })
+  use <- defer(fn() { bag.delete(table) |> should.be_ok })
   bag.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
   bag.delete_object(table, #("Bye", "World"))
@@ -138,6 +139,7 @@ pub fn bag_file2tab_test() {
   bag.lookup(new_table, "Hello")
   |> should.equal(Ok(["World"]))
   bag.delete(new_table)
+  |> should.be_ok
   bag.file2tab("bag8", True, dynamic.int, dynamic.int)
   |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("bag8")

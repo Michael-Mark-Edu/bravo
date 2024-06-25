@@ -56,7 +56,7 @@ pub fn take(with oset: OSet(k, v), at key: a) -> Result(t, BravoError) {
   master.take_set(oset.inner, key)
 }
 
-pub fn delete(with oset: OSet(k, v)) -> Bool {
+pub fn delete(with oset: OSet(k, v)) -> Result(Nil, BravoError) {
   master.delete(oset.inner)
 }
 

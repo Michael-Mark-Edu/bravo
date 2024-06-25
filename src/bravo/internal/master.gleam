@@ -78,7 +78,7 @@ pub fn take_bag(table: InnerTable, key: k) -> Result(List(v), BravoError) {
   bindings.try_take(table.table, key)
 }
 
-pub fn delete(table: InnerTable) -> Bool {
+pub fn delete(table: InnerTable) -> Result(Nil, BravoError) {
   bindings.try_delete(table.table)
 }
 

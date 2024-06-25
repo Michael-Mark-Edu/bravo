@@ -53,7 +53,7 @@ pub fn take(with uset: USet(k, v), at key: k) -> Result(t, BravoError) {
   master.take_set(uset.inner, key)
 }
 
-pub fn delete(with uset: USet(k, v)) -> Bool {
+pub fn delete(with uset: USet(k, v)) -> Result(Nil, BravoError) {
   master.delete(uset.inner)
 }
 

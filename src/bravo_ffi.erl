@@ -11,6 +11,17 @@ inform(Name, Key) ->
   {_, Target} = lists:keyfind(Key, 1, Info),
   Target.
 
+get_error_type(Name, Reason) ->
+  case Reason of
+      badarg ->
+       case ets:info(Name) == undefined of
+         true -> {error, table_does_not_exist};
+         false -> {error, access_denied}
+       end;
+      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
+    end.
+
+
 try_new(Name, Options) ->
   case catch ets:new(Name, Options) of
     {'EXIT', {badarg, _}} ->
@@ -26,40 +37,19 @@ try_new(Name, Options) ->
 
 try_insert(Name, Key, Value) ->
   case catch ets:insert(Name, {Key, Value}) of
-    {'EXIT', {Reason, _}} -> case Reason of
-      badarg ->
-       case ets:info(Name) == undefined of
-         true -> {error, table_does_not_exist};
-         false -> {error, access_denied}
-       end;
-      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
-    end;
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
     _ -> {ok, nil}
   end.
 
 try_insert_list(Name, Objects) ->
   case catch ets:insert(Name, Objects) of
-    {'EXIT', {Reason, _}} -> case Reason of
-      badarg ->
-       case ets:info(Name) == undefined of
-         true -> {error, table_does_not_exist};
-         false -> {error, access_denied}
-       end;
-      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
-    end;
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
     _ -> {ok, nil}
   end.
 
 try_insert_new(Name, Key, Value) ->
   case catch ets:insert_new(Name, {Key, Value}) of
-    {'EXIT', {Reason, _}} -> case Reason of
-      badarg ->
-       case ets:info(Name) == undefined of
-         true -> {error, table_does_not_exist};
-         false -> {error, access_denied}
-       end;
-      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
-    end;
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
     _ -> {ok, nil}
   end.
 
@@ -68,14 +58,7 @@ try_insert_new_list(Name, Object) ->
 
 try_lookup(Name, Key) ->
   case catch ets:lookup(Name, Key) of
-    {'EXIT', {Reason, _}} -> case Reason of
-      badarg ->
-       case ets:info(Name) == undefined of
-         true -> {error, table_does_not_exist};
-         false -> {error, access_denied}
-       end;
-      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
-    end;
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
     Other ->
       case lists:map(fun(Elem) -> element(2, Elem) end, Other) of
         [] -> {error, empty};
@@ -85,14 +68,7 @@ try_lookup(Name, Key) ->
 
 try_take(Name, Key) ->
   case catch ets:take(Name, Key) of
-    {'EXIT', {Reason, _}} -> case Reason of
-      badarg ->
-       case ets:info(Name) == undefined of
-         true -> {error, table_does_not_exist};
-         false -> {error, access_denied}
-       end;
-      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
-    end;
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
     Other ->
       case lists:map(fun(Elem) -> element(2, Elem) end, Other) of
         [] -> {error, empty};
@@ -108,10 +84,8 @@ try_member(Name, Key) ->
 
 try_delete(Name) ->
   case catch ets:delete(Name) of
-    {'EXIT', _} ->
-      false;
-    _ ->
-      true
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
+    _ -> {ok, nil}
   end.
 
 try_delete_key(Name, Key) ->
@@ -162,67 +136,32 @@ try_file2tab(Filename, Verify) ->
 
 try_tab2list(Name) ->
   case catch ets:tab2list(Name) of
-    {'EXIT', {Reason, _}} -> case Reason of
-      badarg ->
-       case ets:info(Name) == undefined of
-         true -> {error, table_does_not_exist};
-         false -> {error, access_denied}
-       end;
-      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
-    end;
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
     Other -> {ok, Other}
   end.
 
 try_first(Name) ->
   case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:first(Name))) of
-    {'EXIT', {Reason, _}} -> case Reason of
-      badarg ->
-       case ets:info(Name) == undefined of
-         true -> {error, table_does_not_exist};
-         false -> {error, access_denied}
-       end;
-      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
-    end;
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
     Other -> Other
   end.
 
 try_last(Name) ->
   case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:last(Name))) of
-    {'EXIT', {Reason, _}} -> case Reason of
-      badarg ->
-       case ets:info(Name) == undefined of
-         true -> {error, table_does_not_exist};
-         false -> {error, access_denied}
-       end;
-      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
-    end;
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
     Other -> Other
   end.
 
 
 try_next(Name, Key) ->
   case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:next(Name, Key))) of
-    {'EXIT', {Reason, _}} -> case Reason of
-      badarg ->
-       case ets:info(Name) == undefined of
-         true -> {error, table_does_not_exist};
-         false -> {error, access_denied}
-       end;
-      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
-    end;
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
     Other -> Other
   end.
 
 try_prev(Name, Key) ->
   case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:next(Name, Key))) of
-    {'EXIT', {Reason, _}} -> case Reason of
-      badarg ->
-       case ets:info(Name) == undefined of
-         true -> {error, table_does_not_exist};
-         false -> {error, access_denied}
-       end;
-      _ -> {error, {erlang_error, atom_to_binary(Reason)}}
-    end;
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
     Other -> Other
   end.
 

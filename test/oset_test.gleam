@@ -13,7 +13,7 @@ fn defer(defer: fn() -> a, block: fn() -> b) -> b {
 
 pub fn oset_insert_lookup_delete_test() {
   let assert Ok(table) = oset.new("oset1", bravo.Public)
-  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  use <- defer(fn() { oset.delete(table) |> should.be_ok })
   oset.insert(table, "a", 1)
   |> should.be_ok
   oset.lookup(table, "a")
@@ -33,13 +33,14 @@ pub fn oset_dupe_test() {
   oset.new("oset2", bravo.Public)
   |> should.equal(Error(bravo.TableAlreadyExists))
   oset.delete(table)
+  |> should.be_ok
   let assert Ok(table) = oset.new("oset2", bravo.Public)
   oset.delete(table)
 }
 
 pub fn oset_multi_insert_test() {
   let assert Ok(table) = oset.new("oset3", bravo.Public)
-  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  use <- defer(fn() { oset.delete(table) |> should.be_ok })
   oset.insert(table, 100, 200)
   |> should.be_ok
   oset.lookup(table, 100)
@@ -52,7 +53,7 @@ pub fn oset_multi_insert_test() {
 
 pub fn oset_large_multitype_test() {
   let assert Ok(table) = oset.new("oset4", bravo.Public)
-  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  use <- defer(fn() { oset.delete(table) |> should.be_ok })
   oset.insert(table, 0, #(
     "String",
     5,
@@ -81,7 +82,7 @@ pub fn oset_large_multitype_test() {
 
 pub fn oset_delete_key_test() {
   let assert Ok(table) = oset.new("oset5", bravo.Public)
-  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  use <- defer(fn() { oset.delete(table) |> should.be_ok })
   oset.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
   oset.lookup(table, "Bye")
@@ -95,7 +96,7 @@ pub fn oset_delete_key_test() {
 
 pub fn oset_delete_all_objects_test() {
   let assert Ok(table) = oset.new("oset6", bravo.Public)
-  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  use <- defer(fn() { oset.delete(table) |> should.be_ok })
   oset.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
   oset.delete_all_objects(table)
@@ -107,7 +108,7 @@ pub fn oset_delete_all_objects_test() {
 
 pub fn oset_delete_object_test() {
   let assert Ok(table) = oset.new("oset7", bravo.Public)
-  use <- defer(fn() { oset.delete(table) |> should.equal(True) })
+  use <- defer(fn() { oset.delete(table) |> should.be_ok })
   oset.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
   oset.delete_object(table, #("Bye", "World"))
@@ -132,6 +133,7 @@ pub fn oset_file2tab_test() {
   oset.lookup(new_table, "Hello")
   |> should.equal(Ok("World"))
   oset.delete(new_table)
+  |> should.be_ok
   oset.file2tab("oset8", True, dynamic.int, dynamic.int)
   |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("oset8")

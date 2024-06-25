@@ -51,7 +51,7 @@ pub fn take(with dbag: DBag(k, v), at key: a) -> Result(List(t), BravoError) {
   master.take_bag(dbag.inner, key)
 }
 
-pub fn delete(with dbag: DBag(k, v)) -> Bool {
+pub fn delete(with dbag: DBag(k, v)) -> Result(Nil, BravoError) {
   master.delete(dbag.inner)
 }
 

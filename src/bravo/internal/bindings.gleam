@@ -45,7 +45,7 @@ pub fn try_take(table: Reference, key: a) -> Result(List(b), BravoError)
 pub fn try_member(table: Reference, key: a) -> Bool
 
 @external(erlang, "bravo_ffi", "try_delete")
-pub fn try_delete(table: Reference) -> Bool
+pub fn try_delete(table: Reference) -> Result(Nil, BravoError)
 
 @external(erlang, "bravo_ffi", "try_delete_key")
 pub fn try_delete_key(table: Reference, key: a) -> Bool

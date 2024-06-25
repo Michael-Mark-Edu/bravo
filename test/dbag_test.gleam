@@ -13,7 +13,7 @@ fn defer(defer: fn() -> a, block: fn() -> b) -> b {
 
 pub fn dbag_insert_lookup_delete_test() {
   let assert Ok(table) = dbag.new("dbag1", bravo.Public)
-  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  use <- defer(fn() { dbag.delete(table) |> should.be_ok })
   dbag.insert(table, "a", 1)
   |> should.be_ok
   dbag.lookup(table, "a")
@@ -33,13 +33,14 @@ pub fn dbag_dupe_test() {
   dbag.new("dbag2", bravo.Public)
   |> should.equal(Error(bravo.TableAlreadyExists))
   dbag.delete(table)
+  |> should.be_ok
   let assert Ok(table) = dbag.new("dbag2", bravo.Public)
   dbag.delete(table)
 }
 
 pub fn dbag_multi_insert_test() {
   let assert Ok(table) = dbag.new("dbag3", bravo.Public)
-  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  use <- defer(fn() { dbag.delete(table) |> should.be_ok })
   dbag.insert(table, 100, 200)
   |> should.be_ok
   dbag.lookup(table, 100)
@@ -56,7 +57,7 @@ pub fn dbag_multi_insert_test() {
 
 pub fn dbag_large_multitype_test() {
   let assert Ok(table) = dbag.new("dbag4", bravo.Public)
-  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  use <- defer(fn() { dbag.delete(table) |> should.be_ok })
   dbag.insert(table, 0, #(
     "String",
     5,
@@ -87,7 +88,7 @@ pub fn dbag_large_multitype_test() {
 
 pub fn dbag_delete_key_test() {
   let assert Ok(table) = dbag.new("dbag5", bravo.Public)
-  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  use <- defer(fn() { dbag.delete(table) |> should.be_ok })
   dbag.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
   dbag.lookup(table, "Bye")
@@ -101,7 +102,7 @@ pub fn dbag_delete_key_test() {
 
 pub fn dbag_delete_all_objects_test() {
   let assert Ok(table) = dbag.new("dbag6", bravo.Public)
-  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  use <- defer(fn() { dbag.delete(table) |> should.be_ok })
   dbag.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
   dbag.delete_all_objects(table)
@@ -113,7 +114,7 @@ pub fn dbag_delete_all_objects_test() {
 
 pub fn dbag_delete_object_test() {
   let assert Ok(table) = dbag.new("dbag7", bravo.Public)
-  use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+  use <- defer(fn() { dbag.delete(table) |> should.be_ok })
   dbag.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
   dbag.delete_object(table, #("Bye", "World"))
@@ -138,6 +139,7 @@ pub fn dbag_file2tab_test() {
   dbag.lookup(new_table, "Hello")
   |> should.equal(Ok(["World"]))
   dbag.delete(new_table)
+  |> should.be_ok
   dbag.file2tab("dbag8", True, dynamic.int, dynamic.int)
   |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("dbag8")
