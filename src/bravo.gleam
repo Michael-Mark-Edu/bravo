@@ -6,6 +6,8 @@ pub type BravoError {
   /// also able to return a non-value (aka `Nil`). In this scenario, `Nil` is
   /// replaced with `Empty`.
   Empty
+  /// Thrown when accessing a key out-of-bounds using functions like `next`.
+  EndOfTable
   /// Thrown if `file2tab` isn't able to successfully decode all elements in a
   /// table file.
   DecodeFailure

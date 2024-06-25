@@ -113,18 +113,18 @@ pub fn member(with uset: USet(k, v), at key: a) -> Result(Bool, BravoError) {
   master.member(uset.inner, key)
 }
 
-pub fn first(with uset: USet(k, v)) -> Result(a, Nil) {
+pub fn first(with uset: USet(k, v)) -> Result(a, BravoError) {
   master.first(uset.inner)
 }
 
-pub fn last(with uset: USet(k, v)) -> Result(a, Nil) {
+pub fn last(with uset: USet(k, v)) -> Result(a, BravoError) {
   master.last(uset.inner)
 }
 
-pub fn next(with uset: USet(k, v), from key: a) -> Result(a, Nil) {
+pub fn next(with uset: USet(k, v), from key: a) -> Result(a, BravoError) {
   master.next(uset.inner, key)
 }
 
-pub fn prev(with uset: USet(k, v), from key: a) -> Result(a, Nil) {
+pub fn prev(with uset: USet(k, v), from key: a) -> Result(a, BravoError) {
   master.prev(uset.inner, key)
 }

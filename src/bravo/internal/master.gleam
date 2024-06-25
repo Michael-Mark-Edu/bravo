@@ -160,18 +160,18 @@ pub fn member(table: InnerTable, key: k) -> Result(Bool, BravoError) {
   bindings.try_member(table.table, key)
 }
 
-pub fn first(table: InnerTable) -> Result(k, Nil) {
+pub fn first(table: InnerTable) -> Result(k, BravoError) {
   bindings.try_first(table.table)
 }
 
-pub fn last(table: InnerTable) -> Result(k, Nil) {
+pub fn last(table: InnerTable) -> Result(k, BravoError) {
   bindings.try_last(table.table)
 }
 
-pub fn next(table: InnerTable, key: k) -> Result(k, Nil) {
+pub fn next(table: InnerTable, key: k) -> Result(k, BravoError) {
   bindings.try_next(table.table, key)
 }
 
-pub fn prev(table: InnerTable, key: k) -> Result(k, Nil) {
+pub fn prev(table: InnerTable, key: k) -> Result(k, BravoError) {
   bindings.try_prev(table.table, key)
 }

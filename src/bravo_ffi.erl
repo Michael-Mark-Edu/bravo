@@ -143,26 +143,30 @@ try_tab2list(Name) ->
 try_first(Name) ->
   case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:first(Name))) of
     {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
-    Other -> Other
+    '$end_of_table' -> {error, end_of_table};
+    Other -> {ok, Other}
   end.
 
 try_last(Name) ->
   case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:last(Name))) of
     {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
-    Other -> Other
+    '$end_of_table' -> {error, end_of_table};
+    Other -> {ok, Other}
   end.
 
 
 try_next(Name, Key) ->
   case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:next(Name, Key))) of
     {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
-    Other -> Other
+    '$end_of_table' -> {error, end_of_table};
+    Other -> {ok, Other}
   end.
 
 try_prev(Name, Key) ->
   case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:next(Name, Key))) of
     {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
-    Other -> Other
+    '$end_of_table' -> {error, end_of_table};
+    Other -> {ok, Other}
   end.
 
 try_whereis(Atom) ->

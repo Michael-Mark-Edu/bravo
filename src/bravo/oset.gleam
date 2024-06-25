@@ -116,18 +116,18 @@ pub fn member(with oset: OSet(k, v), at key: a) -> Result(Bool, BravoError) {
   master.member(oset.inner, key)
 }
 
-pub fn first(with oset: OSet(k, v)) -> Result(a, Nil) {
+pub fn first(with oset: OSet(k, v)) -> Result(a, BravoError) {
   master.first(oset.inner)
 }
 
-pub fn last(with oset: OSet(k, v)) -> Result(a, Nil) {
+pub fn last(with oset: OSet(k, v)) -> Result(a, BravoError) {
   master.last(oset.inner)
 }
 
-pub fn next(with oset: OSet(k, v), from key: a) -> Result(a, Nil) {
+pub fn next(with oset: OSet(k, v), from key: a) -> Result(a, BravoError) {
   master.next(oset.inner, key)
 }
 
-pub fn prev(with oset: OSet(k, v), from key: a) -> Result(a, Nil) {
+pub fn prev(with oset: OSet(k, v), from key: a) -> Result(a, BravoError) {
   master.prev(oset.inner, key)
 }

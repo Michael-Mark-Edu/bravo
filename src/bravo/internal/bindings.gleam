@@ -75,16 +75,16 @@ pub fn try_file2tab(
 pub fn try_tab2list(table: Reference) -> Result(List(#(k, v)), BravoError)
 
 @external(erlang, "bravo_ffi", "try_first")
-pub fn try_first(table: Reference) -> Result(a, Nil)
+pub fn try_first(table: Reference) -> Result(a, BravoError)
 
 @external(erlang, "bravo_ffi", "try_last")
-pub fn try_last(table: Reference) -> Result(a, Nil)
+pub fn try_last(table: Reference) -> Result(a, BravoError)
 
 @external(erlang, "bravo_ffi", "try_next")
-pub fn try_next(table: Reference, key: a) -> Result(a, Nil)
+pub fn try_next(table: Reference, key: a) -> Result(a, BravoError)
 
 @external(erlang, "bravo_ffi", "try_prev")
-pub fn try_prev(table: Reference, key: a) -> Result(a, Nil)
+pub fn try_prev(table: Reference, key: a) -> Result(a, BravoError)
 
 @external(erlang, "bravo_ffi", "try_whereis")
 pub fn try_whereis(atom: Atom) -> Result(Reference, Nil)

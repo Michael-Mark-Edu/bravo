@@ -111,18 +111,18 @@ pub fn member(with dbag: DBag(k, v), at key: a) -> Result(Bool, BravoError) {
   master.member(dbag.inner, key)
 }
 
-pub fn first(with dbag: DBag(k, v)) -> Result(a, Nil) {
+pub fn first(with dbag: DBag(k, v)) -> Result(a, BravoError) {
   master.first(dbag.inner)
 }
 
-pub fn last(with dbag: DBag(k, v)) -> Result(a, Nil) {
+pub fn last(with dbag: DBag(k, v)) -> Result(a, BravoError) {
   master.last(dbag.inner)
 }
 
-pub fn next(with dbag: DBag(k, v), from key: a) -> Result(a, Nil) {
+pub fn next(with dbag: DBag(k, v), from key: a) -> Result(a, BravoError) {
   master.next(dbag.inner, key)
 }
 
-pub fn prev(with dbag: DBag(k, v), from key: a) -> Result(a, Nil) {
+pub fn prev(with dbag: DBag(k, v), from key: a) -> Result(a, BravoError) {
   master.prev(dbag.inner, key)
 }
