@@ -156,7 +156,7 @@ pub fn tab2list(table: InnerTable) -> List(#(k, v)) {
   out
 }
 
-pub fn member(table: InnerTable, key: k) -> Bool {
+pub fn member(table: InnerTable, key: k) -> Result(Bool, BravoError) {
   bindings.try_member(table.table, key)
 }
 

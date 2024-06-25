@@ -109,7 +109,7 @@ pub fn tab2list(with uset: USet(k, v)) -> List(#(k, v)) {
   master.tab2list(uset.inner)
 }
 
-pub fn member(with uset: USet(k, v), at key: a) -> Bool {
+pub fn member(with uset: USet(k, v), at key: a) -> Result(Bool, BravoError) {
   master.member(uset.inner, key)
 }
 

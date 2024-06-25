@@ -78,8 +78,8 @@ try_take(Name, Key) ->
 
 try_member(Name, Key) ->
   case catch ets:member(Name, Key) of
-    {'EXIT', _} -> false;
-    Other -> Other
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
+    Other -> {ok, Other}
   end.
 
 try_delete(Name) ->

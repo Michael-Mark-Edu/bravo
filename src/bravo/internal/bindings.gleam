@@ -42,7 +42,7 @@ pub fn try_lookup(table: Reference, key: a) -> Result(List(b), BravoError)
 pub fn try_take(table: Reference, key: a) -> Result(List(b), BravoError)
 
 @external(erlang, "bravo_ffi", "try_member")
-pub fn try_member(table: Reference, key: a) -> Bool
+pub fn try_member(table: Reference, key: a) -> Result(Bool, BravoError)
 
 @external(erlang, "bravo_ffi", "try_delete")
 pub fn try_delete(table: Reference) -> Result(Nil, BravoError)

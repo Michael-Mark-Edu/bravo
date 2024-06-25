@@ -112,7 +112,7 @@ pub fn tab2list(with oset: OSet(k, v)) -> List(#(k, v)) {
   master.tab2list(oset.inner)
 }
 
-pub fn member(with oset: OSet(k, v), at key: a) -> Bool {
+pub fn member(with oset: OSet(k, v), at key: a) -> Result(Bool, BravoError) {
   master.member(oset.inner, key)
 }
 

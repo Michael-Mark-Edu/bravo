@@ -107,7 +107,7 @@ pub fn tab2list(with dbag: DBag(k, v)) -> List(#(k, v)) {
   master.tab2list(dbag.inner)
 }
 
-pub fn member(with dbag: DBag(k, v), at key: a) -> Bool {
+pub fn member(with dbag: DBag(k, v), at key: a) -> Result(Bool, BravoError) {
   master.member(dbag.inner, key)
 }
 
