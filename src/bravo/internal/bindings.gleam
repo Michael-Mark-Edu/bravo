@@ -48,13 +48,13 @@ pub fn try_member(table: Reference, key: a) -> Bool
 pub fn try_delete(table: Reference) -> Result(Nil, BravoError)
 
 @external(erlang, "bravo_ffi", "try_delete_key")
-pub fn try_delete_key(table: Reference, key: a) -> Bool
+pub fn try_delete_key(table: Reference, key: a) -> Result(Nil, BravoError)
 
 @external(erlang, "bravo_ffi", "try_delete_object")
-pub fn try_delete_object(table: Reference, object: a) -> Bool
+pub fn try_delete_object(table: Reference, object: a) -> Result(Nil, BravoError)
 
 @external(erlang, "bravo_ffi", "try_delete_all_objects")
-pub fn try_delete_all_objects(table: Reference) -> Bool
+pub fn try_delete_all_objects(table: Reference) -> Result(Nil, BravoError)
 
 @external(erlang, "bravo_ffi", "try_tab2file")
 pub fn try_tab2file(

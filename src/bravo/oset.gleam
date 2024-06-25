@@ -60,15 +60,18 @@ pub fn delete(with oset: OSet(k, v)) -> Result(Nil, BravoError) {
   master.delete(oset.inner)
 }
 
-pub fn delete_key(with oset: OSet(k, v), at key: a) -> Nil {
+pub fn delete_key(with oset: OSet(k, v), at key: a) -> Result(Nil, BravoError) {
   master.delete_key(oset.inner, key)
 }
 
-pub fn delete_all_objects(with oset: OSet(k, v)) -> Nil {
+pub fn delete_all_objects(with oset: OSet(k, v)) -> Result(Nil, BravoError) {
   master.delete_all_objects(oset.inner)
 }
 
-pub fn delete_object(with oset: OSet(k, v), target object: #(k, v)) -> Nil {
+pub fn delete_object(
+  with oset: OSet(k, v),
+  target object: #(k, v),
+) -> Result(Nil, BravoError) {
   master.delete_object(oset.inner, object)
 }
 

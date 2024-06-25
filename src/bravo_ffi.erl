@@ -90,20 +90,20 @@ try_delete(Name) ->
 
 try_delete_key(Name, Key) ->
   case catch ets:delete(Name, Key) of
-    {'EXIT', _} -> false;
-    Other -> Other
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
+    _ -> {ok, nil}
   end.
 
 try_delete_object(Name, Object) ->
   case catch ets:delete_object(Name, Object) of
-    {'EXIT', _} -> false;
-    Other -> Other
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
+    _ -> {ok, nil}
   end.
 
 try_delete_all_objects(Name) ->
   case catch ets:delete_all_objects(Name) of
-    {'EXIT', _} -> false;
-    Other -> Other
+    {'EXIT', {Reason, _}} -> get_error_type(Name, Reason);
+    _ -> {ok, nil}
   end.
 
 try_tab2file(Name, Filename, ObjectCount, Md5sum, Sync) ->

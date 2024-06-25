@@ -82,19 +82,19 @@ pub fn delete(table: InnerTable) -> Result(Nil, BravoError) {
   bindings.try_delete(table.table)
 }
 
-pub fn delete_key(table: InnerTable, key: a) -> Nil {
+pub fn delete_key(table: InnerTable, key: a) -> Result(Nil, BravoError) {
   bindings.try_delete_key(table.table, key)
-  Nil
 }
 
-pub fn delete_all_objects(table: InnerTable) -> Nil {
+pub fn delete_all_objects(table: InnerTable) -> Result(Nil, BravoError) {
   bindings.try_delete_all_objects(table.table)
-  Nil
 }
 
-pub fn delete_object(table: InnerTable, object: #(k, v)) -> Nil {
+pub fn delete_object(
+  table: InnerTable,
+  object: #(k, v),
+) -> Result(Nil, BravoError) {
   bindings.try_delete_object(table.table, object)
-  Nil
 }
 
 pub fn tab2file(

@@ -57,15 +57,18 @@ pub fn delete(with uset: USet(k, v)) -> Result(Nil, BravoError) {
   master.delete(uset.inner)
 }
 
-pub fn delete_key(with uset: USet(k, v), at key: a) -> Nil {
+pub fn delete_key(with uset: USet(k, v), at key: a) -> Result(Nil, BravoError) {
   master.delete_key(uset.inner, key)
 }
 
-pub fn delete_all_objects(with uset: USet(k, v)) -> Nil {
+pub fn delete_all_objects(with uset: USet(k, v)) -> Result(Nil, BravoError) {
   master.delete_all_objects(uset.inner)
 }
 
-pub fn delete_object(with uset: USet(k, v), target object: #(k, v)) -> Nil {
+pub fn delete_object(
+  with uset: USet(k, v),
+  target object: #(k, v),
+) -> Result(Nil, BravoError) {
   master.delete_object(uset.inner, object)
 }
 

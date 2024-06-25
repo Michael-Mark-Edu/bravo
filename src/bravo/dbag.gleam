@@ -55,15 +55,18 @@ pub fn delete(with dbag: DBag(k, v)) -> Result(Nil, BravoError) {
   master.delete(dbag.inner)
 }
 
-pub fn delete_key(with dbag: DBag(k, v), at key: a) -> Nil {
+pub fn delete_key(with dbag: DBag(k, v), at key: a) -> Result(Nil, BravoError) {
   master.delete_key(dbag.inner, key)
 }
 
-pub fn delete_all_objects(with dbag: DBag(k, v)) -> Nil {
+pub fn delete_all_objects(with dbag: DBag(k, v)) -> Result(Nil, BravoError) {
   master.delete_all_objects(dbag.inner)
 }
 
-pub fn delete_object(with dbag: DBag(k, v), target object: #(k, v)) -> Nil {
+pub fn delete_object(
+  with dbag: DBag(k, v),
+  target object: #(k, v),
+) -> Result(Nil, BravoError) {
   master.delete_object(dbag.inner, object)
 }
 
