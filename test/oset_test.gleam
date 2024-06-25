@@ -88,6 +88,7 @@ pub fn oset_delete_key_test() {
   oset.lookup(table, "Bye")
   |> should.equal(Ok("World"))
   oset.delete_key(table, "Bye")
+  |> should.be_ok
   oset.lookup(table, "Bye")
   |> should.equal(Error(bravo.Empty))
   oset.lookup(table, "Hello")
@@ -100,6 +101,7 @@ pub fn oset_delete_all_objects_test() {
   oset.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
   oset.delete_all_objects(table)
+  |> should.be_ok
   oset.lookup(table, "Hello")
   |> should.equal(Error(bravo.Empty))
   oset.lookup(table, "Bye")
@@ -111,7 +113,8 @@ pub fn oset_delete_object_test() {
   use <- defer(fn() { oset.delete(table) |> should.be_ok })
   oset.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
-  oset.delete_object(table, #("Bye", "World"))
+  oset.delete_object(table, "Bye", "World")
+  |> should.be_ok
   oset.lookup(table, "Hello")
   |> should.equal(Ok("World"))
   oset.lookup(table, "Bye")

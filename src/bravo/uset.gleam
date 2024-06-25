@@ -66,10 +66,18 @@ pub fn delete_all_objects(with uset: USet(k, v)) -> Result(Nil, BravoError) {
 }
 
 pub fn delete_object(
-  with uset: USet(k, v),
-  target object: #(k, v),
+  from uset: USet(k, v),
+  key key: k,
+  value value: v,
 ) -> Result(Nil, BravoError) {
-  master.delete_object(uset.inner, object)
+  master.delete_object(uset.inner, key, value)
+}
+
+pub fn delete_object_tuple(
+  from uset: USet(k, v),
+  object object: #(k, v),
+) -> Result(Nil, BravoError) {
+  master.delete_object_tuple(uset.inner, object)
 }
 
 pub fn tab2file(

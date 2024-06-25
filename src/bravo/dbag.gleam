@@ -64,10 +64,18 @@ pub fn delete_all_objects(with dbag: DBag(k, v)) -> Result(Nil, BravoError) {
 }
 
 pub fn delete_object(
-  with dbag: DBag(k, v),
-  target object: #(k, v),
+  from dbag: DBag(k, v),
+  key key: k,
+  value value: v,
 ) -> Result(Nil, BravoError) {
-  master.delete_object(dbag.inner, object)
+  master.delete_object(dbag.inner, key, value)
+}
+
+pub fn delete_object_tuple(
+  from dbag: DBag(k, v),
+  object object: #(k, v),
+) -> Result(Nil, BravoError) {
+  master.delete_object_tuple(dbag.inner, object)
 }
 
 pub fn tab2file(

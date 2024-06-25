@@ -92,6 +92,14 @@ pub fn delete_all_objects(table: InnerTable) -> Result(Nil, BravoError) {
 
 pub fn delete_object(
   table: InnerTable,
+  key: k,
+  value: v,
+) -> Result(Nil, BravoError) {
+  bindings.try_delete_object(table.table, #(key, value))
+}
+
+pub fn delete_object_tuple(
+  table: InnerTable,
   object: #(k, v),
 ) -> Result(Nil, BravoError) {
   bindings.try_delete_object(table.table, object)

@@ -69,10 +69,18 @@ pub fn delete_all_objects(with oset: OSet(k, v)) -> Result(Nil, BravoError) {
 }
 
 pub fn delete_object(
-  with oset: OSet(k, v),
-  target object: #(k, v),
+  from oset: OSet(k, v),
+  key key: k,
+  value value: v,
 ) -> Result(Nil, BravoError) {
-  master.delete_object(oset.inner, object)
+  master.delete_object(oset.inner, key, value)
+}
+
+pub fn delete_object_tuple(
+  from oset: OSet(k, v),
+  object object: #(k, v),
+) -> Result(Nil, BravoError) {
+  master.delete_object_tuple(oset.inner, object)
 }
 
 pub fn tab2file(

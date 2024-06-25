@@ -94,6 +94,7 @@ pub fn dbag_delete_key_test() {
   dbag.lookup(table, "Bye")
   |> should.equal(Ok(["World"]))
   dbag.delete_key(table, "Bye")
+  |> should.be_ok
   dbag.lookup(table, "Bye")
   |> should.equal(Error(bravo.Empty))
   dbag.lookup(table, "Hello")
@@ -106,6 +107,7 @@ pub fn dbag_delete_all_objects_test() {
   dbag.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
   dbag.delete_all_objects(table)
+  |> should.be_ok
   dbag.lookup(table, "Hello")
   |> should.equal(Error(bravo.Empty))
   dbag.lookup(table, "Bye")
@@ -117,7 +119,8 @@ pub fn dbag_delete_object_test() {
   use <- defer(fn() { dbag.delete(table) |> should.be_ok })
   dbag.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
-  dbag.delete_object(table, #("Bye", "World"))
+  dbag.delete_object(table, "Bye", "World")
+  |> should.be_ok
   dbag.lookup(table, "Hello")
   |> should.equal(Ok(["World"]))
   dbag.lookup(table, "Bye")

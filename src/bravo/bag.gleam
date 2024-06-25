@@ -65,9 +65,17 @@ pub fn delete_all_objects(bag: Bag(k, v)) -> Result(Nil, BravoError) {
 
 pub fn delete_object(
   from bag: Bag(k, v),
+  key key: k,
+  value value: v,
+) -> Result(Nil, BravoError) {
+  master.delete_object(bag.inner, key, value)
+}
+
+pub fn delete_object_tuple(
+  from bag: Bag(k, v),
   object object: #(k, v),
 ) -> Result(Nil, BravoError) {
-  master.delete_object(bag.inner, object)
+  master.delete_object_tuple(bag.inner, object)
 }
 
 pub fn tab2file(

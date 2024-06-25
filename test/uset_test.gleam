@@ -88,6 +88,7 @@ pub fn uset_delete_key_test() {
   uset.lookup(table, "Bye")
   |> should.equal(Ok("World"))
   uset.delete_key(table, "Bye")
+  |> should.be_ok
   uset.lookup(table, "Bye")
   |> should.equal(Error(bravo.Empty))
   uset.lookup(table, "Hello")
@@ -100,6 +101,7 @@ pub fn uset_delete_all_objects_test() {
   uset.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
   uset.delete_all_objects(table)
+  |> should.be_ok
   uset.lookup(table, "Hello")
   |> should.equal(Error(bravo.Empty))
   uset.lookup(table, "Bye")
@@ -111,7 +113,8 @@ pub fn uset_delete_object_test() {
   use <- defer(fn() { uset.delete(table) |> should.be_ok })
   uset.insert_list(table, [#("Hello", "World"), #("Bye", "World")])
   |> should.be_ok
-  uset.delete_object(table, #("Bye", "World"))
+  uset.delete_object(table, "Bye", "World")
+  |> should.be_ok
   uset.lookup(table, "Hello")
   |> should.equal(Ok("World"))
   uset.lookup(table, "Bye")
