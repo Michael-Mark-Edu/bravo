@@ -67,6 +67,13 @@ pub fn insert(
   master.insert(bag.inner, key, value)
 }
 
+pub fn insert_list(
+  dbag: DBag(k, v),
+  objects: List(#(k, v)),
+) -> Result(Nil, BravoError) {
+  master.insert_list(dbag.inner, objects)
+}
+
 /// Inserts a list of tuples into a `DBag`. Unlike `insert`, this cannot
 /// overwrite objects and will return false if it tries to do so.
 ///

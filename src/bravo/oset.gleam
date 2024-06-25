@@ -68,6 +68,13 @@ pub fn insert(
   master.insert(oset.inner, key, value)
 }
 
+pub fn insert_list(
+  oset: OSet(k, v),
+  objects: List(#(k, v)),
+) -> Result(Nil, BravoError) {
+  master.insert_list(oset.inner, objects)
+}
+
 /// Inserts a list of tuples into a `OSet`. Unlike `insert`, this cannot
 /// overwrite objects and will return false if it tries to do so.
 ///
