@@ -161,7 +161,7 @@ try_file2tab(Filename, Verify) ->
   end.
 
 try_tab2list(Name) ->
-  case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:first(Name))) of
+  case catch ets:tab2list(Name) of
     {'EXIT', {Reason, _}} -> case Reason of
       badarg ->
        case ets:info(Name) == undefined of
@@ -170,7 +170,7 @@ try_tab2list(Name) ->
        end;
       _ -> {error, {erlang_error, atom_to_binary(Reason)}}
     end;
-    Other -> Other
+    Other -> {ok, Other}
   end.
 
 try_first(Name) ->

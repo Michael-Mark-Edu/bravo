@@ -133,7 +133,7 @@ pub fn file2tab(
         |> result.is_ok
       let value =
         object.1
-        |> key_decode
+        |> value_decode
         |> result.is_ok
       bool.and(key, value)
     }
