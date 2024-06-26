@@ -4,14 +4,14 @@ import bravo/internal/new_option
 import gleam/bool
 import gleam/dynamic.{type Dynamic}
 import gleam/erlang.{type Reference}
-import gleam/erlang/atom
+import gleam/erlang/atom.{type Atom}
 import gleam/io
 import gleam/list
 import gleam/result
 import gleam/string
 
 pub type InnerTable {
-  InnerTable(table: Reference)
+  InnerTable(tid: Reference, atom: Atom)
 }
 
 pub fn new(
@@ -20,7 +20,7 @@ pub fn new(
   ttype: new_option.NewOption,
 ) -> Result(InnerTable, BravoError) {
   let atom = atom.create_from_string(name)
-  use a <- result.try(
+  use atom <- result.try(
     bindings.try_new(atom, [
       ttype,
       case access {
@@ -35,19 +35,19 @@ pub fn new(
       new_option.DecentralizedCounters(True),
     ]),
   )
-  let assert Ok(tid) = bindings.try_whereis(a)
-  Ok(InnerTable(tid))
+  let assert Ok(tid) = bindings.try_whereis(atom)
+  Ok(InnerTable(tid, atom))
 }
 
 pub fn insert(table: InnerTable, key: k, value: v) -> Result(Nil, BravoError) {
-  bindings.try_insert(table.table, key, value)
+  bindings.try_insert(table.tid, table.atom, key, value)
 }
 
 pub fn insert_list(
   table: InnerTable,
   list: List(#(k, v)),
 ) -> Result(Nil, BravoError) {
-  bindings.try_insert_list(table.table, list)
+  bindings.try_insert_list(table.tid, table.atom, list)
 }
 
 pub fn insert_new(
@@ -55,39 +55,39 @@ pub fn insert_new(
   key: k,
   value: v,
 ) -> Result(Nil, BravoError) {
-  bindings.try_insert_new(table.table, key, value)
+  bindings.try_insert_new(table.tid, table.atom, key, value)
 }
 
 pub fn lookup_set(table: InnerTable, key: k) -> Result(v, BravoError) {
-  use res <- result.try(bindings.try_lookup(table.table, key))
+  use res <- result.try(bindings.try_lookup(table.tid, table.atom, key))
   let assert [a] = res
   Ok(a)
 }
 
 pub fn lookup_bag(table: InnerTable, key: k) -> Result(List(v), BravoError) {
-  bindings.try_lookup(table.table, key)
+  bindings.try_lookup(table.tid, table.atom, key)
 }
 
 pub fn take_set(table: InnerTable, key: k) -> Result(v, BravoError) {
-  use res <- result.try(bindings.try_take(table.table, key))
+  use res <- result.try(bindings.try_take(table.tid, table.atom, key))
   let assert [a] = res
   Ok(a)
 }
 
 pub fn take_bag(table: InnerTable, key: k) -> Result(List(v), BravoError) {
-  bindings.try_take(table.table, key)
+  bindings.try_take(table.tid, table.atom, key)
 }
 
 pub fn delete(table: InnerTable) -> Result(Nil, BravoError) {
-  bindings.try_delete(table.table)
+  bindings.try_delete(table.tid, table.atom)
 }
 
 pub fn delete_key(table: InnerTable, key: a) -> Result(Nil, BravoError) {
-  bindings.try_delete_key(table.table, key)
+  bindings.try_delete_key(table.tid, table.atom, key)
 }
 
 pub fn delete_all_objects(table: InnerTable) -> Result(Nil, BravoError) {
-  bindings.try_delete_all_objects(table.table)
+  bindings.try_delete_all_objects(table.tid, table.atom)
 }
 
 pub fn delete_object(
@@ -95,14 +95,14 @@ pub fn delete_object(
   key: k,
   value: v,
 ) -> Result(Nil, BravoError) {
-  bindings.try_delete_object(table.table, #(key, value))
+  bindings.try_delete_object(table.tid, table.atom, #(key, value))
 }
 
 pub fn delete_object_tuple(
   table: InnerTable,
   object: #(k, v),
 ) -> Result(Nil, BravoError) {
-  bindings.try_delete_object(table.table, object)
+  bindings.try_delete_object(table.tid, table.atom, object)
 }
 
 pub fn tab2file(
@@ -113,7 +113,7 @@ pub fn tab2file(
   sync: Bool,
 ) -> Result(Nil, BravoError) {
   bindings.try_tab2file(
-    table.table,
+    table.tid,
     string.to_utf_codepoints(filename),
     object_count,
     md5sum,
@@ -127,11 +127,12 @@ pub fn file2tab(
   key_decode: fn(Dynamic) -> Result(k, _),
   value_decode: fn(Dynamic) -> Result(v, _),
 ) -> Result(InnerTable, BravoError) {
-  use table <- result.try(bindings.try_file2tab(
+  use atom <- result.try(bindings.try_file2tab(
     string.to_utf_codepoints(filename),
     verify,
   ))
-  let assert Ok(objects) = bindings.try_tab2list(table)
+  let assert Ok(table) = bindings.try_whereis(atom)
+  let assert Ok(objects) = bindings.try_tab2list(table, atom)
   case
     {
       use object <- list.all(objects)
@@ -146,31 +147,34 @@ pub fn file2tab(
       bool.and(key, value)
     }
   {
-    True -> Ok(InnerTable(table))
-    False -> Error(bravo.DecodeFailure)
+    True -> Ok(InnerTable(table, atom))
+    False -> {
+      let _ = bindings.try_delete(table, atom)
+      Error(bravo.DecodeFailure)
+    }
   }
 }
 
 pub fn tab2list(table: InnerTable) -> Result(List(#(k, v)), BravoError) {
-  bindings.try_tab2list(table.table)
+  bindings.try_tab2list(table.tid, table.atom)
 }
 
 pub fn member(table: InnerTable, key: k) -> Result(Bool, BravoError) {
-  bindings.try_member(table.table, key)
+  bindings.try_member(table.tid, table.atom, key)
 }
 
 pub fn first(table: InnerTable) -> Result(k, BravoError) {
-  bindings.try_first(table.table)
+  bindings.try_first(table.tid, table.atom)
 }
 
 pub fn last(table: InnerTable) -> Result(k, BravoError) {
-  bindings.try_last(table.table)
+  bindings.try_last(table.tid, table.atom)
 }
 
 pub fn next(table: InnerTable, key: k) -> Result(k, BravoError) {
-  bindings.try_next(table.table, key)
+  bindings.try_next(table.tid, table.atom, key)
 }
 
 pub fn prev(table: InnerTable, key: k) -> Result(k, BravoError) {
-  bindings.try_prev(table.table, key)
+  bindings.try_prev(table.tid, table.atom, key)
 }

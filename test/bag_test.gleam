@@ -2,6 +2,7 @@ import bravo
 import bravo/bag
 import gleam/dict
 import gleam/dynamic
+import gleam/otp/task
 import gleeunit/should
 import simplifile
 
@@ -127,26 +128,48 @@ pub fn bag_delete_object_test() {
   |> should.equal(Error(bravo.Empty))
 }
 
-pub fn bag_tab2file_test() {
+pub fn bag_delete_table_test() {
   let assert Ok(table) = bag.new("bag8", bravo.Public)
+  bag.delete(table)
+  |> should.be_ok
+  bag.insert(table, "Hello", "World")
+  |> should.equal(Error(bravo.TableDoesNotExist))
+}
+
+pub fn bag_tab2file_test() {
+  let assert Ok(table) = bag.new("bag9", bravo.Public)
   bag.insert(table, "Hello", "World")
   |> should.be_ok
-  bag.tab2file(table, "bag8", True, True, True)
+  bag.tab2file(table, "bag9", True, True, True)
   |> should.be_ok
   bag.delete(table)
 }
 
 pub fn bag_file2tab_test() {
   let assert Ok(new_table) =
-    bag.file2tab("bag8", True, dynamic.string, dynamic.string)
+    bag.file2tab("bag9", True, dynamic.string, dynamic.string)
   bag.lookup(new_table, "Hello")
   |> should.equal(Ok(["World"]))
   bag.delete(new_table)
   |> should.be_ok
-  bag.file2tab("bag8", True, dynamic.int, dynamic.int)
+  bag.file2tab("bag9", True, dynamic.int, dynamic.int)
   |> should.equal(Error(bravo.DecodeFailure))
-  simplifile.delete("bag8")
+  simplifile.delete("bag9")
   |> should.be_ok
+}
+
+pub fn bag_access_test() {
+  let assert Ok(table) = bag.new("bag10", bravo.Protected)
+  bag.insert(table, "Hello", "World")
+  |> should.be_ok
+  {
+    use <- task.async
+    bag.lookup(table, "Hello")
+    |> should.equal(Ok(["World"]))
+    bag.insert(table, "Goodbye", "World")
+    |> should.equal(Error(bravo.AccessDenied))
+  }
+  |> task.await_forever
 }
 //
 // pub fn bag_tab2list_test() {
