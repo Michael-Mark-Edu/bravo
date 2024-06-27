@@ -1,7 +1,18 @@
 # v5.0.0 (unreleased)
-This is a breaking update!
-- Gave `new`, `insert`, `insert_new`, and `take` more descriptive error types to
-  better indicate what exactly went wrong.
+This is a breaking update -- Every single function has changed!
+- Completely restructured the way objects are represented in the table.
+    - The old system involved creating a "meta table" that had to be looked
+      up from on every lookup call, which isn't ideal for performance or memory.
+      (fun fact: an empty ETS table is nearly a kilobyte in size!)
+    - As well as this, the old system made the object type returned by `lookup`
+      be the entire tuple with the key stored somewhere inside. This is a great
+      departure from how similar data types like `Dict` work. With the new
+      system, it now makes more sense to lookup a key and return a value, not
+      the entire tuple containing both.
+- Every single function now returns a `Result(a, BravoError)`.
+    - The `BravoError` type has been fleshed out with several new error types to
+      allow this. Notably, functions that used to return `Error(Nil)` now return
+      either `Error(bravo.Empty)` or `Error(bravo.EndOfTable)`.
 - Consolidated all function code into a single internal module.
     - This has no effect on the API, but it is a massive change internally. It
       should be easier for me to work on the codebase and it greatly reduces the
