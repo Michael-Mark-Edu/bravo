@@ -1,15 +1,10 @@
 -module(bravo_ffi).
 
--export([inform/2, try_delete/2, try_delete_all_objects/2, try_delete_key/3,
+-export([try_delete/2, try_delete_all_objects/2, try_delete_key/3,
          try_delete_object/3, try_file2tab/2, try_first/2, try_insert/4,
          try_insert_list/3, try_insert_new/4, try_insert_new_list/3, try_last/2,
          try_lookup/3, try_member/3, try_new/2, try_next/3, try_prev/3,
          try_tab2file/5, try_tab2list/2, try_take/3, try_whereis/1]).
-
-inform(Tid, Key) ->
-  Info = catch ets:info(Tid),
-  {_, Target} = lists:keyfind(Key, 1, Info),
-  Target.
 
 get_error_type(Reason, Tid, Atom) ->
   case Reason of
@@ -18,11 +13,6 @@ get_error_type(Reason, Tid, Atom) ->
         true -> {error, access_denied};
         false -> {error, table_does_not_exist}
       end;
-      % case map_get(cause, element(2, lists:nth(1, element(4, lists:nth(1, Trace))))) of
-      %   id -> {error, table_does_not_exist};
-      %   access -> {error, access_denied};
-      %   _ -> {error, {erlang_error, badarg}}
-      % end;
     _ -> {error, {erlang_error, atom_to_binary(Reason)}}
   end.
 

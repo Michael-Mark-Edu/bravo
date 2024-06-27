@@ -1,11 +1,7 @@
 import bravo.{type BravoError}
 import bravo/internal/new_option.{type NewOption}
-import gleam/dynamic.{type Dynamic}
 import gleam/erlang.{type Reference}
 import gleam/erlang/atom.{type Atom}
-
-@external(erlang, "bravo_ffi", "inform")
-pub fn inform(tid: Reference, key: Atom) -> Dynamic
 
 @external(erlang, "bravo_ffi", "try_new")
 pub fn try_new(atom: Atom, options: List(NewOption)) -> Result(Atom, BravoError)
@@ -119,12 +115,3 @@ pub fn try_prev(tid: Reference, atom: Atom, key: a) -> Result(a, BravoError)
 
 @external(erlang, "bravo_ffi", "try_whereis")
 pub fn try_whereis(atom: Atom) -> Result(Reference, Nil)
-
-@external(erlang, "erlang", "tuple_size")
-pub fn tuple_size(tuple: a) -> Int
-
-@external(erlang, "erlang", "element")
-pub fn element(n: Int, tuple: a) -> b
-
-@external(erlang, "erlang", "is_tuple")
-pub fn is_tuple(a: a) -> Bool
