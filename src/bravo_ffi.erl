@@ -8,7 +8,7 @@
 
 get_error_type(Reason, Tid, Atom) ->
   case Reason of
-    {badarg, _} ->
+    badarg ->
       case ets:whereis(Atom) == Tid of
         true -> {error, access_denied};
         false -> {error, table_does_not_exist}
@@ -17,87 +17,80 @@ get_error_type(Reason, Tid, Atom) ->
   end.
 
 try_new(Name, Options) ->
-  case catch ets:new(Name, Options) of
-    {'EXIT', {badarg, _}} ->
+  try {ok, ets:new(Name, Options)}
+  catch
+    _:badarg ->
       case ets:whereis(Name) of
         undefined -> {error, {erlang_error, atom_to_binary(badarg, utf8)}};
         _ -> {error, table_already_exists}
       end;
-    {'EXIT', {Reason, _}} ->
-      {error, {erlang_error, atom_to_binary(Reason, utf8)}};
-    Other ->
-      {ok, Other}
+    _:Reason ->
+      {error, {erlang_error, atom_to_binary(Reason, utf8)}}
   end.
 
 try_insert(Tid, Atom, Key, Value) ->
-  case catch ets:insert(Tid, {Key, Value}) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
-    _ -> {ok, nil}
+  try ets:insert(Tid, {Key, Value}) of _ -> {ok, nil}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_insert_list(Tid, Atom, Objects) ->
-  case catch ets:insert(Tid, Objects) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
-    _ -> {ok, nil}
+  try ets:insert(Tid, Objects) of _ -> {ok, nil}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_insert_new(Tid, Atom, Key, Value) ->
-  case catch ets:insert_new(Tid, {Key, Value}) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
-    _ -> {ok, nil}
+  try ets:insert_new(Tid, {Key, Value}) of _ -> {ok, nil}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
-try_insert_new_list(Tid, Atom, Object) ->
-  todo.
+try_insert_new_list(Tid, Atom, Objects) ->
+  try ets:insert_new(Tid, Objects) of _ -> {ok, nil}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
+  end.
 
 try_lookup(Tid, Atom, Key) ->
-  case catch ets:lookup(Tid, Key) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
+  try ets:lookup(Tid, Key) of
     Other ->
       case lists:map(fun(Elem) -> element(2, Elem) end, Other) of
         [] -> {error, empty};
         Value -> {ok, Value}
       end
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_take(Tid, Atom, Key) ->
-  case catch ets:take(Tid, Key) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
+  try ets:take(Tid, Key) of
     Other ->
       case lists:map(fun(Elem) -> element(2, Elem) end, Other) of
         [] -> {error, empty};
         Value -> {ok, Value}
       end
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_member(Tid, Atom, Key) ->
-  case catch ets:member(Tid, Key) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
-    Other -> {ok, Other}
+  try {ok, ets:member(Tid, Key)}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_delete(Tid, Atom) ->
-  case catch ets:delete(Tid) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
-    _ -> {ok, nil}
+  try ets:delete(Tid) of _ -> {ok, nil}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_delete_key(Tid, Atom, Key) ->
-  case catch ets:delete(Tid, Key) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
-    _ -> {ok, nil}
+  try ets:delete(Tid, Key) of _ -> {ok, nil}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_delete_object(Tid, Atom, Object) ->
-  case catch ets:delete_object(Tid, Object) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
-    _ -> {ok, nil}
+  try ets:delete_object(Tid, Object) of _ -> {ok, nil}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_delete_all_objects(Tid, Atom) ->
-  case catch ets:delete_all_objects(Tid) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
-    _ -> {ok, nil}
+  try ets:delete_all_objects(Tid) of _ -> {ok, nil}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_tab2file(Tid, Filename, ObjectCount, Md5sum, Sync) ->
@@ -114,57 +107,53 @@ try_tab2file(Tid, Filename, ObjectCount, Md5sum, Sync) ->
   C = [{extended_info, lists:append(A, B)}],
   D = [{sync, Sync}],
   Options = lists:append(C, D),
-  case catch ets:tab2file(Tid, Filename, Options) of
-    ok ->
-      {ok, nil};
-    {'EXIT', {Reason, _}} ->
-      {error, {erlang_error, atom_to_binary(Reason, utf8)}}
+  try ets:tab2file(Tid, Filename, Options) of
+    ok -> {ok, nil};
+    {error, Reason} -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
+  catch _:Reason -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
   end.
 
 try_file2tab(Filename, Verify) ->
-  case catch ets:file2tab(Filename, [{verify, Verify}]) of
-    {'EXIT', {Reason, _}} ->
-      {error, {erlang_error, atom_to_binary(Reason, utf8)}};
-    Other -> Other
+  try ets:file2tab(Filename, [{verify, Verify}])
+  catch _:Reason -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
   end.
 
 try_tab2list(Tid, Atom) ->
-  case catch ets:tab2list(Tid) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
-    Other -> {ok, Other}
+  try {ok, ets:tab2list(Tid)}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_first(Tid, Atom) ->
-  case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:first(Tid))) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
+  try lists:map(fun(Elem) -> element(1, Elem) end, ets:first(Tid)) of
     '$end_of_table' -> {error, end_of_table};
     Other -> {ok, Other}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_last(Tid, Atom) ->
-  case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:last(Tid))) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
+  try lists:map(fun(Elem) -> element(1, Elem) end, ets:last(Tid)) of
     '$end_of_table' -> {error, end_of_table};
     Other -> {ok, Other}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 
 try_next(Tid, Atom, Key) ->
-  case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:next(Tid, Key))) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
+  try lists:map(fun(Elem) -> element(1, Elem) end, ets:next(Tid, Key)) of
     '$end_of_table' -> {error, end_of_table};
     Other -> {ok, Other}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_prev(Tid, Atom, Key) ->
-  case catch(lists:map(fun(Elem) -> element(1, Elem) end, ets:next(Tid, Key))) of
-    {'EXIT', Reason} -> get_error_type(Reason, Tid, Atom);
+  try lists:map(fun(Elem) -> element(1, Elem) end, ets:next(Tid, Key)) of
     '$end_of_table' -> {error, end_of_table};
     Other -> {ok, Other}
+  catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_whereis(Atom) ->
   case ets:whereis(Atom) of
     undefined -> {error, nil};
-    Other -> {ok, Other}
+    Tid -> {ok, Tid}
   end.
