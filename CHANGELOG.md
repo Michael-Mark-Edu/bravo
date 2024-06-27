@@ -24,7 +24,7 @@ This is a breaking update -- Every single function has changed!
     - A consequence of this is that when a table is `delete`d, the remaining
       variable will no longer autoconnect to a new table if that table has the
       same name.
-- Improved behavior of tables in asynchronous, especially around `Access` types.
+- Improved asynchronous behavior of tables, especially around `Access` types.
     - Now, instead of crashing the process upon access violation, relevant
       functions now act like the table is completely empty. However, this isn't
       ideal, but the only practical solution would be to change the return types
