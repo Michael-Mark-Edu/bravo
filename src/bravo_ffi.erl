@@ -39,12 +39,12 @@ try_insert_list(Tid, Atom, Objects) ->
   end.
 
 try_insert_new(Tid, Atom, Key, Value) ->
-  try ets:insert_new(Tid, {Key, Value}) of _ -> {ok, nil}
+  try {ok, ets:insert_new(Tid, {Key, Value})}
   catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_insert_new_list(Tid, Atom, Objects) ->
-  try ets:insert_new(Tid, Objects) of _ -> {ok, nil}
+  try {ok, ets:insert_new(Tid, Objects)}
   catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 

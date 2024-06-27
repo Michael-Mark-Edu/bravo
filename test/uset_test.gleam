@@ -209,40 +209,19 @@ pub fn uset_tab2list_orderedness_test() {
   list.contains(list, elem)
   |> should.be_true
 }
-//
-// pub fn uset_empty_insert_test() {
-//   let assert Ok(table) = uset.new("uset20", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [])
-//   |> should.equal(Error(bravo.NothingToInsert))
-// }
-//
-// pub fn uset_dynamic_test() {
-//   let assert Ok(table) = uset.new("uset21", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [
-//     dynamic.from(#("Hello", "World")),
-//     dynamic.from(#(1, 2, 3)),
-//   ])
-//   |> should.be_ok
-//   uset.lookup(table, "Hello")
-//   |> should.equal(Ok(dynamic.from(#("Hello", "World"))))
-//   uset.lookup(table, 1)
-//   |> should.equal(Ok(dynamic.from(#(1, 2, 3))))
-// }
-//
-// pub fn uset_insert_new_test() {
-//   let assert Ok(table) = uset.new("uset22", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert_new(table, [#(1, 2), #(3, 4)])
-//   |> should.be_ok
-//   uset.insert_new(table, [#(1, 3), #(2, 4)])
-//   |> should.equal(Error(bravo.KeyAlreadyPresent))
-//   uset.lookup(table, 1)
-//   |> should.equal(Ok(#(1, 2)))
-//   uset.lookup(table, 2)
-//   |> should.equal(Error(bravo.Empty))
-// }
+
+pub fn uset_insert_new_test() {
+  let assert Ok(table) = uset.new("uset12", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.be_ok })
+  uset.insert_new(table, 1, 2)
+  |> should.be_ok
+  uset.insert_new_list(table, [#(1, 3), #(2, 4)])
+  |> should.equal(Error(bravo.KeyAlreadyPresent))
+  uset.lookup(table, 1)
+  |> should.equal(Ok(2))
+  uset.lookup(table, 2)
+  |> should.equal(Error(bravo.Empty))
+}
 //
 // pub fn uset_take_test() {
 //   let assert Ok(table) = uset.new("uset23", 1, bravo.Public)

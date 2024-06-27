@@ -55,7 +55,22 @@ pub fn insert_new(
   key: k,
   value: v,
 ) -> Result(Nil, BravoError) {
-  bindings.try_insert_new(table.tid, table.atom, key, value)
+  case bindings.try_insert_new(table.tid, table.atom, key, value) {
+    Ok(True) -> Ok(Nil)
+    Ok(False) -> Error(bravo.KeyAlreadyPresent)
+    Error(e) -> Error(e)
+  }
+}
+
+pub fn insert_new_list(
+  table: InnerTable,
+  list: List(#(k, v)),
+) -> Result(Nil, BravoError) {
+  case bindings.try_insert_new_list(table.tid, table.atom, list) {
+    Ok(True) -> Ok(Nil)
+    Ok(False) -> Error(bravo.KeyAlreadyPresent)
+    Error(e) -> Error(e)
+  }
 }
 
 pub fn lookup_set(table: InnerTable, key: k) -> Result(v, BravoError) {

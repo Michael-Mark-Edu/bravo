@@ -215,80 +215,19 @@ pub fn bag_tab2list_orderedness_test() {
   list.contains(list, elem)
   |> should.be_true
 }
-//
-// pub fn bag_tab2list_test() {
-//   let assert Ok(table) = bag.new("bag18", 1, bravo.Public)
-//   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
-//   bag.insert(table, [#("Hello", "World"), #("Bye", "World")])
-//   |> should.equal(Ok(Nil))
-//   let objects = bag.tab2list(table)
-//   list.contains(objects, #("Hello", "World"))
-//   |> should.equal(True)
-//   list.contains(objects, #("Bye", "World"))
-//   |> should.equal(True)
-//   list.contains(objects, #("Bye", "Bye"))
-//   |> should.equal(False)
-// }
-//
-// pub fn bag_tab2list_orderedness_test() {
-//   let assert Ok(table) = bag.new("bag19", 1, bravo.Public)
-//   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
-//   bag.insert(table, [
-//     #("A"),
-//     #("Q"),
-//     #("C"),
-//     #("R"),
-//     #("Z"),
-//     #("B"),
-//     #("S"),
-//     #("F"),
-//     #("Da"),
-//     #("DA"),
-//     #("Db"),
-//     #("a"),
-//   ])
-//   |> should.equal(Ok(Nil))
-//   bag.tab2list(table)
-//   |> should.not_equal([
-//     #("A"),
-//     #("B"),
-//     #("C"),
-//     #("DA"),
-//     #("Da"),
-//     #("Db"),
-//     #("F"),
-//     #("Q"),
-//     #("R"),
-//     #("S"),
-//     #("Z"),
-//     #("a"),
-//   ])
-// }
-//
-// pub fn bag_empty_insert_test() {
-//   let assert Ok(table) = bag.new("bag20", 1, bravo.Public)
-//   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
-//   bag.insert(table, [])
-//   |> should.equal(Error(bravo.NothingToInsert))
-// }
-//
-// pub fn bag_dynamic_test() {
-//   let assert Ok(table) = bag.new("bag21", 1, bravo.Public)
-//   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
-//   bag.insert(table, [
-//     dynamic.from(#("Hello", "World")),
-//     dynamic.from(#("Hello", "my", "friend!")),
-//     dynamic.from(#(1, 2, 3)),
-//   ])
-//   |> should.equal(Ok(Nil))
-//   let assert Ok(list) = bag.lookup(table, "Hello")
-//   list.contains(list, dynamic.from(#("Hello", "World")))
-//   |> should.equal(True)
-//   list.contains(list, dynamic.from(#("Hello", "my", "friend!")))
-//   |> should.equal(True)
-//   bag.lookup(table, 1)
-//   |> should.equal(Ok([dynamic.from(#(1, 2, 3))]))
-// }
+
+pub fn bag_insert_new_test() {
+  let assert Ok(table) = bag.new("bag12", bravo.Public)
+  use <- defer(fn() { bag.delete(table) |> should.be_ok })
+  bag.insert_new(table, 1, 2)
+  |> should.be_ok
+  bag.insert_new_list(table, [#(1, 3), #(2, 4)])
+  |> should.equal(Error(bravo.KeyAlreadyPresent))
+  bag.lookup(table, 1)
+  |> should.equal(Ok([2]))
+  bag.lookup(table, 2)
+  |> should.equal(Error(bravo.Empty))
+}
 //
 // pub fn bag_insert_new_test() {
 //   let assert Ok(table) = bag.new("bag22", 1, bravo.Public)

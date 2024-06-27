@@ -45,6 +45,13 @@ pub fn insert_new(
   master.insert_new(uset.inner, key, value)
 }
 
+pub fn insert_new_list(
+  uset: USet(k, v),
+  objects: List(#(k, v)),
+) -> Result(Nil, BravoError) {
+  master.insert_new_list(uset.inner, objects)
+}
+
 pub fn lookup(with uset: USet(k, v), at key: k) -> Result(t, BravoError) {
   master.lookup_set(uset.inner, key)
 }

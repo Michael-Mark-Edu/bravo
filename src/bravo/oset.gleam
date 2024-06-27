@@ -48,6 +48,13 @@ pub fn insert_new(
   master.insert(oset.inner, key, value)
 }
 
+pub fn insert_new_list(
+  oset: OSet(k, v),
+  objects: List(#(k, v)),
+) -> Result(Nil, BravoError) {
+  master.insert_new_list(oset.inner, objects)
+}
+
 pub fn lookup(with oset: OSet(k, v), at key: a) -> Result(t, BravoError) {
   master.lookup_set(oset.inner, key)
 }

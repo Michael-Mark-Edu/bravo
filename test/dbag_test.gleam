@@ -215,89 +215,19 @@ pub fn dbag_tab2list_orderedness_test() {
   list.contains(list, elem)
   |> should.be_true
 }
-//
-// pub fn ddbag_tab2list_test() {
-//   let assert Ok(table) = ddbag.new("ddbag18", 1, bravo.Public)
-//   use <- defer(fn() { ddbag.delete(table) |> should.equal(True) })
-//   ddbag.insert(table, [#("Hello", "World"), #("Bye", "World")])
-//   |> should.equal(Ok(Nil))
-//   let objects = ddbag.tab2list(table)
-//   list.contains(objects, #("Hello", "World"))
-//   |> should.equal(True)
-//   list.contains(objects, #("Bye", "World"))
-//   |> should.equal(True)
-//   list.contains(objects, #("Bye", "Bye"))
-//   |> should.equal(False)
-// }
-//
-// pub fn ddbag_tab2list_orderedness_test() {
-//   let assert Ok(table) = ddbag.new("ddbag19", 1, bravo.Public)
-//   use <- defer(fn() { ddbag.delete(table) |> should.equal(True) })
-//   ddbag.insert(table, [
-//     #("A"),
-//     #("Q"),
-//     #("C"),
-//     #("R"),
-//     #("Z"),
-//     #("B"),
-//     #("S"),
-//     #("F"),
-//     #("Da"),
-//     #("DA"),
-//     #("Db"),
-//     #("a"),
-//   ])
-//   |> should.equal(Ok(Nil))
-//   ddbag.tab2list(table)
-//   |> should.not_equal([
-//     #("A"),
-//     #("Q"),
-//     #("C"),
-//     #("R"),
-//     #("Z"),
-//     #("B"),
-//     #("S"),
-//     #("F"),
-//     #("Da"),
-//     #("DA"),
-//     #("Db"),
-//     #("a"),
-//   ])
-// }
-//
-// pub fn ddbag_empty_insert_test() {
-//   let assert Ok(table) = ddbag.new("ddbag20", 1, bravo.Public)
-//   use <- defer(fn() { ddbag.delete(table) |> should.equal(True) })
-//   ddbag.insert(table, [])
-//   |> should.equal(Error(bravo.NothingToInsert))
-// }
-//
-// pub fn ddbag_dynamic_test() {
-//   let assert Ok(table) = ddbag.new("ddbag21", 1, bravo.Public)
-//   use <- defer(fn() { ddbag.delete(table) |> should.equal(True) })
-//   ddbag.insert(table, [
-//     dynamic.from(#("Hello", "World")),
-//     dynamic.from(#("Hello", "my", "friend!")),
-//     dynamic.from(#("Hello", "World")),
-//     dynamic.from(#(1, 2, 3)),
-//   ])
-//   |> should.equal(Ok(Nil))
-//   let assert Ok(list) = ddbag.lookup(table, "Hello")
-//   list.contains(list, dynamic.from(#("Hello", "World")))
-//   |> should.equal(True)
-//   let assert Ok(#(_, newlist)) = {
-//     use a <- list.pop(list)
-//     let fun = dynamic.tuple2(dynamic.string, dynamic.string)
-//     let assert Ok(res) = fun(a)
-//     res == #("Hello", "World")
-//   }
-//   list.contains(newlist, dynamic.from(#("Hello", "World")))
-//   |> should.equal(True)
-//   list.contains(newlist, dynamic.from(#("Hello", "my", "friend!")))
-//   |> should.equal(True)
-//   ddbag.lookup(table, 1)
-//   |> should.equal(Ok([dynamic.from(#(1, 2, 3))]))
-// }
+
+pub fn dbag_insert_new_test() {
+  let assert Ok(table) = dbag.new("dbag12", bravo.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.be_ok })
+  dbag.insert_new(table, 1, 2)
+  |> should.be_ok
+  dbag.insert_new_list(table, [#(1, 3), #(2, 4)])
+  |> should.equal(Error(bravo.KeyAlreadyPresent))
+  dbag.lookup(table, 1)
+  |> should.equal(Ok([2]))
+  dbag.lookup(table, 2)
+  |> should.equal(Error(bravo.Empty))
+}
 //
 // pub fn ddbag_insert_new_test() {
 //   let assert Ok(table) = ddbag.new("ddbag22", 1, bravo.Public)

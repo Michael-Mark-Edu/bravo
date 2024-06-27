@@ -43,6 +43,13 @@ pub fn insert_new(
   master.insert_new(bag.inner, key, value)
 }
 
+pub fn insert_new_list(
+  bag: Bag(k, v),
+  objects: List(#(k, v)),
+) -> Result(Nil, BravoError) {
+  master.insert_new_list(bag.inner, objects)
+}
+
 pub fn lookup(from bag: Bag(k, v), at key: k) -> Result(List(v), BravoError) {
   master.lookup_bag(bag.inner, key)
 }

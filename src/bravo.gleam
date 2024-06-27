@@ -17,8 +17,6 @@ pub type BravoError {
   /// Thrown when trying to create a table with the same name as an existing
   /// table.
   TableAlreadyExists
-  /// Thrown when `insert` and similar functions are passed an empty list.
-  NothingToInsert
   /// Thrown when `insert_new` tries to insert with a key that the table already
   /// has.
   KeyAlreadyPresent

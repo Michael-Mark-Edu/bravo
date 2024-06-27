@@ -27,14 +27,14 @@ pub fn try_insert_new(
   atom: Atom,
   key: k,
   value: v,
-) -> Result(Nil, BravoError)
+) -> Result(Bool, BravoError)
 
 @external(erlang, "bravo_ffi", "try_insert_new_list")
 pub fn try_insert_new_list(
   tid: Reference,
   atom: Atom,
   list: List(#(k, v)),
-) -> Result(Nil, BravoError)
+) -> Result(Bool, BravoError)
 
 @external(erlang, "bravo_ffi", "try_lookup")
 pub fn try_lookup(
