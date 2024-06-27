@@ -236,148 +236,142 @@ pub fn dbag_insert_new_test() {
   dbag.lookup(table, 2)
   |> should.equal(Error(bravo.Empty))
 }
+
+pub fn dbag_take_test() {
+  let assert Ok(table) = dbag.new("dbag13", bravo.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.be_ok })
+  dbag.insert_list(table, [#(1, 2), #(1, 3), #(1, 3), #(3, 4)])
+  |> should.be_ok
+  dbag.lookup(table, 1)
+  |> should.equal(Ok([2, 3, 3]))
+  dbag.take(table, 1)
+  |> should.equal(Ok([2, 3, 3]))
+  dbag.take(table, 1)
+  |> should.equal(Error(bravo.Empty))
+  dbag.lookup(table, 1)
+  |> should.equal(Error(bravo.Empty))
+  dbag.lookup(table, 3)
+  |> should.equal(Ok([4]))
+}
+
+pub fn dbag_member_test() {
+  let assert Ok(table) = dbag.new("dbag14", bravo.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.be_ok })
+  dbag.insert_list(table, [#(1, 2), #(1, 3), #(1, 3), #(3, 4)])
+  |> should.be_ok
+  dbag.member(table, 1)
+  |> should.equal(Ok(True))
+  dbag.member(table, 2)
+  |> should.equal(Ok(False))
+  dbag.delete_key(table, 1)
+  |> should.be_ok
+  dbag.member(table, 1)
+  |> should.equal(Ok(False))
+  dbag.member(table, 3)
+  |> should.equal(Ok(True))
+  dbag.member(table, 4)
+  |> should.equal(Ok(False))
+}
 //
-// pub fn ddbag_insert_new_test() {
-//   let assert Ok(table) = ddbag.new("ddbag22", 1, bravo.Public)
-//   use <- defer(fn() { ddbag.delete(table) |> should.equal(True) })
-//   ddbag.insert_new(table, [#(1, 2), #(3, 4)])
+// pub fn dbag_singleton_member_test() {
+//   let assert Ok(table) = dbag.new("dbag25", 1, bravo.Public)
+//   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+//   dbag.insert(table, [1, 3])
 //   |> should.equal(Ok(Nil))
-//   ddbag.insert_new(table, [#(1, 3), #(2, 4)])
-//   |> should.equal(Error(bravo.KeyAlreadyPresent))
-//   ddbag.lookup(table, 1)
-//   |> should.equal(Ok([#(1, 2)]))
-//   ddbag.lookup(table, 2)
-//   |> should.equal(Error(bravo.Empty))
-// }
-//
-// pub fn ddbag_take_test() {
-//   let assert Ok(table) = ddbag.new("ddbag23", 1, bravo.Public)
-//   use <- defer(fn() { ddbag.delete(table) |> should.equal(True) })
-//   ddbag.insert(table, [#(1, 2), #(3, 4)])
-//   |> should.equal(Ok(Nil))
-//   ddbag.lookup(table, 1)
-//   |> should.equal(Ok([#(1, 2)]))
-//   ddbag.take(table, 1)
-//   |> should.equal(Ok([#(1, 2)]))
-//   ddbag.take(table, 1)
-//   |> should.equal(Error(bravo.Empty))
-//   ddbag.lookup(table, 1)
-//   |> should.equal(Error(bravo.Empty))
-// }
-//
-// pub fn ddbag_member_test() {
-//   let assert Ok(table) = ddbag.new("ddbag24", 1, bravo.Public)
-//   use <- defer(fn() { ddbag.delete(table) |> should.equal(True) })
-//   ddbag.insert(table, [#(1, 2), #(3, 4)])
-//   |> should.equal(Ok(Nil))
-//   ddbag.member(table, 1)
+//   dbag.member(table, 1)
 //   |> should.equal(True)
-//   ddbag.member(table, 2)
+//   dbag.member(table, 2)
 //   |> should.equal(False)
-//   ddbag.delete_key(table, 1)
-//   ddbag.member(table, 1)
-//   |> should.equal(False)
-// }
-//
-// pub fn ddbag_singleton_member_test() {
-//   let assert Ok(table) = ddbag.new("ddbag25", 1, bravo.Public)
-//   use <- defer(fn() { ddbag.delete(table) |> should.equal(True) })
-//   ddbag.insert(table, [1, 3])
-//   |> should.equal(Ok(Nil))
-//   ddbag.member(table, 1)
-//   |> should.equal(True)
-//   ddbag.member(table, 2)
-//   |> should.equal(False)
-//   ddbag.delete_key(table, 1)
-//   ddbag.member(table, 1)
+//   dbag.delete_key(table, 1)
+//   dbag.member(table, 1)
 //   |> should.equal(False)
 // }
 //
-// pub fn ddbag_tab2file_singleton_test() {
-//   let assert Ok(table) = ddbag.new("ddbag26", 1, bravo.Public)
-//   ddbag.insert(table, ["Hello"])
+// pub fn dbag_tab2file_singleton_test() {
+//   let assert Ok(table) = dbag.new("dbag26", 1, bravo.Public)
+//   dbag.insert(table, ["Hello"])
 //   |> should.equal(Ok(Nil))
-//   ddbag.tab2file(table, "ddbag26", True, True, True)
+//   dbag.tab2file(table, "dbag26", True, True, True)
 //   |> should.equal(Ok(Nil))
-//   ddbag.delete(table)
-//   let assert Ok(new_table) = ddbag.file2tab("ddbag26", True, dynamic.string)
-//   ddbag.lookup(new_table, "Hello")
+//   dbag.delete(table)
+//   let assert Ok(new_table) = dbag.file2tab("dbag26", True, dynamic.string)
+//   dbag.lookup(new_table, "Hello")
 //   |> should.equal(Ok(["Hello"]))
-//   ddbag.delete(new_table)
-//   ddbag.file2tab("ddbag26", True, dynamic.tuple2(dynamic.int, dynamic.int))
+//   dbag.delete(new_table)
+//   dbag.file2tab("dbag26", True, dynamic.tuple2(dynamic.int, dynamic.int))
 //   |> should.equal(Error(bravo.DecodeFailure))
 //
-//   let assert Ok(newer_table) = ddbag.new("ddbag26", 1, bravo.Public)
-//   ddbag.insert(newer_table, [#("Hello")])
+//   let assert Ok(newer_table) = dbag.new("dbag26", 1, bravo.Public)
+//   dbag.insert(newer_table, [#("Hello")])
 //   |> should.equal(Ok(Nil))
-//   ddbag.tab2file(newer_table, "ddbag26", True, True, True)
+//   dbag.tab2file(newer_table, "dbag26", True, True, True)
 //   |> should.equal(Ok(Nil))
-//   ddbag.delete(newer_table)
-//   let assert Ok(newest_table) = ddbag.file2tab("ddbag26", True, dynamic.string)
-//   ddbag.lookup(newest_table, "Hello")
+//   dbag.delete(newer_table)
+//   let assert Ok(newest_table) = dbag.file2tab("dbag26", True, dynamic.string)
+//   dbag.lookup(newest_table, "Hello")
 //   |> should.equal(Ok(["Hello"]))
-//   ddbag.delete(newest_table)
+//   dbag.delete(newest_table)
 //
-//   simplifile.delete("ddbag26")
+//   simplifile.delete("dbag26")
 //   |> should.equal(Ok(Nil))
 // }
 //
-// pub fn ddbag_tab2file_singleton_record_test() {
-//   let assert Ok(table) = ddbag.new("ddbag27", 1, bravo.Public)
-//   ddbag.insert(table, [Ok("Hello"), Error("World")])
+// pub fn dbag_tab2file_singleton_record_test() {
+//   let assert Ok(table) = dbag.new("dbag27", 1, bravo.Public)
+//   dbag.insert(table, [Ok("Hello"), Error("World")])
 //   |> should.equal(Ok(Nil))
-//   ddbag.tab2file(table, "ddbag27", True, True, True)
+//   dbag.tab2file(table, "dbag27", True, True, True)
 //   |> should.equal(Ok(Nil))
-//   ddbag.delete(table)
+//   dbag.delete(table)
 //   let assert Ok(new_table) =
-//     ddbag.file2tab(
-//       "ddbag27",
+//     dbag.file2tab(
+//       "dbag27",
 //       True,
 //       dynamic.result(dynamic.string, dynamic.string),
 //     )
-//   ddbag.lookup(new_table, Ok("Hello"))
+//   dbag.lookup(new_table, Ok("Hello"))
 //   |> should.equal(Ok([Ok("Hello")]))
-//   ddbag.lookup(new_table, Error("World"))
+//   dbag.lookup(new_table, Error("World"))
 //   |> should.equal(Ok([Error("World")]))
-//   ddbag.delete(new_table)
-//   ddbag.file2tab("ddbag27", True, dynamic.tuple2(dynamic.int, dynamic.int))
+//   dbag.delete(new_table)
+//   dbag.file2tab("dbag27", True, dynamic.tuple2(dynamic.int, dynamic.int))
 //   |> should.equal(Error(bravo.DecodeFailure))
-//   simplifile.delete("ddbag27")
+//   simplifile.delete("dbag27")
 //   |> should.equal(Ok(Nil))
 // }
 //
-// pub fn ddbag_fn_test() {
-//   let assert Ok(table) = ddbag.new("ddbag28", 1, bravo.Public)
-//   use <- defer(fn() { ddbag.delete(table) |> should.equal(True) })
+// pub fn dbag_fn_test() {
+//   let assert Ok(table) = dbag.new("dbag28", 1, bravo.Public)
+//   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
 //   let dataset = [
 //     "A", "Q", "C", "R", "Z", "Z", "B", "S", "F", "Da", "DA", "Db", "a",
 //   ]
-//   ddbag.insert(table, dataset)
+//   dbag.insert(table, dataset)
 //   |> should.equal(Ok(Nil))
-//   let assert Ok(key) = table |> ddbag.first
-//   let assert Ok(a) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.next(key)
-//   let assert Ok(b) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.next(key)
-//   let assert Ok(c) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.next(key)
-//   let assert Ok(d) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.next(key)
-//   let assert Ok(e) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.next(key)
-//   let assert Ok(f) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.next(key)
-//   let assert Ok(g) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.next(key)
-//   let assert Ok(h) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.next(key)
-//   let assert Ok(i) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.next(key)
-//   let assert Ok(j) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.next(key)
-//   let assert Ok(k) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.next(key)
-//   let assert Ok(l) = ddbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.first
+//   let assert Ok(a) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.next(key)
+//   let assert Ok(b) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.next(key)
+//   let assert Ok(c) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.next(key)
+//   let assert Ok(d) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.next(key)
+//   let assert Ok(e) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.next(key)
+//   let assert Ok(f) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.next(key)
+//   let assert Ok(g) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.next(key)
+//   let assert Ok(h) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.next(key)
+//   let assert Ok(i) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.next(key)
+//   let assert Ok(j) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.next(key)
+//   let assert Ok(k) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.next(key)
+//   let assert Ok(l) = dbag.lookup(table, key)
 //   let list = []
 //   let list = list.append(a, list)
 //   let list = list.append(b, list)
@@ -395,42 +389,42 @@ pub fn dbag_insert_new_test() {
 //     list.contains(list, elem)
 //     |> should.equal(True)
 //   })
-//   table |> ddbag.next(l) |> should.equal(Error(Nil))
+//   table |> dbag.next(l) |> should.equal(Error(Nil))
 //   Error(Nil)
 // }
 //
-// pub fn ddbag_lp_test() {
-//   let assert Ok(table) = ddbag.new("ddbag29", 1, bravo.Public)
-//   use <- defer(fn() { ddbag.delete(table) |> should.equal(True) })
+// pub fn dbag_lp_test() {
+//   let assert Ok(table) = dbag.new("dbag29", 1, bravo.Public)
+//   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
 //   let dataset = [
 //     "A", "Q", "C", "R", "Z", "Z", "B", "S", "F", "Da", "DA", "Db", "a",
 //   ]
-//   ddbag.insert(table, dataset)
+//   dbag.insert(table, dataset)
 //   |> should.equal(Ok(Nil))
-//   let assert Ok(key) = table |> ddbag.last
-//   let assert Ok(a) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.prev(key)
-//   let assert Ok(b) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.prev(key)
-//   let assert Ok(c) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.prev(key)
-//   let assert Ok(d) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.prev(key)
-//   let assert Ok(e) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.prev(key)
-//   let assert Ok(f) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.prev(key)
-//   let assert Ok(g) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.prev(key)
-//   let assert Ok(h) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.prev(key)
-//   let assert Ok(i) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.prev(key)
-//   let assert Ok(j) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.prev(key)
-//   let assert Ok(k) = ddbag.lookup(table, key)
-//   let assert Ok(key) = table |> ddbag.prev(key)
-//   let assert Ok(l) = ddbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.last
+//   let assert Ok(a) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.prev(key)
+//   let assert Ok(b) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.prev(key)
+//   let assert Ok(c) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.prev(key)
+//   let assert Ok(d) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.prev(key)
+//   let assert Ok(e) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.prev(key)
+//   let assert Ok(f) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.prev(key)
+//   let assert Ok(g) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.prev(key)
+//   let assert Ok(h) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.prev(key)
+//   let assert Ok(i) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.prev(key)
+//   let assert Ok(j) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.prev(key)
+//   let assert Ok(k) = dbag.lookup(table, key)
+//   let assert Ok(key) = table |> dbag.prev(key)
+//   let assert Ok(l) = dbag.lookup(table, key)
 //   let list = []
 //   let list = list.append(a, list)
 //   let list = list.append(b, list)
@@ -448,18 +442,18 @@ pub fn dbag_insert_new_test() {
 //     list.contains(list, elem)
 //     |> should.equal(True)
 //   })
-//   table |> ddbag.prev(l) |> should.equal(Error(Nil))
+//   table |> dbag.prev(l) |> should.equal(Error(Nil))
 //   Error(Nil)
 // }
 //
 // // TODO: Replace the internal binding calls here with actual functions
-// pub fn ddbag_async_access_test() {
-//   let assert Ok(table) = ddbag.new("ddbag30", 1, bravo.Private)
-//   use <- defer(fn() { ddbag.delete(table) |> should.equal(True) })
-//   ddbag.insert(table, [#("Hello", "World")])
+// pub fn dbag_async_access_test() {
+//   let assert Ok(table) = dbag.new("dbag30", 1, bravo.Private)
+//   use <- defer(fn() { dbag.delete(table) |> should.equal(True) })
+//   dbag.insert(table, [#("Hello", "World")])
 //   |> should.equal(Ok(Nil))
 //   let assert Ok(ref) =
-//     "ddbag30"
+//     "dbag30"
 //     |> atom.create_from_string
 //     |> bindings.try_whereis
 //   bindings.try_lookup(ref, "Hello")
@@ -467,7 +461,7 @@ pub fn dbag_insert_new_test() {
 //   let task = {
 //     use <- task.async
 //     let assert Ok(ref) =
-//       "ddbag30"
+//       "dbag30"
 //       |> atom.create_from_string
 //       |> bindings.try_whereis
 //     bindings.try_lookup(ref, "Hello")
@@ -476,18 +470,18 @@ pub fn dbag_insert_new_test() {
 //   task.await_forever(task)
 // }
 //
-// pub fn ddbag_async_protected_test() {
+// pub fn dbag_async_protected_test() {
 //   let assert Ok(actor) = {
 //     use _, _ <- actor.start(option.None)
-//     let assert Ok(table) = ddbag.new("ddbag30a", 1, bravo.Protected)
-//     ddbag.insert(table, [#("Goodbye", "World")])
+//     let assert Ok(table) = dbag.new("dbag30a", 1, bravo.Protected)
+//     dbag.insert(table, [#("Goodbye", "World")])
 //     |> should.equal(Ok(Nil))
 //     actor.Continue(option.Some(table), option.None)
 //   }
 //   actor.send(actor, Nil)
 //   process.sleep(100)
 //   let assert Ok(ref) =
-//     "ddbag30a"
+//     "dbag30a"
 //     |> atom.create_from_string
 //     |> bindings.try_whereis
 //   bindings.try_lookup(ref, "Goodbye")
@@ -496,12 +490,12 @@ pub fn dbag_insert_new_test() {
 //   |> should.equal(Error(bravo.AccessDenied))
 // }
 //
-// pub fn ddbag_recreation_test() {
-//   let assert Ok(table) = ddbag.new("ddbag31", 1, bravo.Private)
-//   ddbag.insert(table, [#("Hello", "World")])
+// pub fn dbag_recreation_test() {
+//   let assert Ok(table) = dbag.new("dbag31", 1, bravo.Private)
+//   dbag.insert(table, [#("Hello", "World")])
 //   |> should.equal(Ok(Nil))
-//   ddbag.delete(table)
-//   let assert Ok(_table2) = ddbag.new("ddbag31", 1, bravo.Private)
-//   ddbag.insert(table, [#("Hello", "World")])
+//   dbag.delete(table)
+//   let assert Ok(_table2) = dbag.new("dbag31", 1, bravo.Private)
+//   dbag.insert(table, [#("Hello", "World")])
 //   |> should.equal(Error(bravo.TableDoesNotExist))
 // }

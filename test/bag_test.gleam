@@ -236,48 +236,42 @@ pub fn bag_insert_new_test() {
   bag.lookup(table, 2)
   |> should.equal(Error(bravo.Empty))
 }
-//
-// pub fn bag_insert_new_test() {
-//   let assert Ok(table) = bag.new("bag22", 1, bravo.Public)
-//   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
-//   bag.insert_new(table, [#(1, 2), #(3, 4)])
-//   |> should.equal(Ok(Nil))
-//   bag.insert_new(table, [#(1, 3), #(2, 4)])
-//   |> should.equal(Error(bravo.KeyAlreadyPresent))
-//   bag.lookup(table, 1)
-//   |> should.equal(Ok([#(1, 2)]))
-//   bag.lookup(table, 2)
-//   |> should.equal(Error(bravo.Empty))
-// }
-//
-// pub fn bag_take_test() {
-//   let assert Ok(table) = bag.new("bag23", 1, bravo.Public)
-//   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
-//   bag.insert(table, [#(1, 2), #(3, 4)])
-//   |> should.equal(Ok(Nil))
-//   bag.lookup(table, 1)
-//   |> should.equal(Ok([#(1, 2)]))
-//   bag.take(table, 1)
-//   |> should.equal(Ok([#(1, 2)]))
-//   bag.take(table, 1)
-//   |> should.equal(Error(bravo.Empty))
-//   bag.lookup(table, 1)
-//   |> should.equal(Error(bravo.Empty))
-// }
-//
-// pub fn bag_member_test() {
-//   let assert Ok(table) = bag.new("bag24", 1, bravo.Public)
-//   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
-//   bag.insert(table, [#(1, 2), #(3, 4)])
-//   |> should.equal(Ok(Nil))
-//   bag.member(table, 1)
-//   |> should.equal(True)
-//   bag.member(table, 2)
-//   |> should.equal(False)
-//   bag.delete_key(table, 1)
-//   bag.member(table, 1)
-//   |> should.equal(False)
-// }
+
+pub fn bag_take_test() {
+  let assert Ok(table) = bag.new("bag13", bravo.Public)
+  use <- defer(fn() { bag.delete(table) |> should.be_ok })
+  bag.insert_list(table, [#(1, 2), #(1, 3), #(1, 3), #(3, 4)])
+  |> should.be_ok
+  bag.lookup(table, 1)
+  |> should.equal(Ok([2, 3]))
+  bag.take(table, 1)
+  |> should.equal(Ok([2, 3]))
+  bag.take(table, 1)
+  |> should.equal(Error(bravo.Empty))
+  bag.lookup(table, 1)
+  |> should.equal(Error(bravo.Empty))
+  bag.lookup(table, 3)
+  |> should.equal(Ok([4]))
+}
+
+pub fn bag_member_test() {
+  let assert Ok(table) = bag.new("bag14", bravo.Public)
+  use <- defer(fn() { bag.delete(table) |> should.be_ok })
+  bag.insert_list(table, [#(1, 2), #(1, 3), #(1, 3), #(3, 4)])
+  |> should.be_ok
+  bag.member(table, 1)
+  |> should.equal(Ok(True))
+  bag.member(table, 2)
+  |> should.equal(Ok(False))
+  bag.delete_key(table, 1)
+  |> should.be_ok
+  bag.member(table, 1)
+  |> should.equal(Ok(False))
+  bag.member(table, 3)
+  |> should.equal(Ok(True))
+  bag.member(table, 4)
+  |> should.equal(Ok(False))
+}
 //
 // pub fn bag_singleton_member_test() {
 //   let assert Ok(table) = bag.new("bag25", 1, bravo.Public)

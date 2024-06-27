@@ -230,35 +230,42 @@ pub fn uset_insert_new_test() {
   uset.lookup(table, 2)
   |> should.equal(Error(bravo.Empty))
 }
-//
-// pub fn uset_take_test() {
-//   let assert Ok(table) = uset.new("uset23", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [#(1, 2), #(3, 4)])
-//   |> should.be_ok
-//   uset.lookup(table, 1)
-//   |> should.equal(Ok(#(1, 2)))
-//   uset.take(table, 1)
-//   |> should.equal(Ok(#(1, 2)))
-//   uset.take(table, 1)
-//   |> should.equal(Error(bravo.Empty))
-//   uset.lookup(table, 1)
-//   |> should.equal(Error(bravo.Empty))
-// }
-//
-// pub fn uset_member_test() {
-//   let assert Ok(table) = uset.new("uset24", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [#(1, 2), #(3, 4)])
-//   |> should.be_ok
-//   uset.member(table, 1)
-//   |> should.equal(True)
-//   uset.member(table, 2)
-//   |> should.equal(False)
-//   uset.delete_key(table, 1)
-//   uset.member(table, 1)
-//   |> should.equal(False)
-// }
+
+pub fn uset_take_test() {
+  let assert Ok(table) = uset.new("uset13", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.be_ok })
+  uset.insert_list(table, [#(1, 2), #(3, 4)])
+  |> should.be_ok
+  uset.lookup(table, 1)
+  |> should.equal(Ok(2))
+  uset.take(table, 1)
+  |> should.equal(Ok(2))
+  uset.take(table, 1)
+  |> should.equal(Error(bravo.Empty))
+  uset.lookup(table, 1)
+  |> should.equal(Error(bravo.Empty))
+  uset.lookup(table, 3)
+  |> should.equal(Ok(4))
+}
+
+pub fn uset_member_test() {
+  let assert Ok(table) = uset.new("uset14", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.be_ok })
+  uset.insert_list(table, [#(1, 2), #(3, 4)])
+  |> should.be_ok
+  uset.member(table, 1)
+  |> should.equal(Ok(True))
+  uset.member(table, 2)
+  |> should.equal(Ok(False))
+  uset.delete_key(table, 1)
+  |> should.be_ok
+  uset.member(table, 1)
+  |> should.equal(Ok(False))
+  uset.member(table, 3)
+  |> should.equal(Ok(True))
+  uset.member(table, 4)
+  |> should.equal(Ok(False))
+}
 //
 // pub fn uset_singleton_member_test() {
 //   let assert Ok(table) = uset.new("uset25", 1, bravo.Public)

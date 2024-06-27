@@ -225,48 +225,42 @@ pub fn oset_insert_new_test() {
   oset.lookup(table, 2)
   |> should.equal(Error(bravo.Empty))
 }
-//
-// pub fn oset_insert_new_test() {
-//   let assert Ok(table) = oset.new("oset22", 1, bravo.Public)
-//   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
-//   oset.insert_new(table, [#(1, 2), #(3, 4)])
-//   |> should.equal(Ok(Nil))
-//   oset.insert_new(table, [#(1, 3), #(2, 4)])
-//   |> should.equal(Error(bravo.KeyAlreadyPresent))
-//   oset.lookup(table, 1)
-//   |> should.equal(Ok(#(1, 2)))
-//   oset.lookup(table, 2)
-//   |> should.equal(Error(bravo.Empty))
-// }
-//
-// pub fn oset_take_test() {
-//   let assert Ok(table) = oset.new("oset23", 1, bravo.Public)
-//   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
-//   oset.insert(table, [#(1, 2), #(3, 4)])
-//   |> should.equal(Ok(Nil))
-//   oset.lookup(table, 1)
-//   |> should.equal(Ok(#(1, 2)))
-//   oset.take(table, 1)
-//   |> should.equal(Ok(#(1, 2)))
-//   oset.take(table, 1)
-//   |> should.equal(Error(bravo.Empty))
-//   oset.lookup(table, 1)
-//   |> should.equal(Error(bravo.Empty))
-// }
-//
-// pub fn oset_member_test() {
-//   let assert Ok(table) = oset.new("oset24", 1, bravo.Public)
-//   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
-//   oset.insert(table, [#(1, 2), #(3, 4)])
-//   |> should.equal(Ok(Nil))
-//   oset.member(table, 1)
-//   |> should.equal(True)
-//   oset.member(table, 2)
-//   |> should.equal(False)
-//   oset.delete_key(table, 1)
-//   oset.member(table, 1)
-//   |> should.equal(False)
-// }
+
+pub fn oset_take_test() {
+  let assert Ok(table) = oset.new("oset13", bravo.Public)
+  use <- defer(fn() { oset.delete(table) |> should.be_ok })
+  oset.insert_list(table, [#(1, 2), #(3, 4)])
+  |> should.be_ok
+  oset.lookup(table, 1)
+  |> should.equal(Ok(2))
+  oset.take(table, 1)
+  |> should.equal(Ok(2))
+  oset.take(table, 1)
+  |> should.equal(Error(bravo.Empty))
+  oset.lookup(table, 1)
+  |> should.equal(Error(bravo.Empty))
+  oset.lookup(table, 3)
+  |> should.equal(Ok(4))
+}
+
+pub fn oset_member_test() {
+  let assert Ok(table) = oset.new("oset14", bravo.Public)
+  use <- defer(fn() { oset.delete(table) |> should.be_ok })
+  oset.insert_list(table, [#(1, 2), #(3, 4)])
+  |> should.be_ok
+  oset.member(table, 1)
+  |> should.equal(Ok(True))
+  oset.member(table, 2)
+  |> should.equal(Ok(False))
+  oset.delete_key(table, 1)
+  |> should.be_ok
+  oset.member(table, 1)
+  |> should.equal(Ok(False))
+  oset.member(table, 3)
+  |> should.equal(Ok(True))
+  oset.member(table, 4)
+  |> should.equal(Ok(False))
+}
 //
 // pub fn oset_singleton_member_test() {
 //   let assert Ok(table) = oset.new("oset25", 1, bravo.Public)
