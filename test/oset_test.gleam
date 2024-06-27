@@ -5,6 +5,7 @@ import gleam/dynamic
 import gleam/list
 import gleam/otp/task
 import gleeunit/should
+import shellout
 import simplifile
 
 fn defer(defer: fn() -> a, block: fn() -> b) -> b {
@@ -138,6 +139,11 @@ pub fn oset_tab2file_test() {
   oset.tab2file(table, "oset9", True, True, True)
   |> should.be_ok
   oset.delete(table)
+  |> should.be_ok
+  shellout.command("mkdir", ["no_access", "-p", "-m", "555"], ".", [])
+  |> should.be_ok
+  oset.tab2file(table, "no_access/oset9", True, True, True)
+  |> should.equal(Error(bravo.NoFilePermissions))
 }
 
 pub fn oset_file2tab_test() {
@@ -151,6 +157,8 @@ pub fn oset_file2tab_test() {
   |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("oset9")
   |> should.be_ok
+  oset.file2tab("no_access/oset9", True, dynamic.string, dynamic.string)
+  |> should.equal(Error(bravo.FileDoesNotExist))
 }
 
 pub fn oset_access_test() {

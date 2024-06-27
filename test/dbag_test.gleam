@@ -5,6 +5,7 @@ import gleam/dynamic
 import gleam/list
 import gleam/otp/task
 import gleeunit/should
+import shellout
 import simplifile
 
 fn defer(defer: fn() -> a, block: fn() -> b) -> b {
@@ -144,6 +145,11 @@ pub fn dbag_tab2file_test() {
   dbag.tab2file(table, "dbag9", True, True, True)
   |> should.be_ok
   dbag.delete(table)
+  |> should.be_ok
+  shellout.command("mkdir", ["no_access", "-p", "-m", "555"], ".", [])
+  |> should.be_ok
+  dbag.tab2file(table, "no_access/dbag9", True, True, True)
+  |> should.equal(Error(bravo.NoFilePermissions))
 }
 
 pub fn dbag_file2tab_test() {
@@ -157,6 +163,8 @@ pub fn dbag_file2tab_test() {
   |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("dbag9")
   |> should.be_ok
+  dbag.file2tab("no_access/dbag9", True, dynamic.string, dynamic.string)
+  |> should.equal(Error(bravo.FileDoesNotExist))
 }
 
 pub fn dbag_access_test() {

@@ -109,12 +109,20 @@ try_tab2file(Tid, Filename, ObjectCount, Md5sum, Sync) ->
   Options = lists:append(C, D),
   try ets:tab2file(Tid, Filename, Options) of
     ok -> {ok, nil};
-    {error, Reason} -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
-  catch _:Reason -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
+    {error, eaccess} -> {error, no_file_permissions};
+    {error, {file_error, _, eacces}} -> {error, no_file_permissions};
+    {error, badtab} -> {error, table_does_not_exist};
+    {error, Reason} -> term_to_binary(Reason)
+  catch
+    _:badarg -> {error, access_denied}; % this assumes the only possible cause of badarg is if table is private
+    _:Reason -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
   end.
 
 try_file2tab(Filename, Verify) ->
-  try ets:file2tab(Filename, [{verify, Verify}])
+  try ets:file2tab(Filename, [{verify, Verify}]) of
+    {ok, Atom} -> {ok, Atom};
+    {error, {read_error, {file_error, _, enoent}}} -> {error, file_does_not_exist};
+    {error, Reason} -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
   catch _:Reason -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
   end.
 
