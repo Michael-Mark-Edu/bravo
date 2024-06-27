@@ -2,6 +2,7 @@ import bravo
 import bravo/uset
 import gleam/dict
 import gleam/dynamic
+import gleam/list
 import gleam/otp/task
 import gleeunit/should
 import simplifile
@@ -165,55 +166,49 @@ pub fn uset_access_test() {
   }
   |> task.await_forever
 }
-//
-// pub fn uset_tab2list_test() {
-//   let assert Ok(table) = uset.new("uset18", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [#("Hello", "World"), #("Bye", "World")])
-//   |> should.be_ok
-//   let objects = uset.tab2list(table)
-//   list.contains(objects, #("Hello", "World"))
-//   |> should.equal(True)
-//   list.contains(objects, #("Bye", "World"))
-//   |> should.equal(True)
-//   list.contains(objects, #("Bye", "Bye"))
-//   |> should.equal(False)
-// }
-//
-// pub fn uset_tab2list_orderedness_test() {
-//   let assert Ok(table) = uset.new("uset19", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [
-//     #("A"),
-//     #("Q"),
-//     #("C"),
-//     #("R"),
-//     #("Z"),
-//     #("B"),
-//     #("S"),
-//     #("F"),
-//     #("Da"),
-//     #("DA"),
-//     #("Db"),
-//     #("a"),
-//   ])
-//   |> should.be_ok
-//   uset.tab2list(table)
-//   |> should.not_equal([
-//     #("A"),
-//     #("B"),
-//     #("C"),
-//     #("DA"),
-//     #("Da"),
-//     #("Db"),
-//     #("F"),
-//     #("Q"),
-//     #("R"),
-//     #("S"),
-//     #("Z"),
-//     #("a"),
-//   ])
-// }
+
+pub fn uset_tab2list_orderedness_test() {
+  let assert Ok(table) = uset.new("uset11", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.be_ok })
+  let control = [
+    #("A", "B"),
+    #("Q", "S"),
+    #("C", "F"),
+    #("R", "Da"),
+    #("Z", "DA"),
+    #("B", "Db"),
+    #("S", "a"),
+    #("F", "A"),
+    #("Da", "Q"),
+    #("DA", "C"),
+    #("Db", "R"),
+    #("a", "Z"),
+  ]
+  uset.insert_list(table, control)
+  |> should.be_ok
+  let assert Ok(list) = uset.tab2list(table)
+  list
+  |> should.not_equal([
+    #("A", "B"),
+    #("B", "Db"),
+    #("C", "F"),
+    #("DA", "C"),
+    #("Da", "Q"),
+    #("Db", "R"),
+    #("F", "A"),
+    #("Q", "S"),
+    #("R", "Da"),
+    #("S", "a"),
+    #("Z", "DA"),
+    #("a", "Z"),
+  ])
+  list
+  |> list.length
+  |> should.equal(12)
+  use elem <- list.each(control)
+  list.contains(list, elem)
+  |> should.be_true
+}
 //
 // pub fn uset_empty_insert_test() {
 //   let assert Ok(table) = uset.new("uset20", 1, bravo.Public)

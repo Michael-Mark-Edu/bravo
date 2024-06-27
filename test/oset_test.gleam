@@ -2,6 +2,7 @@ import bravo
 import bravo/oset
 import gleam/dict
 import gleam/dynamic
+import gleam/list
 import gleam/otp/task
 import gleeunit/should
 import simplifile
@@ -164,6 +165,44 @@ pub fn oset_access_test() {
     |> should.equal(Error(bravo.AccessDenied))
   }
   |> task.await_forever
+}
+
+pub fn oset_tab2list_orderedness_test() {
+  let assert Ok(table) = oset.new("oset11", bravo.Public)
+  use <- defer(fn() { oset.delete(table) |> should.be_ok })
+  let control = [
+    #("A", "B"),
+    #("Q", "S"),
+    #("C", "F"),
+    #("R", "Da"),
+    #("Z", "DA"),
+    #("B", "Db"),
+    #("S", "a"),
+    #("F", "A"),
+    #("Da", "Q"),
+    #("DA", "C"),
+    #("Db", "R"),
+    #("a", "Z"),
+  ]
+  oset.insert_list(table, control)
+  |> should.be_ok
+  oset.tab2list(table)
+  |> should.equal(
+    Ok([
+      #("A", "B"),
+      #("B", "Db"),
+      #("C", "F"),
+      #("DA", "C"),
+      #("Da", "Q"),
+      #("Db", "R"),
+      #("F", "A"),
+      #("Q", "S"),
+      #("R", "Da"),
+      #("S", "a"),
+      #("Z", "DA"),
+      #("a", "Z"),
+    ]),
+  )
 }
 //
 // pub fn oset_tab2list_test() {

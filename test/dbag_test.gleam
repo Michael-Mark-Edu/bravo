@@ -2,6 +2,7 @@ import bravo
 import bravo/dbag
 import gleam/dict
 import gleam/dynamic
+import gleam/list
 import gleam/otp/task
 import gleeunit/should
 import simplifile
@@ -170,6 +171,49 @@ pub fn dbag_access_test() {
     |> should.equal(Error(bravo.AccessDenied))
   }
   |> task.await_forever
+}
+
+pub fn dbag_tab2list_orderedness_test() {
+  let assert Ok(table) = dbag.new("dbag11", bravo.Public)
+  use <- defer(fn() { dbag.delete(table) |> should.be_ok })
+  let control = [
+    #("A", "B"),
+    #("Q", "S"),
+    #("C", "F"),
+    #("R", "Da"),
+    #("Z", "DA"),
+    #("B", "Db"),
+    #("S", "a"),
+    #("F", "A"),
+    #("Da", "Q"),
+    #("DA", "C"),
+    #("Db", "R"),
+    #("a", "Z"),
+  ]
+  dbag.insert_list(table, control)
+  |> should.be_ok
+  let assert Ok(list) = dbag.tab2list(table)
+  list
+  |> should.not_equal([
+    #("A", "B"),
+    #("B", "Db"),
+    #("C", "F"),
+    #("DA", "C"),
+    #("Da", "Q"),
+    #("Db", "R"),
+    #("F", "A"),
+    #("Q", "S"),
+    #("R", "Da"),
+    #("S", "a"),
+    #("Z", "DA"),
+    #("a", "Z"),
+  ])
+  list
+  |> list.length
+  |> should.equal(12)
+  use elem <- list.each(control)
+  list.contains(list, elem)
+  |> should.be_true
 }
 //
 // pub fn ddbag_tab2list_test() {
