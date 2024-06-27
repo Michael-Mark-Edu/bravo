@@ -2,6 +2,7 @@ import bravo
 import bravo/oset
 import gleam/dict
 import gleam/dynamic
+import gleam/otp/task
 import gleeunit/should
 import simplifile
 
@@ -121,26 +122,48 @@ pub fn oset_delete_object_test() {
   |> should.equal(Error(bravo.Empty))
 }
 
-pub fn oset_tab2file_test() {
+pub fn oset_delete_table_test() {
   let assert Ok(table) = oset.new("oset8", bravo.Public)
+  oset.delete(table)
+  |> should.be_ok
+  oset.insert(table, "Hello", "World")
+  |> should.equal(Error(bravo.TableDoesNotExist))
+}
+
+pub fn oset_tab2file_test() {
+  let assert Ok(table) = oset.new("oset9", bravo.Public)
   oset.insert(table, "Hello", "World")
   |> should.be_ok
-  oset.tab2file(table, "oset8", True, True, True)
+  oset.tab2file(table, "oset9", True, True, True)
   |> should.be_ok
   oset.delete(table)
 }
 
 pub fn oset_file2tab_test() {
   let assert Ok(new_table) =
-    oset.file2tab("oset8", True, dynamic.string, dynamic.string)
+    oset.file2tab("oset9", True, dynamic.string, dynamic.string)
   oset.lookup(new_table, "Hello")
   |> should.equal(Ok("World"))
   oset.delete(new_table)
   |> should.be_ok
-  oset.file2tab("oset8", True, dynamic.int, dynamic.int)
+  oset.file2tab("oset9", True, dynamic.int, dynamic.int)
   |> should.equal(Error(bravo.DecodeFailure))
-  simplifile.delete("oset8")
+  simplifile.delete("oset9")
   |> should.be_ok
+}
+
+pub fn oset_access_test() {
+  let assert Ok(table) = oset.new("oset10", bravo.Protected)
+  oset.insert(table, "Hello", "World")
+  |> should.be_ok
+  {
+    use <- task.async
+    oset.lookup(table, "Hello")
+    |> should.equal(Ok("World"))
+    oset.insert(table, "Goodbye", "World")
+    |> should.equal(Error(bravo.AccessDenied))
+  }
+  |> task.await_forever
 }
 //
 // pub fn oset_tab2list_test() {

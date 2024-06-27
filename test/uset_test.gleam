@@ -2,6 +2,7 @@ import bravo
 import bravo/uset
 import gleam/dict
 import gleam/dynamic
+import gleam/otp/task
 import gleeunit/should
 import simplifile
 
@@ -121,26 +122,48 @@ pub fn uset_delete_object_test() {
   |> should.equal(Error(bravo.Empty))
 }
 
-pub fn uset_tab2file_test() {
+pub fn uset_delete_table_test() {
   let assert Ok(table) = uset.new("uset8", bravo.Public)
+  uset.delete(table)
+  |> should.be_ok
+  uset.insert(table, "Hello", "World")
+  |> should.equal(Error(bravo.TableDoesNotExist))
+}
+
+pub fn uset_tab2file_test() {
+  let assert Ok(table) = uset.new("uset9", bravo.Public)
   uset.insert(table, "Hello", "World")
   |> should.be_ok
-  uset.tab2file(table, "uset8", True, True, True)
+  uset.tab2file(table, "uset9", True, True, True)
   |> should.be_ok
   uset.delete(table)
 }
 
 pub fn uset_file2tab_test() {
   let assert Ok(new_table) =
-    uset.file2tab("uset8", True, dynamic.string, dynamic.string)
+    uset.file2tab("uset9", True, dynamic.string, dynamic.string)
   uset.lookup(new_table, "Hello")
   |> should.equal(Ok("World"))
   uset.delete(new_table)
   |> should.be_ok
-  uset.file2tab("uset8", True, dynamic.int, dynamic.int)
+  uset.file2tab("uset9", True, dynamic.int, dynamic.int)
   |> should.equal(Error(bravo.DecodeFailure))
-  simplifile.delete("uset8")
+  simplifile.delete("uset9")
   |> should.be_ok
+}
+
+pub fn uset_access_test() {
+  let assert Ok(table) = uset.new("uset10", bravo.Protected)
+  uset.insert(table, "Hello", "World")
+  |> should.be_ok
+  {
+    use <- task.async
+    uset.lookup(table, "Hello")
+    |> should.equal(Ok("World"))
+    uset.insert(table, "Goodbye", "World")
+    |> should.equal(Error(bravo.AccessDenied))
+  }
+  |> task.await_forever
 }
 //
 // pub fn uset_tab2list_test() {

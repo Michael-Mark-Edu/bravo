@@ -2,6 +2,7 @@ import bravo
 import bravo/dbag
 import gleam/dict
 import gleam/dynamic
+import gleam/otp/task
 import gleeunit/should
 import simplifile
 
@@ -127,26 +128,48 @@ pub fn dbag_delete_object_test() {
   |> should.equal(Error(bravo.Empty))
 }
 
-pub fn dbag_tab2file_test() {
+pub fn dbag_delete_table_test() {
   let assert Ok(table) = dbag.new("dbag8", bravo.Public)
+  dbag.delete(table)
+  |> should.be_ok
+  dbag.insert(table, "Hello", "World")
+  |> should.equal(Error(bravo.TableDoesNotExist))
+}
+
+pub fn dbag_tab2file_test() {
+  let assert Ok(table) = dbag.new("dbag9", bravo.Public)
   dbag.insert(table, "Hello", "World")
   |> should.be_ok
-  dbag.tab2file(table, "dbag8", True, True, True)
+  dbag.tab2file(table, "dbag9", True, True, True)
   |> should.be_ok
   dbag.delete(table)
 }
 
 pub fn dbag_file2tab_test() {
   let assert Ok(new_table) =
-    dbag.file2tab("dbag8", True, dynamic.string, dynamic.string)
+    dbag.file2tab("dbag9", True, dynamic.string, dynamic.string)
   dbag.lookup(new_table, "Hello")
   |> should.equal(Ok(["World"]))
   dbag.delete(new_table)
   |> should.be_ok
-  dbag.file2tab("dbag8", True, dynamic.int, dynamic.int)
+  dbag.file2tab("dbag9", True, dynamic.int, dynamic.int)
   |> should.equal(Error(bravo.DecodeFailure))
-  simplifile.delete("dbag8")
+  simplifile.delete("dbag9")
   |> should.be_ok
+}
+
+pub fn dbag_access_test() {
+  let assert Ok(table) = dbag.new("dbag10", bravo.Protected)
+  dbag.insert(table, "Hello", "World")
+  |> should.be_ok
+  {
+    use <- task.async
+    dbag.lookup(table, "Hello")
+    |> should.equal(Ok(["World"]))
+    dbag.insert(table, "Goodbye", "World")
+    |> should.equal(Error(bravo.AccessDenied))
+  }
+  |> task.await_forever
 }
 //
 // pub fn ddbag_tab2list_test() {
