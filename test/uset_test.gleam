@@ -2,6 +2,7 @@ import bravo
 import bravo/uset
 import gleam/dict
 import gleam/dynamic
+import gleam/io
 import gleam/list
 import gleam/otp/task
 import gleeunit/should
@@ -266,175 +267,132 @@ pub fn uset_member_test() {
   uset.member(table, 4)
   |> should.equal(Ok(False))
 }
-//
-// pub fn uset_singleton_member_test() {
-//   let assert Ok(table) = uset.new("uset25", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [1, 3])
-//   |> should.be_ok
-//   uset.member(table, 1)
-//   |> should.equal(True)
-//   uset.member(table, 2)
-//   |> should.equal(False)
-//   uset.delete_key(table, 1)
-//   uset.member(table, 1)
-//   |> should.equal(False)
-// }
-//
-// pub fn uset_tab2file_singleton_test() {
-//   let assert Ok(table) = uset.new("uset26", 1, bravo.Public)
-//   uset.insert(table, ["Hello"])
-//   |> should.be_ok
-//   uset.tab2file(table, "uset26", True, True, True)
-//   |> should.be_ok
-//   uset.delete(table)
-//   let assert Ok(new_table) = uset.file2tab("uset26", True, dynamic.string)
-//   uset.lookup(new_table, "Hello")
-//   |> should.equal(Ok("Hello"))
-//   uset.delete(new_table)
-//   uset.file2tab("uset26", True, dynamic.tuple2(dynamic.int, dynamic.int))
-//   |> should.equal(Error(bravo.DecodeFailure))
-//
-//   let assert Ok(newer_table) = uset.new("uset26", 1, bravo.Public)
-//   uset.insert(newer_table, [#("Hello")])
-//   |> should.be_ok
-//   uset.tab2file(newer_table, "uset26", True, True, True)
-//   |> should.be_ok
-//   uset.delete(newer_table)
-//   let assert Ok(newest_table) = uset.file2tab("uset26", True, dynamic.string)
-//   uset.lookup(newest_table, "Hello")
-//   |> should.equal(Ok("Hello"))
-//   uset.delete(newest_table)
-//
-//   simplifile.delete("uset26")
-//   |> should.be_ok
-// }
-//
-// pub fn uset_tab2file_singleton_record_test() {
-//   let assert Ok(table) = uset.new("uset27", 1, bravo.Public)
-//   uset.insert(table, [Ok("Hello"), Error("World")])
-//   |> should.be_ok
-//   uset.tab2file(table, "uset27", True, True, True)
-//   |> should.be_ok
-//   uset.delete(table)
-//   let assert Ok(new_table) =
-//     uset.file2tab(
-//       "uset27",
-//       True,
-//       dynamic.result(dynamic.string, dynamic.string),
-//     )
-//   uset.lookup(new_table, Ok("Hello"))
-//   |> should.equal(Ok(Ok("Hello")))
-//   uset.lookup(new_table, Error("World"))
-//   |> should.equal(Ok(Error("World")))
-//   uset.delete(new_table)
-//   uset.file2tab("uset27", True, dynamic.tuple2(dynamic.int, dynamic.int))
-//   |> should.equal(Error(bravo.DecodeFailure))
-//   simplifile.delete("uset27")
-//   |> should.be_ok
-// }
-//
-// pub fn uset_fn_test() {
-//   let assert Ok(table) = uset.new("uset28", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
-//   uset.insert(table, dataset)
-//   |> should.be_ok
-//   let assert Ok(key) = table |> uset.first
-//   let assert Ok(a) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.next(key)
-//   let assert Ok(b) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.next(key)
-//   let assert Ok(c) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.next(key)
-//   let assert Ok(d) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.next(key)
-//   let assert Ok(e) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.next(key)
-//   let assert Ok(f) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.next(key)
-//   let assert Ok(g) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.next(key)
-//   let assert Ok(h) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.next(key)
-//   let assert Ok(i) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.next(key)
-//   let assert Ok(j) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.next(key)
-//   let assert Ok(k) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.next(key)
-//   let assert Ok(l) = uset.lookup(table, key)
-//   let list = []
-//   let list = list.append([a], list)
-//   let list = list.append([b], list)
-//   let list = list.append([c], list)
-//   let list = list.append([d], list)
-//   let list = list.append([e], list)
-//   let list = list.append([f], list)
-//   let list = list.append([g], list)
-//   let list = list.append([h], list)
-//   let list = list.append([i], list)
-//   let list = list.append([j], list)
-//   let list = list.append([k], list)
-//   let list = list.append([l], list)
-//   list.map(dataset, fn(elem) {
-//     list.contains(list, elem)
-//     |> should.equal(True)
-//   })
-//   table |> uset.next(l) |> should.equal(Error(Nil))
-//   Error(Nil)
-// }
-//
-// pub fn uset_lp_test() {
-//   let assert Ok(table) = uset.new("uset29", 1, bravo.Public)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
-//   uset.insert(table, dataset)
-//   |> should.be_ok
-//   let assert Ok(key) = table |> uset.last
-//   let assert Ok(a) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.prev(key)
-//   let assert Ok(b) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.prev(key)
-//   let assert Ok(c) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.prev(key)
-//   let assert Ok(d) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.prev(key)
-//   let assert Ok(e) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.prev(key)
-//   let assert Ok(f) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.prev(key)
-//   let assert Ok(g) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.prev(key)
-//   let assert Ok(h) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.prev(key)
-//   let assert Ok(i) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.prev(key)
-//   let assert Ok(j) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.prev(key)
-//   let assert Ok(k) = uset.lookup(table, key)
-//   let assert Ok(key) = table |> uset.prev(key)
-//   let assert Ok(l) = uset.lookup(table, key)
-//   let list = []
-//   let list = list.append([a], list)
-//   let list = list.append([b], list)
-//   let list = list.append([c], list)
-//   let list = list.append([d], list)
-//   let list = list.append([e], list)
-//   let list = list.append([f], list)
-//   let list = list.append([g], list)
-//   let list = list.append([h], list)
-//   let list = list.append([i], list)
-//   let list = list.append([j], list)
-//   let list = list.append([k], list)
-//   let list = list.append([l], list)
-//   list.map(dataset, fn(elem) {
-//     list.contains(list, elem)
-//     |> should.equal(True)
-//   })
-//   table |> uset.prev(l) |> should.equal(Error(Nil))
-//   Error(Nil)
-// }
+
+pub fn uset_fn_test() {
+  let assert Ok(table) = uset.new("uset15", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.be_ok })
+  let control = [
+    #("A", "B"),
+    #("Q", "S"),
+    #("C", "F"),
+    #("R", "Da"),
+    #("Z", "DA"),
+    #("B", "Db"),
+    #("S", "a"),
+    #("F", "A"),
+    #("Da", "Q"),
+    #("DA", "C"),
+    #("Db", "R"),
+    #("a", "Z"),
+  ]
+  uset.insert_list(table, control)
+  |> should.be_ok
+  let assert Ok(key) = table |> uset.first
+  let assert Ok(a) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(b) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(c) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(d) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(e) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(f) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(g) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(h) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(i) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(j) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(k) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.next(key)
+  let assert Ok(l) = uset.lookup(table, key)
+  let list = []
+  let list = list.append([a], list)
+  let list = list.append([b], list)
+  let list = list.append([c], list)
+  let list = list.append([d], list)
+  let list = list.append([e], list)
+  let list = list.append([f], list)
+  let list = list.append([g], list)
+  let list = list.append([h], list)
+  let list = list.append([i], list)
+  let list = list.append([j], list)
+  let list = list.append([k], list)
+  let list = list.append([l], list)
+  list.map(control, fn(elem) {
+    list.contains(list, elem.1)
+    |> should.equal(True)
+  })
+  table |> uset.next(key) |> should.equal(Error(bravo.EndOfTable))
+}
+
+pub fn uset_lp_test() {
+  let assert Ok(table) = uset.new("uset16", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.be_ok })
+  let control = [
+    #("A", "B"),
+    #("Q", "S"),
+    #("C", "F"),
+    #("R", "Da"),
+    #("Z", "DA"),
+    #("B", "Db"),
+    #("S", "a"),
+    #("F", "A"),
+    #("Da", "Q"),
+    #("DA", "C"),
+    #("Db", "R"),
+    #("a", "Z"),
+  ]
+  uset.insert_list(table, control)
+  |> should.be_ok
+  let assert Ok(key) = table |> uset.last
+  let assert Ok(a) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(b) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(c) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(d) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(e) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(f) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(g) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(h) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(i) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(j) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(k) = uset.lookup(table, key)
+  let assert Ok(key) = table |> uset.prev(key)
+  let assert Ok(l) = uset.lookup(table, key)
+  let list = []
+  let list = list.append([a], list)
+  let list = list.append([b], list)
+  let list = list.append([c], list)
+  let list = list.append([d], list)
+  let list = list.append([e], list)
+  let list = list.append([f], list)
+  let list = list.append([g], list)
+  let list = list.append([h], list)
+  let list = list.append([i], list)
+  let list = list.append([j], list)
+  let list = list.append([k], list)
+  let list = list.append([l], list)
+  list.map(control, fn(elem) {
+    list.contains(list, elem.1)
+    |> should.equal(True)
+  })
+  table |> uset.prev(key) |> should.equal(Error(bravo.EndOfTable))
+}
 //
 // // TODO: Replace the internal binding calls here with actual functions
 // pub fn uset_async_access_test() {

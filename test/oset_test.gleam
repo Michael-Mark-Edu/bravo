@@ -4,6 +4,7 @@ import gleam/dict
 import gleam/dynamic
 import gleam/list
 import gleam/otp/task
+import gleam/string
 import gleeunit/should
 import shellout
 import simplifile
@@ -261,216 +262,119 @@ pub fn oset_member_test() {
   oset.member(table, 4)
   |> should.equal(Ok(False))
 }
-//
-// pub fn oset_singleton_member_test() {
-//   let assert Ok(table) = oset.new("oset25", 1, bravo.Public)
-//   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
-//   oset.insert(table, [1, 3])
-//   |> should.equal(Ok(Nil))
-//   oset.member(table, 1)
-//   |> should.equal(True)
-//   oset.member(table, 2)
-//   |> should.equal(False)
-//   oset.delete_key(table, 1)
-//   oset.member(table, 1)
-//   |> should.equal(False)
-// }
-//
-// pub fn oset_tab2file_singleton_test() {
-//   let assert Ok(table) = oset.new("oset26", 1, bravo.Public)
-//   oset.insert(table, ["Hello"])
-//   |> should.equal(Ok(Nil))
-//   oset.tab2file(table, "oset26", True, True, True)
-//   |> should.equal(Ok(Nil))
-//   oset.delete(table)
-//   let assert Ok(new_table) = oset.file2tab("oset26", True, dynamic.string)
-//   oset.lookup(new_table, "Hello")
-//   |> should.equal(Ok("Hello"))
-//   oset.delete(new_table)
-//   oset.file2tab("oset26", True, dynamic.tuple2(dynamic.int, dynamic.int))
-//   |> should.equal(Error(bravo.DecodeFailure))
-//
-//   let assert Ok(newer_table) = oset.new("oset26", 1, bravo.Public)
-//   oset.insert(newer_table, [#("Hello")])
-//   |> should.equal(Ok(Nil))
-//   oset.tab2file(newer_table, "oset26", True, True, True)
-//   |> should.equal(Ok(Nil))
-//   oset.delete(newer_table)
-//   let assert Ok(newest_table) = oset.file2tab("oset26", True, dynamic.string)
-//   oset.lookup(newest_table, "Hello")
-//   |> should.equal(Ok("Hello"))
-//   oset.delete(newest_table)
-//
-//   simplifile.delete("oset26")
-//   |> should.equal(Ok(Nil))
-// }
-//
-// pub fn oset_tab2file_singleton_record_test() {
-//   let assert Ok(table) = oset.new("oset27", 1, bravo.Public)
-//   oset.insert(table, [Ok("Hello"), Error("World")])
-//   |> should.equal(Ok(Nil))
-//   oset.tab2file(table, "oset27", True, True, True)
-//   |> should.equal(Ok(Nil))
-//   oset.delete(table)
-//   let assert Ok(new_table) =
-//     oset.file2tab(
-//       "oset27",
-//       True,
-//       dynamic.result(dynamic.string, dynamic.string),
-//     )
-//   oset.lookup(new_table, Ok("Hello"))
-//   |> should.equal(Ok(Ok("Hello")))
-//   oset.lookup(new_table, Error("World"))
-//   |> should.equal(Ok(Error("World")))
-//   oset.delete(new_table)
-//   oset.file2tab("oset27", True, dynamic.tuple2(dynamic.int, dynamic.int))
-//   |> should.equal(Error(bravo.DecodeFailure))
-//   simplifile.delete("oset27")
-//   |> should.equal(Ok(Nil))
-// }
-//
-// pub fn oset_fn_test() {
-//   let assert Ok(table) = oset.new("oset28", 1, bravo.Public)
-//   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
-//   oset.insert(table, [
-//     #("A"),
-//     #("Q"),
-//     #("C"),
-//     #("R"),
-//     #("Z"),
-//     #("B"),
-//     #("S"),
-//     #("F"),
-//     #("Da"),
-//     #("DA"),
-//     #("Db"),
-//     #("a"),
-//   ])
-//   |> should.equal(Ok(Nil))
-//   let assert Ok(a) = table |> oset.first
-//   let assert Ok(b) = table |> oset.next(a)
-//   let assert Ok(c) = table |> oset.next(b)
-//   let assert Ok(d) = table |> oset.next(c)
-//   let assert Ok(e) = table |> oset.next(d)
-//   let assert Ok(f) = table |> oset.next(e)
-//   let assert Ok(g) = table |> oset.next(f)
-//   let assert Ok(h) = table |> oset.next(g)
-//   let assert Ok(i) = table |> oset.next(h)
-//   let assert Ok(j) = table |> oset.next(i)
-//   let assert Ok(k) = table |> oset.next(j)
-//   let assert Ok(l) = table |> oset.next(k)
-//   oset.lookup(table, a) |> should.equal(Ok(#("A")))
-//   oset.lookup(table, b) |> should.equal(Ok(#("B")))
-//   oset.lookup(table, c) |> should.equal(Ok(#("C")))
-//   oset.lookup(table, d) |> should.equal(Ok(#("DA")))
-//   oset.lookup(table, e) |> should.equal(Ok(#("Da")))
-//   oset.lookup(table, f) |> should.equal(Ok(#("Db")))
-//   oset.lookup(table, g) |> should.equal(Ok(#("F")))
-//   oset.lookup(table, h) |> should.equal(Ok(#("Q")))
-//   oset.lookup(table, i) |> should.equal(Ok(#("R")))
-//   oset.lookup(table, j) |> should.equal(Ok(#("S")))
-//   oset.lookup(table, k) |> should.equal(Ok(#("Z")))
-//   oset.lookup(table, l) |> should.equal(Ok(#("a")))
-//   table |> oset.next(l) |> should.equal(Error(Nil))
-//   Error(Nil)
-// }
-//
-// pub fn oset_lp_test() {
-//   let assert Ok(table) = oset.new("oset28", 1, bravo.Public)
-//   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
-//   oset.insert(table, [
-//     #("A"),
-//     #("Q"),
-//     #("C"),
-//     #("R"),
-//     #("Z"),
-//     #("B"),
-//     #("S"),
-//     #("F"),
-//     #("Da"),
-//     #("DA"),
-//     #("Db"),
-//     #("a"),
-//   ])
-//   |> should.equal(Ok(Nil))
-//   let assert Ok(a) = table |> oset.last
-//   let assert Ok(b) = table |> oset.prev(a)
-//   let assert Ok(c) = table |> oset.prev(b)
-//   let assert Ok(d) = table |> oset.prev(c)
-//   let assert Ok(e) = table |> oset.prev(d)
-//   let assert Ok(f) = table |> oset.prev(e)
-//   let assert Ok(g) = table |> oset.prev(f)
-//   let assert Ok(h) = table |> oset.prev(g)
-//   let assert Ok(i) = table |> oset.prev(h)
-//   let assert Ok(j) = table |> oset.prev(i)
-//   let assert Ok(k) = table |> oset.prev(j)
-//   let assert Ok(l) = table |> oset.prev(k)
-//   oset.lookup(table, a) |> should.equal(Ok(#("a")))
-//   oset.lookup(table, b) |> should.equal(Ok(#("Z")))
-//   oset.lookup(table, c) |> should.equal(Ok(#("S")))
-//   oset.lookup(table, d) |> should.equal(Ok(#("R")))
-//   oset.lookup(table, e) |> should.equal(Ok(#("Q")))
-//   oset.lookup(table, f) |> should.equal(Ok(#("F")))
-//   oset.lookup(table, g) |> should.equal(Ok(#("Db")))
-//   oset.lookup(table, h) |> should.equal(Ok(#("Da")))
-//   oset.lookup(table, i) |> should.equal(Ok(#("DA")))
-//   oset.lookup(table, j) |> should.equal(Ok(#("C")))
-//   oset.lookup(table, k) |> should.equal(Ok(#("B")))
-//   oset.lookup(table, l) |> should.equal(Ok(#("A")))
-//   table |> oset.prev(l) |> should.equal(Error(Nil))
-//   Error(Nil)
-// }
-//
-// // TODO: Replace the internal binding calls here with actual functions
-// pub fn oset_async_access_test() {
-//   let assert Ok(table) = oset.new("oset30", 1, bravo.Private)
-//   use <- defer(fn() { oset.delete(table) |> should.equal(True) })
-//   oset.insert(table, [#("Hello", "World")])
-//   |> should.equal(Ok(Nil))
-//   let assert Ok(ref) =
-//     "oset30"
-//     |> atom.create_from_string
-//     |> bindings.try_whereis
-//   bindings.try_lookup(ref, "Hello")
-//   |> should.equal(Ok([#("Hello", "World")]))
-//   let task = {
-//     use <- task.async
-//     let assert Ok(ref) =
-//       "oset30"
-//       |> atom.create_from_string
-//       |> bindings.try_whereis
-//     bindings.try_lookup(ref, "Hello")
-//     |> should.equal(Error(bravo.AccessDenied))
-//   }
-//   task.await_forever(task)
-// }
-//
-// pub fn oset_async_protected_test() {
-//   let assert Ok(actor) = {
-//     use _, _ <- actor.start(option.None)
-//     let assert Ok(table) = oset.new("oset30a", 1, bravo.Protected)
-//     oset.insert(table, [#("Goodbye", "World")])
-//     |> should.equal(Ok(Nil))
-//     actor.Continue(option.Some(table), option.None)
-//   }
-//   actor.send(actor, Nil)
-//   process.sleep(100)
-//   let assert Ok(ref) =
-//     "oset30a"
-//     |> atom.create_from_string
-//     |> bindings.try_whereis
-//   bindings.try_lookup(ref, "Goodbye")
-//   |> should.equal(Ok([#("Goodbye", "World")]))
-//   bindings.try_insert(ref, 1, [#("Hello", "Again")])
-//   |> should.equal(Error(bravo.AccessDenied))
-// }
-//
-// pub fn oset_recreation_test() {
-//   let assert Ok(table) = oset.new("oset31", 1, bravo.Private)
-//   oset.insert(table, [#("Hello", "World")])
-//   |> should.equal(Ok(Nil))
-//   oset.delete(table)
-//   let assert Ok(_table2) = oset.new("oset31", 1, bravo.Private)
-//   oset.insert(table, [#("Hello", "World")])
-//   |> should.equal(Error(bravo.TableDoesNotExist))
-// }
+
+pub fn oset_fn_test() {
+  let assert Ok(table) = oset.new("oset15", bravo.Public)
+  use <- defer(fn() { oset.delete(table) |> should.be_ok })
+  let control = [
+    #("A", "B"),
+    #("Q", "S"),
+    #("C", "F"),
+    #("R", "Da"),
+    #("Z", "DA"),
+    #("B", "Db"),
+    #("S", "a"),
+    #("F", "A"),
+    #("Da", "Q"),
+    #("DA", "C"),
+    #("Db", "R"),
+    #("a", "Z"),
+  ]
+  oset.insert_list(table, control)
+  |> should.be_ok
+  let assert Ok(key) = table |> oset.first
+  oset.lookup(table, key)
+  |> should.equal(Ok("B"))
+  let assert Ok(key) = table |> oset.next(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("Db"))
+  let assert Ok(key) = table |> oset.next(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("F"))
+  let assert Ok(key) = table |> oset.next(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("C"))
+  let assert Ok(key) = table |> oset.next(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("Q"))
+  let assert Ok(key) = table |> oset.next(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("R"))
+  let assert Ok(key) = table |> oset.next(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("A"))
+  let assert Ok(key) = table |> oset.next(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("S"))
+  let assert Ok(key) = table |> oset.next(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("Da"))
+  let assert Ok(key) = table |> oset.next(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("a"))
+  let assert Ok(key) = table |> oset.next(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("DA"))
+  let assert Ok(key) = table |> oset.next(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("Z"))
+  table |> oset.next(key) |> should.equal(Error(bravo.EndOfTable))
+}
+
+pub fn oset_lp_test() {
+  let assert Ok(table) = oset.new("oset16", bravo.Public)
+  use <- defer(fn() { oset.delete(table) |> should.be_ok })
+  let control = [
+    #("A", "B"),
+    #("Q", "S"),
+    #("C", "F"),
+    #("R", "Da"),
+    #("Z", "DA"),
+    #("B", "Db"),
+    #("S", "a"),
+    #("F", "A"),
+    #("Da", "Q"),
+    #("DA", "C"),
+    #("Db", "R"),
+    #("a", "Z"),
+  ]
+  oset.insert_list(table, control)
+  |> should.be_ok
+  let assert Ok(key) = table |> oset.last
+  oset.lookup(table, key)
+  |> should.equal(Ok("Z"))
+  let assert Ok(key) = table |> oset.prev(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("DA"))
+  let assert Ok(key) = table |> oset.prev(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("a"))
+  let assert Ok(key) = table |> oset.prev(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("Da"))
+  let assert Ok(key) = table |> oset.prev(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("S"))
+  let assert Ok(key) = table |> oset.prev(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("A"))
+  let assert Ok(key) = table |> oset.prev(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("R"))
+  let assert Ok(key) = table |> oset.prev(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("Q"))
+  let assert Ok(key) = table |> oset.prev(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("C"))
+  let assert Ok(key) = table |> oset.prev(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("F"))
+  let assert Ok(key) = table |> oset.prev(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("Db"))
+  let assert Ok(key) = table |> oset.prev(key)
+  oset.lookup(table, key)
+  |> should.equal(Ok("B"))
+  table |> oset.prev(key) |> should.equal(Error(bravo.EndOfTable))
+}

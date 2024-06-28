@@ -13,7 +13,9 @@ get_error_type(Reason, Tid, Atom) ->
         true -> {error, access_denied};
         false -> {error, table_does_not_exist}
       end;
-    _ -> {error, {erlang_error, atom_to_binary(Reason)}}
+    _ ->
+      erlang:display(Reason),
+      {error, {erlang_error, term_to_binary(Reason)}}
   end.
 
 try_new(Name, Options) ->
@@ -132,29 +134,28 @@ try_tab2list(Tid, Atom) ->
   end.
 
 try_first(Tid, Atom) ->
-  try lists:map(fun(Elem) -> element(1, Elem) end, ets:first(Tid)) of
+  try ets:first(Tid) of
     '$end_of_table' -> {error, end_of_table};
     Other -> {ok, Other}
   catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_last(Tid, Atom) ->
-  try lists:map(fun(Elem) -> element(1, Elem) end, ets:last(Tid)) of
+  try ets:last(Tid) of
     '$end_of_table' -> {error, end_of_table};
     Other -> {ok, Other}
   catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
-
 try_next(Tid, Atom, Key) ->
-  try lists:map(fun(Elem) -> element(1, Elem) end, ets:next(Tid, Key)) of
+  try ets:next(Tid, Key) of
     '$end_of_table' -> {error, end_of_table};
     Other -> {ok, Other}
   catch _:Reason -> get_error_type(Reason, Tid, Atom)
   end.
 
 try_prev(Tid, Atom, Key) ->
-  try lists:map(fun(Elem) -> element(1, Elem) end, ets:next(Tid, Key)) of
+  try ets:prev(Tid, Key) of
     '$end_of_table' -> {error, end_of_table};
     Other -> {ok, Other}
   catch _:Reason -> get_error_type(Reason, Tid, Atom)

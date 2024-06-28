@@ -272,222 +272,129 @@ pub fn bag_member_test() {
   bag.member(table, 4)
   |> should.equal(Ok(False))
 }
-//
-// pub fn bag_singleton_member_test() {
-//   let assert Ok(table) = bag.new("bag25", 1, bravo.Public)
-//   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
-//   bag.insert(table, [1, 3])
-//   |> should.equal(Ok(Nil))
-//   bag.member(table, 1)
-//   |> should.equal(True)
-//   bag.member(table, 2)
-//   |> should.equal(False)
-//   bag.delete_key(table, 1)
-//   bag.member(table, 1)
-//   |> should.equal(False)
-// }
-//
-// pub fn bag_tab2file_singleton_test() {
-//   let assert Ok(table) = bag.new("bag26", 1, bravo.Public)
-//   bag.insert(table, ["Hello"])
-//   |> should.equal(Ok(Nil))
-//   bag.tab2file(table, "bag26", True, True, True)
-//   |> should.equal(Ok(Nil))
-//   bag.delete(table)
-//   let assert Ok(new_table) = bag.file2tab("bag26", True, dynamic.string)
-//   bag.lookup(new_table, "Hello")
-//   |> should.equal(Ok(["Hello"]))
-//   bag.delete(new_table)
-//   bag.file2tab("bag26", True, dynamic.tuple2(dynamic.int, dynamic.int))
-//   |> should.equal(Error(bravo.DecodeFailure))
-//
-//   let assert Ok(newer_table) = bag.new("bag26", 1, bravo.Public)
-//   bag.insert(newer_table, [#("Hello")])
-//   |> should.equal(Ok(Nil))
-//   bag.tab2file(newer_table, "bag26", True, True, True)
-//   |> should.equal(Ok(Nil))
-//   bag.delete(newer_table)
-//   let assert Ok(newest_table) = bag.file2tab("bag26", True, dynamic.string)
-//   bag.lookup(newest_table, "Hello")
-//   |> should.equal(Ok(["Hello"]))
-//   bag.delete(newest_table)
-//
-//   simplifile.delete("bag26")
-//   |> should.equal(Ok(Nil))
-// }
-//
-// pub fn bag_tab2file_singleton_record_test() {
-//   let assert Ok(table) = bag.new("bag27", 1, bravo.Public)
-//   bag.insert(table, [Ok("Hello"), Error("World")])
-//   |> should.equal(Ok(Nil))
-//   bag.tab2file(table, "bag27", True, True, True)
-//   |> should.equal(Ok(Nil))
-//   bag.delete(table)
-//   let assert Ok(new_table) =
-//     bag.file2tab("bag27", True, dynamic.result(dynamic.string, dynamic.string))
-//   bag.lookup(new_table, Ok("Hello"))
-//   |> should.equal(Ok([Ok("Hello")]))
-//   bag.lookup(new_table, Error("World"))
-//   |> should.equal(Ok([Error("World")]))
-//   bag.delete(new_table)
-//   bag.file2tab("bag27", True, dynamic.tuple2(dynamic.int, dynamic.int))
-//   |> should.equal(Error(bravo.DecodeFailure))
-//   simplifile.delete("bag27")
-//   |> should.equal(Ok(Nil))
-// }
-//
-// pub fn bag_fn_test() {
-//   let assert Ok(table) = bag.new("bag28", 1, bravo.Public)
-//   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
-//   let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
-//   bag.insert(table, dataset)
-//   |> should.equal(Ok(Nil))
-//   let assert Ok(key) = table |> bag.first
-//   let assert Ok(a) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.next(key)
-//   let assert Ok(b) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.next(key)
-//   let assert Ok(c) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.next(key)
-//   let assert Ok(d) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.next(key)
-//   let assert Ok(e) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.next(key)
-//   let assert Ok(f) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.next(key)
-//   let assert Ok(g) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.next(key)
-//   let assert Ok(h) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.next(key)
-//   let assert Ok(i) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.next(key)
-//   let assert Ok(j) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.next(key)
-//   let assert Ok(k) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.next(key)
-//   let assert Ok(l) = bag.lookup(table, key)
-//   let list = []
-//   let list = list.append(a, list)
-//   let list = list.append(b, list)
-//   let list = list.append(c, list)
-//   let list = list.append(d, list)
-//   let list = list.append(e, list)
-//   let list = list.append(f, list)
-//   let list = list.append(g, list)
-//   let list = list.append(h, list)
-//   let list = list.append(i, list)
-//   let list = list.append(j, list)
-//   let list = list.append(k, list)
-//   let list = list.append(l, list)
-//   list.map(dataset, fn(elem) {
-//     list.contains(list, elem)
-//     |> should.equal(True)
-//   })
-//   table |> bag.next(l) |> should.equal(Error(Nil))
-//   Error(Nil)
-// }
-//
-// pub fn bag_lp_test() {
-//   let assert Ok(table) = bag.new("bag29", 1, bravo.Public)
-//   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
-//   let dataset = ["A", "Q", "C", "R", "Z", "B", "S", "F", "Da", "DA", "Db", "a"]
-//   bag.insert(table, dataset)
-//   |> should.equal(Ok(Nil))
-//   let assert Ok(key) = table |> bag.last
-//   let assert Ok(a) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.prev(key)
-//   let assert Ok(b) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.prev(key)
-//   let assert Ok(c) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.prev(key)
-//   let assert Ok(d) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.prev(key)
-//   let assert Ok(e) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.prev(key)
-//   let assert Ok(f) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.prev(key)
-//   let assert Ok(g) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.prev(key)
-//   let assert Ok(h) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.prev(key)
-//   let assert Ok(i) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.prev(key)
-//   let assert Ok(j) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.prev(key)
-//   let assert Ok(k) = bag.lookup(table, key)
-//   let assert Ok(key) = table |> bag.prev(key)
-//   let assert Ok(l) = bag.lookup(table, key)
-//   let list = []
-//   let list = list.append(a, list)
-//   let list = list.append(b, list)
-//   let list = list.append(c, list)
-//   let list = list.append(d, list)
-//   let list = list.append(e, list)
-//   let list = list.append(f, list)
-//   let list = list.append(g, list)
-//   let list = list.append(h, list)
-//   let list = list.append(i, list)
-//   let list = list.append(j, list)
-//   let list = list.append(k, list)
-//   let list = list.append(l, list)
-//   list.map(dataset, fn(elem) {
-//     list.contains(list, elem)
-//     |> should.equal(True)
-//   })
-//   table |> bag.prev(l) |> should.equal(Error(Nil))
-//   Error(Nil)
-// }
-//
-// // TODO: Replace the internal binding calls here with actual functions
-// pub fn bag_async_access_test() {
-//   let assert Ok(table) = bag.new("bag30", 1, bravo.Private)
-//   use <- defer(fn() { bag.delete(table) |> should.equal(True) })
-//   bag.insert(table, [#("Hello", "World")])
-//   |> should.equal(Ok(Nil))
-//   let assert Ok(ref) =
-//     "bag30"
-//     |> atom.create_from_string
-//     |> bindings.try_whereis
-//   bindings.try_lookup(ref, "Hello")
-//   |> should.equal(Ok([#("Hello", "World")]))
-//   let task = {
-//     use <- task.async
-//     let assert Ok(ref) =
-//       "bag30"
-//       |> atom.create_from_string
-//       |> bindings.try_whereis
-//     bindings.try_lookup(ref, "Hello")
-//     |> should.equal(Error(bravo.AccessDenied))
-//   }
-//   task.await_forever(task)
-// }
-//
-// pub fn bag_async_protected_test() {
-//   let assert Ok(actor) = {
-//     use _, _ <- actor.start(option.None)
-//     let assert Ok(table) = bag.new("bag30a", 1, bravo.Protected)
-//     bag.insert(table, [#("Goodbye", "World")])
-//     |> should.equal(Ok(Nil))
-//     actor.Continue(option.Some(table), option.None)
-//   }
-//   actor.send(actor, Nil)
-//   process.sleep(100)
-//   let assert Ok(ref) =
-//     "bag30a"
-//     |> atom.create_from_string
-//     |> bindings.try_whereis
-//   bindings.try_lookup(ref, "Goodbye")
-//   |> should.equal(Ok([#("Goodbye", "World")]))
-//   bindings.try_insert(ref, 1, [#("Hello", "Again")])
-//   |> should.equal(Error(bravo.AccessDenied))
-// }
-//
-// pub fn bag_recreation_test() {
-//   let assert Ok(table) = bag.new("bag31", 1, bravo.Private)
-//   bag.insert(table, [#("Hello", "World")])
-//   |> should.equal(Ok(Nil))
-//   bag.delete(table)
-//   let assert Ok(_table2) = bag.new("bag31", 1, bravo.Private)
-//   bag.insert(table, [#("Hello", "World")])
-//   |> should.equal(Error(bravo.TableDoesNotExist))
-// }
+
+pub fn bag_fn_test() {
+  let assert Ok(table) = bag.new("bag15", bravo.Public)
+  use <- defer(fn() { bag.delete(table) |> should.be_ok })
+  let control = [
+    #("A", "B"),
+    #("Q", "S"),
+    #("C", "F"),
+    #("R", "Da"),
+    #("Z", "DA"),
+    #("B", "Db"),
+    #("S", "a"),
+    #("F", "A"),
+    #("Da", "Q"),
+    #("DA", "C"),
+    #("Db", "R"),
+    #("a", "Z"),
+  ]
+  bag.insert_list(table, control)
+  |> should.be_ok
+  let assert Ok(key) = table |> bag.first
+  let assert Ok(a) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(b) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(c) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(d) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(e) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(f) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(g) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(h) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(i) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(j) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(k) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.next(key)
+  let assert Ok(l) = bag.lookup(table, key)
+  let list = []
+  let list = list.append(a, list)
+  let list = list.append(b, list)
+  let list = list.append(c, list)
+  let list = list.append(d, list)
+  let list = list.append(e, list)
+  let list = list.append(f, list)
+  let list = list.append(g, list)
+  let list = list.append(h, list)
+  let list = list.append(i, list)
+  let list = list.append(j, list)
+  let list = list.append(k, list)
+  let list = list.append(l, list)
+  list.map(control, fn(elem) {
+    list.contains(list, elem.1)
+    |> should.equal(True)
+  })
+  table |> bag.next(key) |> should.equal(Error(bravo.EndOfTable))
+}
+
+pub fn bag_lp_test() {
+  let assert Ok(table) = bag.new("bag16", bravo.Public)
+  use <- defer(fn() { bag.delete(table) |> should.be_ok })
+  let control = [
+    #("A", "B"),
+    #("Q", "S"),
+    #("C", "F"),
+    #("R", "Da"),
+    #("Z", "DA"),
+    #("B", "Db"),
+    #("S", "a"),
+    #("F", "A"),
+    #("Da", "Q"),
+    #("DA", "C"),
+    #("Db", "R"),
+    #("a", "Z"),
+  ]
+  bag.insert_list(table, control)
+  |> should.be_ok
+  let assert Ok(key) = table |> bag.last
+  let assert Ok(a) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(b) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(c) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(d) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(e) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(f) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(g) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(h) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(i) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(j) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(k) = bag.lookup(table, key)
+  let assert Ok(key) = table |> bag.prev(key)
+  let assert Ok(l) = bag.lookup(table, key)
+  let list = []
+  let list = list.append(a, list)
+  let list = list.append(b, list)
+  let list = list.append(c, list)
+  let list = list.append(d, list)
+  let list = list.append(e, list)
+  let list = list.append(f, list)
+  let list = list.append(g, list)
+  let list = list.append(h, list)
+  let list = list.append(i, list)
+  let list = list.append(j, list)
+  let list = list.append(k, list)
+  let list = list.append(l, list)
+  list.map(control, fn(elem) {
+    list.contains(list, elem.1)
+    |> should.equal(True)
+  })
+  table |> bag.prev(key) |> should.equal(Error(bravo.EndOfTable))
+}
