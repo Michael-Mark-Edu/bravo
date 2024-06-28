@@ -31,6 +31,9 @@ pub type BravoError {
   AccessDenied
   NoFilePermissions
   FileDoesNotExist
+  InvalidPath
+  ChecksumError
+  InvalidObjectCount
   /// Thrown when trying to perform an action on a table that has never been
   /// `insert`ed into. This library relies on a `insert`, `insert_new`, or
   /// `file2tab` call to initialize information about a table due to them

@@ -113,6 +113,7 @@ try_tab2file(Tid, Filename, ObjectCount, Md5sum, Sync) ->
     ok -> {ok, nil};
     {error, eaccess} -> {error, no_file_permissions};
     {error, {file_error, _, eacces}} -> {error, no_file_permissions};
+    {error, {file_error, _, enoent}} -> {error, invalid_path};
     {error, badtab} -> {error, table_does_not_exist};
     {error, Reason} -> term_to_binary(Reason)
   catch
@@ -124,6 +125,8 @@ try_file2tab(Filename, Verify) ->
   try ets:file2tab(Filename, [{verify, Verify}]) of
     {ok, Atom} -> {ok, Atom};
     {error, {read_error, {file_error, _, enoent}}} -> {error, file_does_not_exist};
+    {error, checksum_error} -> {error, checksum_error};
+    {error, invalid_object_count} -> {error, invalid_object_count};
     {error, Reason} -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
   catch _:Reason -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
   end.
