@@ -1,4 +1,5 @@
 import bravo
+import bravo/bravo_options
 import bravo/uset
 import gleam/dict
 import gleam/dynamic
@@ -396,4 +397,38 @@ pub fn uset_lp_test() {
     |> should.equal(True)
   })
   table |> uset.prev(key) |> should.equal(Error(bravo.EndOfTable))
+}
+
+pub fn uset_spec_test() {
+  let assert Ok(table1) =
+    bravo.spec("uset17a")
+    |> bravo.access(bravo.Public)
+    |> bravo.write_concurrency(bravo_options.Off)
+    |> bravo.read_concurrency(False)
+    |> bravo.decentralized_counters(False)
+    |> bravo.compressed
+    |> uset.from_spec
+  uset.insert(table1, "Hello", "World")
+  |> should.be_ok
+  uset.lookup(table1, "Hello")
+  |> should.equal(Ok("World"))
+  let assert Ok(table2) =
+    bravo.spec("uset17b")
+    |> bravo.access(bravo.Private)
+    |> bravo.write_concurrency(bravo_options.On)
+    |> bravo.read_concurrency(True)
+    |> bravo.decentralized_counters(True)
+    |> uset.from_spec
+  uset.insert(table2, "Hello", "World")
+  |> should.be_ok
+  uset.lookup(table2, "Hello")
+  |> should.equal(Ok("World"))
+  let assert Ok(table3) =
+    bravo.spec("uset17c")
+    |> bravo.write_concurrency(bravo_options.Auto)
+    |> uset.from_spec
+  uset.insert(table3, "Hello", "World")
+  |> should.be_ok
+  uset.lookup(table3, "Hello")
+  |> should.equal(Ok("World"))
 }

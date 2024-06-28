@@ -1,4 +1,5 @@
 import bravo
+import bravo/bravo_options
 import bravo/dbag
 import gleam/dict
 import gleam/dynamic
@@ -402,4 +403,38 @@ pub fn dbag_lp_test() {
     |> should.equal(True)
   })
   table |> dbag.prev(key) |> should.equal(Error(bravo.EndOfTable))
+}
+
+pub fn dbag_spec_test() {
+  let assert Ok(table1) =
+    bravo.spec("dbag17a")
+    |> bravo.access(bravo.Public)
+    |> bravo.write_concurrency(bravo_options.Off)
+    |> bravo.read_concurrency(False)
+    |> bravo.decentralized_counters(False)
+    |> bravo.compressed
+    |> dbag.from_spec
+  dbag.insert(table1, "Hello", "World")
+  |> should.be_ok
+  dbag.lookup(table1, "Hello")
+  |> should.equal(Ok(["World"]))
+  let assert Ok(table2) =
+    bravo.spec("dbag17b")
+    |> bravo.access(bravo.Private)
+    |> bravo.write_concurrency(bravo_options.On)
+    |> bravo.read_concurrency(True)
+    |> bravo.decentralized_counters(True)
+    |> dbag.from_spec
+  dbag.insert(table2, "Hello", "World")
+  |> should.be_ok
+  dbag.lookup(table2, "Hello")
+  |> should.equal(Ok(["World"]))
+  let assert Ok(table3) =
+    bravo.spec("dbag17c")
+    |> bravo.write_concurrency(bravo_options.Auto)
+    |> dbag.from_spec
+  dbag.insert(table3, "Hello", "World")
+  |> should.be_ok
+  dbag.lookup(table3, "Hello")
+  |> should.equal(Ok(["World"]))
 }

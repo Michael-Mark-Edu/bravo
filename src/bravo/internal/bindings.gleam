@@ -1,10 +1,13 @@
 import bravo.{type BravoError}
-import bravo/internal/new_option.{type NewOption}
+import bravo/bravo_options
 import gleam/erlang.{type Reference}
 import gleam/erlang/atom.{type Atom}
 
 @external(erlang, "bravo_ffi", "try_new")
-pub fn try_new(atom: Atom, options: List(NewOption)) -> Result(Atom, BravoError)
+pub fn try_new(
+  atom: Atom,
+  options: List(bravo_options.NewOption),
+) -> Result(Atom, BravoError)
 
 @external(erlang, "bravo_ffi", "try_insert")
 pub fn try_insert(

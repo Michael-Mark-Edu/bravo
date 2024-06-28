@@ -1,5 +1,6 @@
 import bravo
 import bravo/bag
+import bravo/bravo_options
 import gleam/dict
 import gleam/dynamic
 import gleam/list
@@ -402,4 +403,38 @@ pub fn bag_lp_test() {
     |> should.equal(True)
   })
   table |> bag.prev(key) |> should.equal(Error(bravo.EndOfTable))
+}
+
+pub fn bag_spec_test() {
+  let assert Ok(table1) =
+    bravo.spec("bag17a")
+    |> bravo.access(bravo.Public)
+    |> bravo.write_concurrency(bravo_options.Off)
+    |> bravo.read_concurrency(False)
+    |> bravo.decentralized_counters(False)
+    |> bravo.compressed
+    |> bag.from_spec
+  bag.insert(table1, "Hello", "World")
+  |> should.be_ok
+  bag.lookup(table1, "Hello")
+  |> should.equal(Ok(["World"]))
+  let assert Ok(table2) =
+    bravo.spec("bag17b")
+    |> bravo.access(bravo.Private)
+    |> bravo.write_concurrency(bravo_options.On)
+    |> bravo.read_concurrency(True)
+    |> bravo.decentralized_counters(True)
+    |> bag.from_spec
+  bag.insert(table2, "Hello", "World")
+  |> should.be_ok
+  bag.lookup(table2, "Hello")
+  |> should.equal(Ok(["World"]))
+  let assert Ok(table3) =
+    bravo.spec("bag17c")
+    |> bravo.write_concurrency(bravo_options.Auto)
+    |> bag.from_spec
+  bag.insert(table3, "Hello", "World")
+  |> should.be_ok
+  bag.lookup(table3, "Hello")
+  |> should.equal(Ok(["World"]))
 }

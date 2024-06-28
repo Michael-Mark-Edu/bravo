@@ -1,4 +1,4 @@
-pub type Term
+import bravo/internal/write_concurrency_internal
 
 pub type NewOption {
   Set
@@ -10,20 +10,14 @@ pub type NewOption {
   Private
   NamedTable
   Keypos(Int)
-  Heir(Pid, Term)
-  WriteConcurrency(Auto)
+  WriteConcurrency(write_concurrency_internal.WriteConcurrencyInternal)
   ReadConcurrency(Bool)
   DecentralizedCounters(Bool)
   Compressed
 }
 
-pub type Pid
-
-pub type Auto {
+pub type WriteConcurrency {
+  On
+  Off
   Auto
-}
-
-pub type EmptyResult(error) {
-  Ok
-  Error(error)
 }

@@ -1,8 +1,8 @@
 //// This module provides functions to work with `DBag`s
 
 import bravo.{type Access, type BravoError}
+import bravo/bravo_options
 import bravo/internal/master
-import bravo/internal/new_option
 import gleam/dynamic.{type Dynamic}
 import gleam/result
 
@@ -16,7 +16,12 @@ pub fn new(
   name name: String,
   access access: Access,
 ) -> Result(DBag(k, v), BravoError) {
-  use res <- result.try(master.new(name, access, new_option.DuplicateBag))
+  use res <- result.try(master.new(name, access, bravo_options.DuplicateBag))
+  Ok(DBag(res))
+}
+
+pub fn from_spec(spec spec: bravo.Spec) -> Result(DBag(k, v), BravoError) {
+  use res <- result.try(master.from_spec(spec, bravo_options.DuplicateBag))
   Ok(DBag(res))
 }
 
