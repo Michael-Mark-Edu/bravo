@@ -37,8 +37,13 @@ pub fn dbag_dupe_test() {
   |> should.equal(Error(bravo.TableAlreadyExists))
   dbag.delete(table)
   |> should.be_ok
-  let assert Ok(table) = dbag.new("dbag2", bravo.Public)
-  dbag.delete(table)
+  let assert Ok(table2) = dbag.new("dbag2", bravo.Public)
+  dbag.insert(table, "Goodbye", "World")
+  |> should.equal(Error(bravo.TableDoesNotExist))
+  dbag.insert(table2, "Goodbye", "World")
+  |> should.be_ok
+  dbag.delete(table2)
+  |> should.be_ok
 }
 
 pub fn dbag_multi_insert_test() {

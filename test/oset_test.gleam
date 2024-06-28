@@ -2,9 +2,7 @@ import bravo
 import bravo/oset
 import gleam/dict
 import gleam/dynamic
-import gleam/list
 import gleam/otp/task
-import gleam/string
 import gleeunit/should
 import shellout
 import simplifile
@@ -38,8 +36,13 @@ pub fn oset_dupe_test() {
   |> should.equal(Error(bravo.TableAlreadyExists))
   oset.delete(table)
   |> should.be_ok
-  let assert Ok(table) = oset.new("oset2", bravo.Public)
-  oset.delete(table)
+  let assert Ok(table2) = oset.new("oset2", bravo.Public)
+  oset.insert(table, "Goodbye", "World")
+  |> should.equal(Error(bravo.TableDoesNotExist))
+  oset.insert(table2, "Goodbye", "World")
+  |> should.be_ok
+  oset.delete(table2)
+  |> should.be_ok
 }
 
 pub fn oset_multi_insert_test() {

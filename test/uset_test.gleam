@@ -2,7 +2,6 @@ import bravo
 import bravo/uset
 import gleam/dict
 import gleam/dynamic
-import gleam/io
 import gleam/list
 import gleam/otp/task
 import gleeunit/should
@@ -38,8 +37,13 @@ pub fn uset_dupe_test() {
   |> should.equal(Error(bravo.TableAlreadyExists))
   uset.delete(table)
   |> should.be_ok
-  let assert Ok(table) = uset.new("uset2", bravo.Public)
-  uset.delete(table)
+  let assert Ok(table2) = uset.new("uset2", bravo.Public)
+  uset.insert(table, "Goodbye", "World")
+  |> should.equal(Error(bravo.TableDoesNotExist))
+  uset.insert(table2, "Goodbye", "World")
+  |> should.be_ok
+  uset.delete(table2)
+  |> should.be_ok
 }
 
 pub fn uset_multi_insert_test() {
@@ -163,7 +167,7 @@ pub fn uset_file2tab_test() {
 }
 
 pub fn uset_access_test() {
-  let assert Ok(table) = uset.new("uset10", bravo.Protected)
+  let assert Ok(table) = uset.new("uset10a", bravo.Protected)
   uset.insert(table, "Hello", "World")
   |> should.be_ok
   {
@@ -393,57 +397,3 @@ pub fn uset_lp_test() {
   })
   table |> uset.prev(key) |> should.equal(Error(bravo.EndOfTable))
 }
-//
-// // TODO: Replace the internal binding calls here with actual functions
-// pub fn uset_async_access_test() {
-//   let assert Ok(table) = uset.new("uset30", 1, bravo.Private)
-//   use <- defer(fn() { uset.delete(table) |> should.equal(True) })
-//   uset.insert(table, [#("Hello", "World")])
-//   |> should.be_ok
-//   let assert Ok(ref) =
-//     "uset30"
-//     |> atom.create_from_string
-//     |> bindings.try_whereis
-//   bindings.try_lookup(ref, "Hello")
-//   |> should.equal(Ok([#("Hello", "World")]))
-//   let task = {
-//     use <- task.async
-//     let assert Ok(ref) =
-//       "uset30"
-//       |> atom.create_from_string
-//       |> bindings.try_whereis
-//     bindings.try_lookup(ref, "Hello")
-//     |> should.equal(Error(bravo.AccessDenied))
-//   }
-//   task.await_forever(task)
-// }
-//
-// pub fn uset_async_protected_test() {
-//   let assert Ok(actor) = {
-//     use _, _ <- actor.start(option.None)
-//     let assert Ok(table) = uset.new("uset30a", 1, bravo.Protected)
-//     uset.insert(table, [#("Goodbye", "World")])
-//     |> should.be_ok
-//     actor.Continue(option.Some(table), option.None)
-//   }
-//   actor.send(actor, Nil)
-//   process.sleep(100)
-//   let assert Ok(ref) =
-//     "uset30a"
-//     |> atom.create_from_string
-//     |> bindings.try_whereis
-//   bindings.try_lookup(ref, "Goodbye")
-//   |> should.equal(Ok([#("Goodbye", "World")]))
-//   bindings.try_insert(ref, 1, [#("Hello", "Again")])
-//   |> should.equal(Error(bravo.AccessDenied))
-// }
-//
-// pub fn uset_recreation_test() {
-//   let assert Ok(table) = uset.new("uset31", 1, bravo.Public)
-//   uset.insert(table, [#("Hello", "World")])
-//   |> should.be_ok
-//   uset.delete(table)
-//   let assert Ok(_table2) = uset.new("uset31", 1, bravo.Public)
-//   uset.insert(table, [#("Hello", "World")])
-//   |> should.equal(Error(bravo.TableDoesNotExist))
-// }
