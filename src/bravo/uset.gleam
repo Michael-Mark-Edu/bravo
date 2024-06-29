@@ -348,8 +348,8 @@ pub fn tab2file(
 /// written, which may result in issues if the table was written to during the
 /// original dump; avoid this by not verifying or setting on of the `tab2file`
 /// flags.
-/// - `k key_decoder: fn(Dynamic) -> Result(k, _)`
-/// - `v value_decoder: fn(Dynamic) -> Result(v, _)`
+/// - `k key_decoder: fn(Dynamic) -> Result(k, _),
+///   v value_decoder: fn(Dynamic) -> Result(v, _)`
 /// Used to ensure at runtime that the type of the table makes sense. The types
 /// of the key and value are *not* stored in the file, so you must know what the
 /// types are supposed to be when calling this function through other means.
