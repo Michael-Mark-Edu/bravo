@@ -1,7 +1,6 @@
 import bravo.{type Access, type BravoError}
-import bravo/bravo_options
 import bravo/internal/bindings
-import bravo/internal/write_concurrency_internal
+import bravo/internal/new_options
 import gleam/bool
 import gleam/dynamic.{type Dynamic}
 import gleam/erlang.{type Reference}
@@ -17,22 +16,22 @@ pub type InnerTable {
 pub fn new(
   name: String,
   access: Access,
-  ttype: bravo_options.NewOption,
+  ttype: new_options.NewOption,
 ) -> Result(InnerTable, BravoError) {
   let atom = atom.create_from_string(name)
   use atom <- result.try(
     bindings.try_new(atom, [
       ttype,
       case access {
-        bravo.Public -> bravo_options.Public
-        bravo.Protected -> bravo_options.Protected
-        bravo.Private -> bravo_options.Private
+        bravo.Public -> new_options.Public
+        bravo.Protected -> new_options.Protected
+        bravo.Private -> new_options.Private
       },
-      bravo_options.NamedTable,
-      bravo_options.Keypos(1),
-      bravo_options.WriteConcurrency(write_concurrency_internal.Auto),
-      bravo_options.ReadConcurrency(True),
-      bravo_options.DecentralizedCounters(True),
+      new_options.NamedTable,
+      new_options.Keypos(1),
+      new_options.WriteConcurrency(new_options.Auto),
+      new_options.ReadConcurrency(True),
+      new_options.DecentralizedCounters(True),
     ]),
   )
   let assert Ok(tid) = bindings.try_whereis(atom)
@@ -41,13 +40,13 @@ pub fn new(
 
 pub fn from_spec(
   spec: bravo.Spec,
-  ttype: bravo_options.NewOption,
+  ttype: new_options.NewOption,
 ) -> Result(InnerTable, BravoError) {
   use atom <- result.try(
     bindings.try_new(spec.name, [
       ttype,
-      bravo_options.NamedTable,
-      bravo_options.Keypos(1),
+      new_options.NamedTable,
+      new_options.Keypos(1),
       ..spec.opts
     ]),
   )

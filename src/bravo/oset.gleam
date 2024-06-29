@@ -1,8 +1,8 @@
 //// This module provides functions to work with `OSet`s
 
 import bravo.{type Access, type BravoError}
-import bravo/bravo_options
 import bravo/internal/master
+import bravo/internal/new_options
 import gleam/dynamic.{type Dynamic}
 import gleam/result
 
@@ -21,12 +21,12 @@ pub fn new(
   name name: String,
   access access: Access,
 ) -> Result(OSet(k, v), BravoError) {
-  use res <- result.try(master.new(name, access, bravo_options.OrderedSet))
+  use res <- result.try(master.new(name, access, new_options.OrderedSet))
   Ok(OSet(res))
 }
 
 pub fn from_spec(spec spec: bravo.Spec) -> Result(OSet(k, v), BravoError) {
-  use res <- result.try(master.from_spec(spec, bravo_options.OrderedSet))
+  use res <- result.try(master.from_spec(spec, new_options.OrderedSet))
   Ok(OSet(res))
 }
 

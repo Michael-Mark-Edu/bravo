@@ -1,8 +1,8 @@
 //// This module provides functions to work with `USet`s
 
 import bravo.{type Access, type BravoError}
-import bravo/bravo_options
 import bravo/internal/master
+import bravo/internal/new_options
 import gleam/dynamic.{type Dynamic}
 import gleam/result
 
@@ -34,7 +34,7 @@ pub fn new(
   name name: String,
   access access: Access,
 ) -> Result(USet(k, v), BravoError) {
-  use res <- result.try(master.new(name, access, bravo_options.Set))
+  use res <- result.try(master.new(name, access, new_options.Set))
   Ok(USet(res))
 }
 
@@ -53,7 +53,7 @@ pub fn new(
 /// A table with the same `name` already exists. Either delete the existing
 /// table or choose a different name
 pub fn from_spec(spec spec: bravo.Spec) -> Result(USet(k, v), BravoError) {
-  use res <- result.try(master.from_spec(spec, bravo_options.Set))
+  use res <- result.try(master.from_spec(spec, new_options.Set))
   Ok(USet(res))
 }
 
@@ -287,7 +287,6 @@ pub fn delete_all_objects(from uset: USet(k, v)) -> Result(Nil, BravoError) {
 /// The table is protected or private and the current process does not own it.
 /// ## `Error(bravo.TableDoesNotExist)`
 /// The table given does not exist. Was it deleted by a different `delete` call?
-@deprecated("For `USet` and `OSet`, there is little reason to use this function over `delete_key`.")
 pub fn delete_object(
   from uset: USet(k, v),
   key key: k,

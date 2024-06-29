@@ -1,5 +1,4 @@
 import bravo
-import bravo/bravo_options
 import bravo/oset
 import gleam/dict
 import gleam/dynamic
@@ -387,7 +386,7 @@ pub fn oset_spec_test() {
   let assert Ok(table1) =
     bravo.spec("oset17a")
     |> bravo.access(bravo.Public)
-    |> bravo.write_concurrency(bravo_options.Off)
+    |> bravo.write_concurrency(bravo.Off)
     |> bravo.read_concurrency(False)
     |> bravo.decentralized_counters(False)
     |> bravo.compressed
@@ -399,7 +398,7 @@ pub fn oset_spec_test() {
   let assert Ok(table2) =
     bravo.spec("oset17b")
     |> bravo.access(bravo.Private)
-    |> bravo.write_concurrency(bravo_options.On)
+    |> bravo.write_concurrency(bravo.On)
     |> bravo.read_concurrency(True)
     |> bravo.decentralized_counters(True)
     |> oset.from_spec
@@ -409,7 +408,7 @@ pub fn oset_spec_test() {
   |> should.equal(Ok("World"))
   let assert Ok(table3) =
     bravo.spec("oset17c")
-    |> bravo.write_concurrency(bravo_options.Auto)
+    |> bravo.write_concurrency(bravo.Auto)
     |> oset.from_spec
   oset.insert(table3, "Hello", "World")
   |> should.be_ok

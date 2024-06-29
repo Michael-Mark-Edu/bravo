@@ -1,5 +1,3 @@
-import bravo/internal/write_concurrency_internal
-
 pub type NewOption {
   Set
   OrderedSet
@@ -10,14 +8,14 @@ pub type NewOption {
   Private
   NamedTable
   Keypos(Int)
-  WriteConcurrency(write_concurrency_internal.WriteConcurrencyInternal)
+  WriteConcurrency(WriteConcurrencyInternal)
   ReadConcurrency(Bool)
   DecentralizedCounters(Bool)
   Compressed
 }
 
-pub type WriteConcurrency {
-  On
-  Off
+pub type WriteConcurrencyInternal {
+  True
+  False
   Auto
 }

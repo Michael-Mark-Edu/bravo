@@ -1,7 +1,6 @@
 //// Contains types used by all modules in the Bravo package.
 
-import bravo/bravo_options
-import bravo/internal/write_concurrency_internal
+import bravo/internal/new_options
 import gleam/erlang/atom
 
 /// The error type all Bravo functions use.
@@ -48,7 +47,7 @@ pub type BravoError {
 }
 
 pub type Spec {
-  Spec(name: atom.Atom, opts: List(bravo_options.NewOption))
+  Spec(name: atom.Atom, opts: List(new_options.NewOption))
 }
 
 pub fn spec(name: String) -> Spec {
@@ -60,37 +59,34 @@ pub fn access(spec spec: Spec, opt opt: Access) -> Spec {
     ..spec,
     opts: [
       case opt {
-        Public -> bravo_options.Public
-        Protected -> bravo_options.Protected
-        Private -> bravo_options.Private
+        Public -> new_options.Public
+        Protected -> new_options.Protected
+        Private -> new_options.Private
       },
       ..spec.opts
     ],
   )
 }
 
-pub fn write_concurrency(
-  spec spec: Spec,
-  opt opt: bravo_options.WriteConcurrency,
-) -> Spec {
+pub fn write_concurrency(spec spec: Spec, opt opt: WriteConcurrency) -> Spec {
   let parsed = case opt {
-    bravo_options.On -> write_concurrency_internal.True
-    bravo_options.Off -> write_concurrency_internal.False
-    bravo_options.Auto -> write_concurrency_internal.Auto
+    On -> new_options.True
+    Off -> new_options.False
+    Auto -> new_options.Auto
   }
-  Spec(..spec, opts: [bravo_options.WriteConcurrency(parsed), ..spec.opts])
+  Spec(..spec, opts: [new_options.WriteConcurrency(parsed), ..spec.opts])
 }
 
 pub fn read_concurrency(spec spec: Spec, opt opt: Bool) -> Spec {
-  Spec(..spec, opts: [bravo_options.ReadConcurrency(opt), ..spec.opts])
+  Spec(..spec, opts: [new_options.ReadConcurrency(opt), ..spec.opts])
 }
 
 pub fn decentralized_counters(spec spec: Spec, opt opt: Bool) -> Spec {
-  Spec(..spec, opts: [bravo_options.DecentralizedCounters(opt), ..spec.opts])
+  Spec(..spec, opts: [new_options.DecentralizedCounters(opt), ..spec.opts])
 }
 
 pub fn compressed(spec spec: Spec) -> Spec {
-  Spec(..spec, opts: [bravo_options.Compressed, ..spec.opts])
+  Spec(..spec, opts: [new_options.Compressed, ..spec.opts])
 }
 
 /// Access specifiers for ETS tables. Affects how other processes can interact
@@ -102,4 +98,10 @@ pub type Access {
   Protected
   /// Only the owner process can read or write to the table.
   Private
+}
+
+pub type WriteConcurrency {
+  On
+  Off
+  Auto
 }
