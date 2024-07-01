@@ -282,7 +282,7 @@ pub fn delete_all_objects(from uset: USet(k, v)) -> Result(Nil, BravoError) {
 /// # Parameters
 /// - `from uset: USet(k, v)`
 /// The table to delete from.
-/// - `at key: k`
+/// - `key key: k`
 /// The key of the object to delete.
 /// - `value value: v`
 /// The value of the object to delete.
