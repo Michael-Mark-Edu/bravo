@@ -13,9 +13,7 @@ get_error_type(Reason, Tid, Atom) ->
         true -> {error, access_denied};
         false -> {error, table_does_not_exist}
       end;
-    _ ->
-      erlang:display(Reason),
-      {error, {erlang_error, term_to_binary(Reason)}}
+    _ -> {error, {erlang_error, term_to_binary(Reason)}}
   end.
 
 try_new(Name, Options) ->

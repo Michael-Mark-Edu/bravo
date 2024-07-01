@@ -12,7 +12,9 @@ import gleam/result
 /// The specific order of keys is based on the [Erlang documentation.](https://www.erlang.org/doc/system/expressions.html#term-comparisons)
 ///
 /// In order for a lookup match to occur, entries must _coerce into the
-/// same value_. Two values may match even if they have different types.
+/// same value_. Two values may match even if they have different types,
+/// although it should be noted this only becomes relevant when the `OSet`'s key
+/// type is set to `Dynamic`.
 pub opaque type OSet(k, v) {
   OSet(inner: master.InnerTable)
 }

@@ -13,7 +13,14 @@ pub opaque type USet(k, v) {
   USet(inner: master.InnerTable)
 }
 
-/// Creates a new table using default configuration options.
+/// Creates a new table using default configuration options. If maximizing
+/// performance is desired, instead use `from_spec` instead, as it allows for
+/// fine-tuning performance settings to specific use cases.
+///
+/// It should be noted that the type of the table is not defined at all by this
+/// function. This is intentional, as it allows a call to `insert` et al. to
+/// coerce the type automatically, so the user shouldn't have to think about
+/// type safety too much.
 ///
 /// # Parameters
 /// - `name name: String`
