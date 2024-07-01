@@ -380,26 +380,131 @@ pub fn file2tab(
   Ok(USet(res))
 }
 
-pub fn tab2list(with uset: USet(k, v)) -> Result(List(#(k, v)), BravoError) {
+/// Gets a list of all objects in a table.
+///
+/// # Parameters
+/// - `from uset: USet(k, v)`
+/// The table to get a list from.
+///
+/// # Returns
+/// - `Ok(List(#(k, v)))`
+/// The table's contents were read succesfully.
+/// - `Error(bravo.AccessDenied)`
+/// The table is private and the current process does not own it.
+/// - `Error(bravo.TableDoesNotExist)`
+/// The table given does not exist. Was it deleted?
+pub fn tab2list(from uset: USet(k, v)) -> Result(List(#(k, v)), BravoError) {
   master.tab2list(uset.inner)
 }
 
-pub fn member(with uset: USet(k, v), at key: a) -> Result(Bool, BravoError) {
+/// Returns whether a table contains any objects with a key. Similar to `lookup`
+/// except that it doesn't return any objects.
+///
+/// # Parameters
+/// - `of uset: USet(k, v)`
+/// The table to test for.
+/// - `at key: k`
+/// The key of the object being tested.
+///
+/// # Returns
+/// - `Ok(Bool)
+/// Whether or not the table contains an object with the given key.
+/// - `Error(bravo.AccessDenied)`
+/// The table is private and the current process does not own it.
+/// - `Error(bravo.TableDoesNotExist)`
+/// The table given does not exist. Was it deleted?
+pub fn member(of uset: USet(k, v), at key: k) -> Result(Bool, BravoError) {
   master.member(uset.inner, key)
 }
 
-pub fn first(with uset: USet(k, v)) -> Result(a, BravoError) {
+/// Gets the key of the first object in a table.
+///
+/// `USet`s are unordered, so there is no guarantee of order in the result.
+///
+/// # Parameters
+/// - `of uset: USet(k, v)`
+/// The table to get the first object of.
+///
+/// # Returns
+/// - `Ok(k)`
+/// There is at least one object in the table and the objects were read
+/// successfully.
+/// - `Error(bravo.EndOfTable)`
+/// The table is empty.
+/// - `Error(bravo.AccessDenied)`
+/// The table is private and the current process does not own it.
+/// - `Error(bravo.TableDoesNotExist)`
+/// The table given does not exist. Was it deleted?
+pub fn first(of uset: USet(k, v)) -> Result(k, BravoError) {
   master.first(uset.inner)
 }
 
-pub fn last(with uset: USet(k, v)) -> Result(a, BravoError) {
+/// Gets the key of the last object in a table.
+///
+/// `USet`s are unordered, so there is no guarantee of order in the result.
+///
+/// # Parameters
+/// - `of uset: USet(k, v)`
+/// The table to get the last object of.
+///
+/// # Returns
+/// - `Ok(k)`
+/// There is at least one object in the table and the objects were read
+/// successfully.
+/// - `Error(bravo.EndOfTable)`
+/// The table is empty.
+/// - `Error(bravo.AccessDenied)`
+/// The table is private and the current process does not own it.
+/// - `Error(bravo.TableDoesNotExist)`
+/// The table given does not exist. Was it deleted?
+pub fn last(of uset: USet(k, v)) -> Result(k, BravoError) {
   master.last(uset.inner)
 }
 
-pub fn next(with uset: USet(k, v), from key: a) -> Result(a, BravoError) {
+/// Given a key, get the next key after it in a table.
+///
+/// `USet`s are unordered, so there is no guarantee of order in the result.
+///
+/// # Parameters
+/// - `in uset: USet(k, v)`
+/// The table to get the next object in.
+/// - `from key: k`
+/// The key to look after.
+///
+/// # Returns
+/// - `Ok(k)`
+/// The given key is not the last key of the table and the objects were read
+/// successfully.
+/// - `Error(bravo.EndOfTable)`
+/// The given key is the last key of the table, or the table is empty.
+/// - `Error(bravo.AccessDenied)`
+/// The table is private and the current process does not own it.
+/// - `Error(bravo.TableDoesNotExist)`
+/// The table given does not exist. Was it deleted?
+pub fn next(in uset: USet(k, v), from key: k) -> Result(k, BravoError) {
   master.next(uset.inner, key)
 }
 
-pub fn prev(with uset: USet(k, v), from key: a) -> Result(a, BravoError) {
+/// Given a key, get the previous key before it in a table.
+///
+/// `USet`s are unordered, so there is no guarantee of order in the result.
+///
+/// # Parameters
+/// - `in uset: USet(k, v)`
+/// The table to get the previous key in.
+/// - `from key: k`
+/// The key to look before.
+///
+/// # Returns
+/// - `Ok(k)`
+/// The given key is not the first key of the table and the objects were read
+/// successfully.
+/// - `Error(bravo.EndOfTable)`
+/// The given key is the first key of the table, or the table is empty.
+/// - `Error(bravo.AccessDenied)`
+/// The table is private and the current process does not own it.
+/// - `Error(bravo.TableDoesNotExist)`
+/// The table given does not exist. Was it deleted?
+pub fn prev(in uset: USet(k, v), from key: k) -> Result(k, BravoError) {
   master.prev(uset.inner, key)
 }
