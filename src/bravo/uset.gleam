@@ -7,15 +7,16 @@ import gleam/dynamic.{type Dynamic}
 import gleam/result
 
 /// An unordered set. Keys may only occur once per table and are unordered.
-///
-/// In order for a match to occur, entries must have the same value _and type_.
 pub opaque type USet(k, v) {
   USet(inner: master.InnerTable)
 }
 
-/// Creates a new table using default configuration options. If maximizing
-/// performance is desired, instead use `from_spec` instead, as it allows for
-/// fine-tuning performance settings to specific use cases.
+/// Creates a new table using Erlang's default configuration options. These
+/// defaults are generally optimized for synchronous performance, as all async
+/// settings are disabled.
+///
+/// If maximizing performance is desired, instead use `from_spec` instead, as it
+/// allows for fine-tuning performance settings to specific use cases.
 ///
 /// It should be noted that the type of the table is not defined at all by this
 /// function. This is intentional, as it allows a call to `insert` et al. to

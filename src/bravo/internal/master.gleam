@@ -29,9 +29,6 @@ pub fn new(
       },
       new_options.NamedTable,
       new_options.Keypos(1),
-      new_options.WriteConcurrency(new_options.Auto),
-      new_options.ReadConcurrency(True),
-      new_options.DecentralizedCounters(True),
     ]),
   )
   let assert Ok(tid) = bindings.try_whereis(atom)
