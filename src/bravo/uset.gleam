@@ -6,8 +6,7 @@ import bravo/internal/new_options
 import gleam/dynamic.{type Dynamic}
 import gleam/result
 
-/// An unordered set. Keys may only occur once per table,
-/// and keys are unordered.
+/// An unordered set. Keys may only occur once per table and are unordered.
 ///
 /// In order for a match to occur, entries must have the same value _and type_.
 pub opaque type USet(k, v) {
@@ -346,8 +345,8 @@ pub fn tab2file(
 /// this function may be slow. If neither flag is set, then the "size of the
 /// table ... when the dump started" is compared to the number of objects
 /// written, which may result in issues if the table was written to during the
-/// original dump; avoid this by not verifying or setting on of the `tab2file`
-/// flags.
+/// original dump; avoid this by setting `verify` to false, or setting either
+/// `tab2file`'s `object_count` or `md5sum` flags to `true`.
 /// - `k key_decoder: fn(Dynamic) -> Result(k, _),
 ///   v value_decoder: fn(Dynamic) -> Result(v, _)`
 /// Used to ensure at runtime that the type of the table makes sense. The types
