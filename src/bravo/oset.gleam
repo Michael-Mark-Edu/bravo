@@ -231,7 +231,7 @@ pub fn take(from oset: OSet(k, v), at key: a) -> Result(v, BravoError) {
 /// if a new table with the same name is created.
 ///
 /// # Parameters
-/// - `from oset: OSet(k, v)`
+/// - `table oset: OSet(k, v)`
 /// The table to delete.
 ///
 /// # Returns
@@ -241,7 +241,7 @@ pub fn take(from oset: OSet(k, v), at key: a) -> Result(v, BravoError) {
 /// The table is protected or private and the current process does not own it.
 /// - `Error(bravo.TableDoesNotExist)`
 /// The table given does not exist. Was it deleted by a different `delete` call?
-pub fn delete(from oset: OSet(k, v)) -> Result(Nil, BravoError) {
+pub fn delete(table oset: OSet(k, v)) -> Result(Nil, BravoError) {
   master.delete(oset.inner)
 }
 
@@ -264,7 +264,7 @@ pub fn delete_key(from oset: OSet(k, v), at key: a) -> Result(Nil, BravoError) {
   master.delete_key(oset.inner, key)
 }
 
-/// Deletes all objects in a table.
+/// Deletes all objects from a table.
 ///
 /// # Parameters
 /// - `from oset: OSet(k, v)`

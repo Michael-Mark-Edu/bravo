@@ -223,7 +223,7 @@ pub fn take(from uset: USet(k, v), at key: k) -> Result(v, BravoError) {
 /// if a new table with the same name is created.
 ///
 /// # Parameters
-/// - `from uset: USet(k, v)`
+/// - `table uset: USet(k, v)`
 /// The table to delete.
 ///
 /// # Returns
@@ -233,7 +233,7 @@ pub fn take(from uset: USet(k, v), at key: k) -> Result(v, BravoError) {
 /// The table is protected or private and the current process does not own it.
 /// - `Error(bravo.TableDoesNotExist)`
 /// The table given does not exist. Was it deleted by a different `delete` call?
-pub fn delete(from uset: USet(k, v)) -> Result(Nil, BravoError) {
+pub fn delete(table uset: USet(k, v)) -> Result(Nil, BravoError) {
   master.delete(uset.inner)
 }
 
@@ -256,7 +256,7 @@ pub fn delete_key(from uset: USet(k, v), at key: k) -> Result(Nil, BravoError) {
   master.delete_key(uset.inner, key)
 }
 
-/// Deletes all objects in a table.
+/// Deletes all objects from a table.
 ///
 /// # Parameters
 /// - `from uset: USet(k, v)`
