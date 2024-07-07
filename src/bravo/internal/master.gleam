@@ -1,4 +1,5 @@
 import bravo.{type Access, type BravoError}
+import bravo/internal
 import bravo/internal/bindings
 import bravo/internal/new_options
 import gleam/bool
@@ -205,3 +206,40 @@ pub fn next(table: InnerTable, key: k) -> Result(k, BravoError) {
 pub fn prev(table: InnerTable, key: k) -> Result(k, BravoError) {
   bindings.try_prev(table.tid, table.atom, key)
 }
+// pub fn tabfile_info(filename: String) -> Result(bravo.TabfileInfo, BravoError) {
+//   use res <- result.try(
+//     bindings.try_tabfile_info(string.to_utf_codepoints(filename)),
+//   )
+//   Ok({
+//     use obj, point <- list.fold(
+//       res,
+//       bravo.TabfileInfo(
+//         "",
+//         bravo.Set,
+//         bravo.Protected,
+//         True,
+//         1,
+//         0,
+//         False,
+//         False,
+//         #(0, 0),
+//       ),
+//     )
+//     case point {
+//       internal.Name(field) ->
+//         bravo.TabfileInfo(..obj, name: atom.to_string(field))
+//       internal.Type(field) -> bravo.TabfileInfo(..obj, table_type: field)
+//       internal.Protection(field) -> bravo.TabfileInfo(..obj, protection: field)
+//       internal.NamedTable(field) -> bravo.TabfileInfo(..obj, named_table: field)
+//       internal.Keypos(field) -> bravo.TabfileInfo(..obj, keypos: field)
+//       internal.Size(field) -> bravo.TabfileInfo(..obj, size: field)
+//       internal.ExtendedInfo(field) ->
+//         bravo.TabfileInfo(
+//           ..obj,
+//           md5sum: list.contains(field, bravo.Md5sum),
+//           object_count: list.contains(field, bravo.ObjectCount),
+//         )
+//       internal.Version(field) -> bravo.TabfileInfo(..obj, version: field)
+//     }
+//   })
+// }

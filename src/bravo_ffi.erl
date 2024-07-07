@@ -4,7 +4,8 @@
          try_delete_object/3, try_file2tab/2, try_first/2, try_insert/4,
          try_insert_list/3, try_insert_new/4, try_insert_new_list/3, try_last/2,
          try_lookup/3, try_member/3, try_new/2, try_next/3, try_prev/3,
-         try_tab2file/5, try_tab2list/2, try_take/3, try_whereis/1]).
+         try_tab2file/5, try_tab2list/2, try_tabfile_info/1, try_take/3,
+         try_whereis/1]).
 
 get_error_type(Reason, Tid, Atom) ->
   case Reason of
@@ -166,4 +167,9 @@ try_whereis(Atom) ->
   case ets:whereis(Atom) of
     undefined -> {error, nil};
     Tid -> {ok, Tid}
+  end.
+
+try_tabfile_info(Filename) ->
+  try ets:tabfile_info(Filename)
+  catch _:Reason -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
   end.

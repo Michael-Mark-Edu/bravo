@@ -515,3 +515,6 @@ pub fn next(in uset: USet(k, v), from key: k) -> Result(k, BravoError) {
 pub fn prev(in uset: USet(k, v), from key: k) -> Result(k, BravoError) {
   master.prev(uset.inner, key)
 }
+// pub fn tabfile_info(at file: String) -> Result(bravo.TabfileInfo, BravoError) {
+//   master.tabfile_info(file)
+// }

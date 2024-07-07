@@ -1,7 +1,13 @@
 //// Contains types used by all modules in the Bravo package.
 
 import bravo/internal/new_options
+import gleam/bool
+import gleam/dynamic
+import gleam/erlang
 import gleam/erlang/atom
+import gleam/list
+import gleam/result
+import gleam/string
 
 /// The error type all Bravo functions use.
 pub type BravoError {
@@ -201,3 +207,71 @@ pub type WriteConcurrency {
   /// Like `On`, except with granularity optimizations that help in most cases.
   Auto
 }
+
+pub type TableType {
+  Set
+  OrderedSet
+  Bag
+  DuplicateBag
+}
+
+pub type ExtInfo {
+  Md5sum
+  ObjectCount
+}
+
+type TabfileInfoPoint {
+  Name(atom.Atom)
+  Type(TableType)
+  Protection(Access)
+  NamedTable(Bool)
+  Keypos(Int)
+  Size(Int)
+  ExtendedInfo(List(ExtInfo))
+  Version(#(Int, Int))
+}
+
+pub type TabfileInfo {
+  TabfileInfo(
+    name: String,
+    table_type: TableType,
+    protection: Access,
+    named_table: Bool,
+    keypos: Int,
+    size: Int,
+    md5sum: Bool,
+    object_count: Bool,
+    version: #(Int, Int),
+  )
+}
+
+@external(erlang, "bravo_ffi", "try_tabfile_info")
+fn try_tabfile_info(
+  filename: List(UtfCodepoint),
+) -> Result(List(TabfileInfoPoint), BravoError)
+
+pub fn tabfile_info(at file: String) -> Result(TabfileInfo, BravoError) {
+  use res <- result.try(try_tabfile_info(string.to_utf_codepoints(file)))
+  Ok({
+    use obj, point <- list.fold(
+      res,
+      TabfileInfo("", Set, Protected, True, 1, 0, False, False, #(0, 0)),
+    )
+    case point {
+      Name(field) -> TabfileInfo(..obj, name: atom.to_string(field))
+      Type(field) -> TabfileInfo(..obj, table_type: field)
+      Protection(field) -> TabfileInfo(..obj, protection: field)
+      NamedTable(field) -> TabfileInfo(..obj, named_table: field)
+      Keypos(field) -> TabfileInfo(..obj, keypos: field)
+      Size(field) -> TabfileInfo(..obj, size: field)
+      ExtendedInfo(field) ->
+        TabfileInfo(
+          ..obj,
+          md5sum: list.contains(field, Md5sum),
+          object_count: list.contains(field, ObjectCount),
+        )
+      Version(field) -> TabfileInfo(..obj, version: field)
+    }
+  })
+}
+

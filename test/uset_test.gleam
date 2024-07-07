@@ -2,6 +2,7 @@ import bravo
 import bravo/uset
 import gleam/dict
 import gleam/dynamic
+import gleam/io
 import gleam/list
 import gleam/otp/task
 import gleeunit/should
@@ -430,4 +431,22 @@ pub fn uset_spec_test() {
   |> should.be_ok
   uset.lookup(table3, "Hello")
   |> should.equal(Ok("World"))
+}
+
+pub fn uset_tabfile_info_test() {
+  let assert Ok(table) = uset.new("uset18", bravo.Public)
+  use <- defer(fn() { uset.delete(table) |> should.be_ok })
+  uset.insert(table, "Hello", "World")
+  |> should.be_ok
+  uset.tab2file(table, "uset18", False, True, True)
+  |> should.be_ok
+  let assert Ok(info) = bravo.tabfile_info("uset18")
+  info.name |> should.equal("uset18")
+  info.table_type |> should.equal(bravo.Set)
+  info.protection |> should.equal(bravo.Public)
+  info.named_table |> should.equal(True)
+  info.keypos |> should.equal(1)
+  info.size |> should.equal(1)
+  info.md5sum |> should.equal(True)
+  info.object_count |> should.equal(False)
 }

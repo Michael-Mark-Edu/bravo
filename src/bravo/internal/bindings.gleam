@@ -1,4 +1,5 @@
 import bravo.{type BravoError}
+import bravo/internal
 import bravo/internal/new_options
 import gleam/erlang.{type Reference}
 import gleam/erlang/atom.{type Atom}
