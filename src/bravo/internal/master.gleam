@@ -1,5 +1,4 @@
 import bravo.{type Access, type BravoError}
-import bravo/internal
 import bravo/internal/bindings
 import bravo/internal/new_options
 import gleam/bool
