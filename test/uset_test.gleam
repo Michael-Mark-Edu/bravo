@@ -440,6 +440,7 @@ pub fn uset_tabfile_info_test() {
   |> should.be_ok
   uset.tab2file(table, "uset18", False, True, True)
   |> should.be_ok
+  use <- defer(fn() { simplifile.delete("uset18") |> should.be_ok })
   let assert Ok(info) = bravo.tabfile_info("uset18")
   info.name |> should.equal("uset18")
   info.table_type |> should.equal(bravo.Set)
