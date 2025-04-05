@@ -2,7 +2,7 @@ import bravo.{type Access, type BravoError}
 import bravo/internal/bindings
 import bravo/internal/new_options
 import gleam/bool
-import gleam/dynamic.{type Dynamic}
+import gleam/dynamic/decode.{type Decoder}
 import gleam/erlang.{type Reference}
 import gleam/erlang/atom.{type Atom}
 import gleam/list
@@ -151,8 +151,8 @@ pub fn tab2file(
 pub fn file2tab(
   filename: String,
   verify: Bool,
-  key_decode: fn(Dynamic) -> Result(k, _),
-  value_decode: fn(Dynamic) -> Result(v, _),
+  key_decode: Decoder(k),
+  value_decode: Decoder(v),
 ) -> Result(InnerTable, BravoError) {
   use atom <- result.try(bindings.try_file2tab(
     string.to_utf_codepoints(filename),
@@ -165,11 +165,11 @@ pub fn file2tab(
       use object <- list.all(objects)
       let key =
         object.0
-        |> key_decode
+        |> decode.run(key_decode)
         |> result.is_ok
       let value =
         object.1
-        |> value_decode
+        |> decode.run(value_decode)
         |> result.is_ok
       bool.and(key, value)
     }

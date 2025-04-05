@@ -1,7 +1,7 @@
 import bravo
 import bravo/dbag
 import gleam/dict
-import gleam/dynamic
+import gleam/dynamic/decode
 import gleam/list
 import gleam/otp/task
 import gleeunit/should
@@ -159,16 +159,16 @@ pub fn dbag_tab2file_test() {
 
 pub fn dbag_file2tab_test() {
   let assert Ok(new_table) =
-    dbag.file2tab("dbag9", True, dynamic.string, dynamic.string)
+    dbag.file2tab("dbag9", True, decode.string, decode.string)
   dbag.lookup(new_table, "Hello")
   |> should.equal(Ok(["World"]))
   dbag.delete(new_table)
   |> should.be_ok
-  dbag.file2tab("dbag9", True, dynamic.int, dynamic.int)
+  dbag.file2tab("dbag9", True, decode.int, decode.int)
   |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("dbag9")
   |> should.be_ok
-  dbag.file2tab("no_access/dbag9", True, dynamic.string, dynamic.string)
+  dbag.file2tab("no_access/dbag9", True, decode.string, decode.string)
   |> should.equal(Error(bravo.FileDoesNotExist))
 }
 

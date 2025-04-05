@@ -3,7 +3,7 @@
 import bravo.{type Access, type BravoError}
 import bravo/internal/master
 import bravo/internal/new_options
-import gleam/dynamic.{type Dynamic}
+import gleam/dynamic/decode.{type Decoder}
 import gleam/result
 
 /// A bag table. Keys may occur multiple times per table, but exact key-value
@@ -360,8 +360,8 @@ pub fn tab2file(
 /// written, which may result in issues if the table was written to during the
 /// original dump; avoid this by setting `verify` to false, or setting either
 /// `tab2file`'s `object_count` or `md5sum` flags to `true`.
-/// - `k key_decoder: fn(Dynamic) -> Result(k, _),
-///   v value_decoder: fn(Dynamic) -> Result(v, _)`
+/// - `k key_decoder: Decoder(k),
+///   v value_decoder: Decoder(v)`
 /// Used to ensure at runtime that the type of the table makes sense. The types
 /// of the key and value are *not* stored in the file, so you must know what the
 /// types are supposed to be when calling this function through other means.
@@ -380,8 +380,8 @@ pub fn tab2file(
 pub fn file2tab(
   from filename: String,
   verify verify: Bool,
-  k key_decoder: fn(Dynamic) -> Result(k, _),
-  v value_decoder: fn(Dynamic) -> Result(v, _),
+  k key_decoder: Decoder(k),
+  v value_decoder: Decoder(v),
 ) -> Result(Bag(k, v), BravoError) {
   use res <- result.try(master.file2tab(
     filename,
