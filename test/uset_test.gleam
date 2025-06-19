@@ -1,12 +1,12 @@
 import bravo
 import bravo/uset
 import gleam/dict
-import gleam/dynamic
+import gleam/dynamic/decode
 import gleam/list
-import gleam/otp/task
 import gleeunit/should
 import shellout
 import simplifile
+import test_helpers
 
 fn defer(defer: fn() -> a, block: fn() -> b) -> b {
   let b = block()
@@ -153,16 +153,31 @@ pub fn uset_tab2file_test() {
 
 pub fn uset_file2tab_test() {
   let assert Ok(new_table) =
-    uset.file2tab("uset9", True, dynamic.string, dynamic.string)
+    uset.file2tab(
+      from: "uset9",
+      verify: True,
+      k: decode.run(_, decode.string),
+      v: decode.run(_, decode.string),
+    )
   uset.lookup(new_table, "Hello")
   |> should.equal(Ok("World"))
   uset.delete(new_table)
   |> should.be_ok
-  uset.file2tab("uset9", True, dynamic.int, dynamic.int)
+  uset.file2tab(
+    from: "uset9",
+    verify: True,
+    k: decode.run(_, decode.int),
+    v: decode.run(_, decode.int),
+  )
   |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("uset9")
   |> should.be_ok
-  uset.file2tab("no_access/uset9", True, dynamic.string, dynamic.string)
+  uset.file2tab(
+    from: "no_access/uset9",
+    verify: True,
+    k: decode.run(_, decode.string),
+    v: decode.run(_, decode.string),
+  )
   |> should.equal(Error(bravo.FileDoesNotExist))
 }
 
@@ -170,14 +185,12 @@ pub fn uset_access_test() {
   let assert Ok(table) = uset.new("uset10a", bravo.Protected)
   uset.insert(table, "Hello", "World")
   |> should.be_ok
-  {
-    use <- task.async
+  test_helpers.run_async(fn() {
     uset.lookup(table, "Hello")
     |> should.equal(Ok("World"))
     uset.insert(table, "Goodbye", "World")
     |> should.equal(Error(bravo.AccessDenied))
-  }
-  |> task.await_forever
+  })
 }
 
 pub fn uset_tab2list_orderedness_test() {

@@ -1,12 +1,12 @@
 import bravo
 import bravo/bag
 import gleam/dict
-import gleam/dynamic
+import gleam/dynamic/decode
 import gleam/list
-import gleam/otp/task
 import gleeunit/should
 import shellout
 import simplifile
+import test_helpers
 
 fn defer(defer: fn() -> a, block: fn() -> b) -> b {
   let b = block()
@@ -159,16 +159,31 @@ pub fn bag_tab2file_test() {
 
 pub fn bag_file2tab_test() {
   let assert Ok(new_table) =
-    bag.file2tab("bag9", True, dynamic.string, dynamic.string)
+    bag.file2tab(
+      from: "bag9",
+      verify: True,
+      k: decode.run(_, decode.string),
+      v: decode.run(_, decode.string),
+    )
   bag.lookup(new_table, "Hello")
   |> should.equal(Ok(["World"]))
   bag.delete(new_table)
   |> should.be_ok
-  bag.file2tab("bag9", True, dynamic.int, dynamic.int)
+  bag.file2tab(
+    from: "bag9",
+    verify: True,
+    k: decode.run(_, decode.int),
+    v: decode.run(_, decode.int),
+  )
   |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("bag9")
   |> should.be_ok
-  bag.file2tab("no_access/bag9", True, dynamic.string, dynamic.string)
+  bag.file2tab(
+    from: "no_access/bag9",
+    verify: True,
+    k: decode.run(_, decode.string),
+    v: decode.run(_, decode.string),
+  )
   |> should.equal(Error(bravo.FileDoesNotExist))
 }
 
@@ -176,14 +191,12 @@ pub fn bag_access_test() {
   let assert Ok(table) = bag.new("bag10", bravo.Protected)
   bag.insert(table, "Hello", "World")
   |> should.be_ok
-  {
-    use <- task.async
+  test_helpers.run_async(fn() {
     bag.lookup(table, "Hello")
     |> should.equal(Ok(["World"]))
     bag.insert(table, "Goodbye", "World")
     |> should.equal(Error(bravo.AccessDenied))
-  }
-  |> task.await_forever
+  })
 }
 
 pub fn bag_tab2list_orderedness_test() {
