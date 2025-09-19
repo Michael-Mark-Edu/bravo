@@ -2,7 +2,7 @@ import bravo
 import bravo/oset
 import gleam/dict
 import gleam/dynamic/decode
-import gleam/otp/task
+import gleam/erlang/process
 import gleeunit/should
 import shellout
 import simplifile
@@ -170,13 +170,12 @@ pub fn oset_access_test() {
   oset.insert(table, "Hello", "World")
   |> should.be_ok
   {
-    use <- task.async
+    use <- process.spawn
     oset.lookup(table, "Hello")
     |> should.equal(Ok("World"))
     oset.insert(table, "Goodbye", "World")
     |> should.equal(Error(bravo.AccessDenied))
   }
-  |> task.await_forever
 }
 
 pub fn oset_tab2list_orderedness_test() {

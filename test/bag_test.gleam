@@ -3,7 +3,7 @@ import bravo/bag
 import gleam/dict
 import gleam/dynamic/decode
 import gleam/list
-import gleam/otp/task
+import gleam/erlang/process
 import gleeunit/should
 import shellout
 import simplifile
@@ -177,13 +177,12 @@ pub fn bag_access_test() {
   bag.insert(table, "Hello", "World")
   |> should.be_ok
   {
-    use <- task.async
+    use <- process.spawn
     bag.lookup(table, "Hello")
     |> should.equal(Ok(["World"]))
     bag.insert(table, "Goodbye", "World")
     |> should.equal(Error(bravo.AccessDenied))
   }
-  |> task.await_forever
 }
 
 pub fn bag_tab2list_orderedness_test() {

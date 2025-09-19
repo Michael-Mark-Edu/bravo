@@ -3,7 +3,7 @@ import bravo/internal/bindings
 import bravo/internal/new_options
 import gleam/bool
 import gleam/dynamic/decode.{type Decoder}
-import gleam/erlang.{type Reference}
+import gleam/erlang/reference.{type Reference}
 import gleam/erlang/atom.{type Atom}
 import gleam/list
 import gleam/result
@@ -18,7 +18,7 @@ pub fn new(
   access: Access,
   ttype: new_options.NewOption,
 ) -> Result(InnerTable, BravoError) {
-  let atom = atom.create_from_string(name)
+  let atom = atom.create(name)
   use atom <- result.try(
     bindings.try_new(atom, [
       ttype,

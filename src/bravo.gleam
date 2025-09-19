@@ -70,7 +70,7 @@ pub type Spec {
 /// - `Spec`
 /// The created `Spec`.
 pub fn spec(name name: String) -> Spec {
-  Spec(atom.create_from_string(name), [])
+  Spec(atom.create(name), [])
 }
 
 /// Sets a `Spec`'s access control.

@@ -3,7 +3,7 @@ import bravo/uset
 import gleam/dict
 import gleam/dynamic/decode
 import gleam/list
-import gleam/otp/task
+import gleam/erlang/process
 import gleeunit/should
 import shellout
 import simplifile
@@ -171,13 +171,12 @@ pub fn uset_access_test() {
   uset.insert(table, "Hello", "World")
   |> should.be_ok
   {
-    use <- task.async
+    use <- process.spawn
     uset.lookup(table, "Hello")
     |> should.equal(Ok("World"))
     uset.insert(table, "Goodbye", "World")
     |> should.equal(Error(bravo.AccessDenied))
   }
-  |> task.await_forever
 }
 
 pub fn uset_tab2list_orderedness_test() {
