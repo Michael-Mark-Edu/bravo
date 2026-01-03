@@ -165,6 +165,8 @@ pub fn oset_file2tab_test() {
   |> should.be_ok
   oset.file2tab("no_access/oset9", True, decode.string, decode.string)
   |> should.equal(Error(bravo.FileDoesNotExist))
+  oset.file2tab("gleam.toml", True, decode.string, decode.string)
+  |> should.equal(Error(bravo.FileIsNotTable))
 }
 
 pub fn oset_access_test() {

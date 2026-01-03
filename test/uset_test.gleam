@@ -166,6 +166,8 @@ pub fn uset_file2tab_test() {
   |> should.be_ok
   uset.file2tab("no_access/uset9", True, decode.string, decode.string)
   |> should.equal(Error(bravo.FileDoesNotExist))
+  uset.file2tab("gleam.toml", True, decode.string, decode.string)
+  |> should.equal(Error(bravo.FileIsNotTable))
 }
 
 pub fn uset_access_test() {

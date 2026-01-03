@@ -172,6 +172,8 @@ pub fn dbag_file2tab_test() {
   |> should.be_ok
   dbag.file2tab("no_access/dbag9", True, decode.string, decode.string)
   |> should.equal(Error(bravo.FileDoesNotExist))
+  dbag.file2tab("gleam.toml", True, decode.string, decode.string)
+  |> should.equal(Error(bravo.FileIsNotTable))
 }
 
 pub fn dbag_access_test() {
