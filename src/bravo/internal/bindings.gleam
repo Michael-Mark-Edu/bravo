@@ -1,7 +1,7 @@
 import bravo.{type BravoError}
 import bravo/internal/new_options
-import gleam/erlang.{type Reference}
 import gleam/erlang/atom.{type Atom}
+import gleam/erlang/reference.{type Reference}
 
 @external(erlang, "bravo_ffi", "try_new")
 pub fn try_new(

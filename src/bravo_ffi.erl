@@ -124,8 +124,10 @@ try_file2tab(Filename, Verify) ->
   try ets:file2tab(Filename, [{verify, Verify}]) of
     {ok, Atom} -> {ok, Atom};
     {error, {read_error, {file_error, _, enoent}}} -> {error, file_does_not_exist};
+    {error, {read_error, {not_a_log_file, _}}} -> {error, file_is_not_table};
     {error, checksum_error} -> {error, checksum_error};
     {error, invalid_object_count} -> {error, invalid_object_count};
+    {error, cannot_create_table} -> {error, table_already_exists};
     {error, Reason} -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
   catch _:Reason -> {error, {erlang_error, atom_to_binary(Reason, utf8)}}
   end.

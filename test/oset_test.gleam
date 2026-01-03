@@ -1,8 +1,8 @@
 import bravo
 import bravo/oset
 import gleam/dict
-import gleam/dynamic
-import gleam/otp/task
+import gleam/dynamic/decode
+import gleam/erlang/process
 import gleeunit/should
 import shellout
 import simplifile
@@ -152,17 +152,21 @@ pub fn oset_tab2file_test() {
 
 pub fn oset_file2tab_test() {
   let assert Ok(new_table) =
-    oset.file2tab("oset9", True, dynamic.string, dynamic.string)
+    oset.file2tab("oset9", True, decode.string, decode.string)
   oset.lookup(new_table, "Hello")
   |> should.equal(Ok("World"))
+  oset.file2tab("oset9", True, decode.string, decode.string)
+  |> should.equal(Error(bravo.TableAlreadyExists))
   oset.delete(new_table)
   |> should.be_ok
-  oset.file2tab("oset9", True, dynamic.int, dynamic.int)
+  oset.file2tab("oset9", True, decode.int, decode.int)
   |> should.equal(Error(bravo.DecodeFailure))
   simplifile.delete("oset9")
   |> should.be_ok
-  oset.file2tab("no_access/oset9", True, dynamic.string, dynamic.string)
+  oset.file2tab("no_access/oset9", True, decode.string, decode.string)
   |> should.equal(Error(bravo.FileDoesNotExist))
+  oset.file2tab("gleam.toml", True, decode.string, decode.string)
+  |> should.equal(Error(bravo.FileIsNotTable))
 }
 
 pub fn oset_access_test() {
@@ -170,13 +174,12 @@ pub fn oset_access_test() {
   oset.insert(table, "Hello", "World")
   |> should.be_ok
   {
-    use <- task.async
+    use <- process.spawn
     oset.lookup(table, "Hello")
     |> should.equal(Ok("World"))
     oset.insert(table, "Goodbye", "World")
     |> should.equal(Error(bravo.AccessDenied))
   }
-  |> task.await_forever
 }
 
 pub fn oset_tab2list_orderedness_test() {
