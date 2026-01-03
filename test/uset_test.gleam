@@ -156,6 +156,8 @@ pub fn uset_file2tab_test() {
     uset.file2tab("uset9", True, decode.string, decode.string)
   uset.lookup(new_table, "Hello")
   |> should.equal(Ok("World"))
+  uset.file2tab("uset9", True, decode.string, decode.string)
+  |> should.equal(Error(bravo.TableAlreadyExists))
   uset.delete(new_table)
   |> should.be_ok
   uset.file2tab("uset9", True, decode.int, decode.int)

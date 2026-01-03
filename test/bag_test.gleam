@@ -162,6 +162,8 @@ pub fn bag_file2tab_test() {
     bag.file2tab("bag9", True, decode.string, decode.string)
   bag.lookup(new_table, "Hello")
   |> should.equal(Ok(["World"]))
+  bag.file2tab("bag9", True, decode.string, decode.string)
+  |> should.equal(Error(bravo.TableAlreadyExists))
   bag.delete(new_table)
   |> should.be_ok
   bag.file2tab("bag9", True, decode.int, decode.int)

@@ -155,6 +155,8 @@ pub fn oset_file2tab_test() {
     oset.file2tab("oset9", True, decode.string, decode.string)
   oset.lookup(new_table, "Hello")
   |> should.equal(Ok("World"))
+  oset.file2tab("oset9", True, decode.string, decode.string)
+  |> should.equal(Error(bravo.TableAlreadyExists))
   oset.delete(new_table)
   |> should.be_ok
   oset.file2tab("oset9", True, decode.int, decode.int)
