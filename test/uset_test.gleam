@@ -2,8 +2,8 @@ import bravo
 import bravo/uset
 import gleam/dict
 import gleam/dynamic/decode
-import gleam/list
 import gleam/erlang/process
+import gleam/list
 import gleeunit/should
 import shellout
 import simplifile

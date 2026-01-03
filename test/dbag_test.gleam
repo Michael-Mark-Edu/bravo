@@ -2,9 +2,9 @@ import bravo
 import bravo/dbag
 import gleam/dict
 import gleam/dynamic/decode
+import gleam/erlang/process
 import gleam/list
 import gleeunit/should
-import gleam/erlang/process
 import shellout
 import simplifile
 

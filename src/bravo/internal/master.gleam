@@ -3,8 +3,8 @@ import bravo/internal/bindings
 import bravo/internal/new_options
 import gleam/bool
 import gleam/dynamic/decode.{type Decoder}
-import gleam/erlang/reference.{type Reference}
 import gleam/erlang/atom.{type Atom}
+import gleam/erlang/reference.{type Reference}
 import gleam/list
 import gleam/result
 import gleam/string

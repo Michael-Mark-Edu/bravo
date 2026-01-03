@@ -87,17 +87,14 @@ pub fn spec(name name: String) -> Spec {
 /// - `Spec`
 /// The modified `Spec`.
 pub fn access(spec spec: Spec, opt opt: Access) -> Spec {
-  Spec(
-    ..spec,
-    opts: [
-      case opt {
-        Public -> new_options.Public
-        Protected -> new_options.Protected
-        Private -> new_options.Private
-      },
-      ..spec.opts
-    ],
-  )
+  Spec(..spec, opts: [
+    case opt {
+      Public -> new_options.Public
+      Protected -> new_options.Protected
+      Private -> new_options.Private
+    },
+    ..spec.opts
+  ])
 }
 
 /// Sets a `Spec`'s write concurrency flag. ///
