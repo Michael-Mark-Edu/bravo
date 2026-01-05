@@ -47,7 +47,7 @@ pub fn main() {
   // a USet (an alias for "set" in Erlang terms)
   let assert Ok(table) = uset.new("MyTable", bravo.Public)
 
-  // We can then insert tuples into this table
+  // We can then insert key-value pairs into this table
   let assert Ok(Nil) = uset.insert(table, "Hello", "world!")
 
   // Then we can lookup the value from the table using the key
